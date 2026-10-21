@@ -1,0 +1,13 @@
+/* Concept diagrams shared by task and episode pages. */
+function drawing(id='T11', compact=false){
+ const t=task(id); const c=group(t.group).color;
+ const art=t.group==='navigate'?`<path d="M90 220V70h160v65h130V75h150v165H350v-55H200v55Z"/><path class="art-path" d="M110 202h70v-80h115v40h100v40h100" stroke="${c}"/><circle cx="110" cy="202" r="6" fill="${c}"/><circle cx="495" cy="202" r="9"/>`
+ :t.group==='construct'?`<path d="M160 215V100l145-58 145 58v115l-145 60Z M160 100l145 60 145-60 M305 160v115 M230 130v115 M380 130v115 M160 158l145 60 145-60"/><path class="art-path" d="M230 130v115l75 30" stroke="${c}"/><path d="m465 102 55-22v115l-55 22Z"/>`
+ :t.group==='dexterity'?`<path d="M235 247v-75l-32-54q-8-18 5-24t23 8l33 48v-91q0-23 15-23t15 23v77-105q0-20 15-20t15 20v108-89q0-20 15-20t15 20v104-60q0-19 15-19t15 19v109l-32 49Z"/><path class="art-path" d="m185 140 220-25" stroke="${c}"/><circle cx="309" cy="128" r="36" stroke-dasharray="3 6"/>`
+ :t.id==='T11'?`<path d="M290 58h234v171H290Z M300 68h214v151H300Z M355 229v32m110-32v32 M78 264h128 M120 264v-39h44v39 M145 224v-74l61-43 72 30 34-23"/><circle cx="145" cy="150" r="13"/><circle cx="206" cy="107" r="12"/><circle cx="278" cy="137" r="9"/><path d="m312 114 18-11"/><path class="art-path" d="M341 102h20v18h-20v20h24m17-38v38m0-38h20v38m18-38v38m-79 20h22m18 0h19m20 0h22m-102 18h60" stroke="${c}"/>`
+ :`<path d="M85 245h440 M130 245v-40h40v40 M150 205v-70l65-48 65 45 27 29 M450 245v-40h-40v40 M430 205v-70l-65-48-65 45-16 27"/><circle cx="150" cy="135" r="12"/><circle cx="215" cy="87" r="11"/><circle cx="280" cy="132" r="9"/><circle cx="430" cy="135" r="12"/><circle cx="365" cy="87" r="11"/><circle cx="300" cy="132" r="9"/><path class="art-path" d="m285 173 25-16 19 24-25 16Z" stroke="${c}"/>`;
+ return `<svg class="technical-art ${compact?'compact':''}" viewBox="0 0 610 300" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path class="art-grid" d="M40 50H570M40 100H570M40 150H570M40 200H570M40 250H570M100 25V280M200 25V280M300 25V280M400 25V280M500 25V280"/>${art}<path stroke-width="1" d="M50 40h12m-6-6v12 M550 260h12m-6-6v12"/></svg>`;
+}
+
+function media(id, extra='') {const t=task(id); return `<div class="media-slot ${extra}" style="--task-color:${group(t.group).color}"><div class="slot-top"><span>${t.id} / ${esc(t.robot)}</span><span>VIDEO TO COME</span></div>${drawing(id)}<div class="slot-bottom"><span class="slot-cross" aria-hidden="true">+</span><div><span class="mono">${t.en.toUpperCase()}</span><p>${t.name}</p></div><button class="slot-button" data-task="${t.id}" aria-label="查看${t.name}视频拍摄需求">查看镜头需求 ${arrow}</button></div><p class="diagram-note">概念示意 · 非实验画面</p></div>`;}
+

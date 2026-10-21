@@ -1,24 +1,24 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="AI4Robot — 从代码到物理结果。探索面向通用大模型与编码智能体的 22 项具身能力任务。">
-  <meta name="theme-color" content="#f5f3ed">
-  <title>AI4Robot — Code meets the physical world</title>
-  <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="lab.css">
-  <script defer src="tasks.js"></script>
-  <script defer src="results.js"></script>
-  <script defer src="lab.js"></script>
-  <script defer src="app.js"></script>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <meta name="description" content="用22项具身任务检验大模型从代码到物理结果的能力。">
+ <meta name="theme-color" content="#f5f3ed">
+ <title>AI4Robot — Code meets the physical world</title>
+ <link rel="icon" href="data:,">
+ <link rel="stylesheet" href="styles.css">
+ <link rel="stylesheet" href="lab.css">
+ <link rel="stylesheet" href="site.css">
+ <script defer src="tasks.js"></script>
+<script defer src="site.js"></script>
+<script defer src="illustrations.js"></script>
+<script defer src="app.js"></script>
 </head>
-<body>
-  <a class="skip-link" href="#main">跳转至内容</a>
-  <div id="app"></div>
-  <dialog id="dossier" aria-labelledby="dialog-title"><div id="dialog-content"></div></dialog>
-  <aside id="prototype-switcher" aria-label="Demo 设计方向"></aside>
-  <noscript>此交互原型需要启用 JavaScript。视频拍摄需求也可以在 VIDEO-BRIEF.md 中阅读。</noscript>
+<body data-page="home">
+ <a class="skip-link" href="#main">跳转至内容</a>
+ <div id="app"></div>
+ <dialog id="dossier" aria-labelledby="dialog-title"><div id="dialog-content"></div></dialog>
+ <noscript>此交互网站需要启用 JavaScript。<a href="VIDEO-BRIEF.md">阅读拍摄清单</a>。</noscript>
 </body>
 </html>
