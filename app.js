@@ -10,8 +10,29 @@ const task = id => TASKS.find(t=>t.id===id);
 const group = id => GROUPS.find(g=>g.id===id);
 const arrow = '<span aria-hidden="true">↗</span>';
 const esc = value => String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let cleanupNavigation=()=>{};
+function initNavigation(){
+ cleanupNavigation();const nav=$('#primary-nav'),toggle=$('.nav-toggle'),header=$('.site-header');
+ let frame=0;
+ const close=()=>{nav.classList.remove('is-open');toggle.setAttribute('aria-expanded','false');};
+ toggle.addEventListener('click',()=>{const open=toggle.getAttribute('aria-expanded')!=='true';toggle.setAttribute('aria-expanded',String(open));nav.classList.toggle('is-open',open);});
+ nav.addEventListener('click',e=>{const link=e.target.closest('a');if(!link)return;close();const target=$(link.hash);if(target){target.setAttribute('tabindex','-1');target.focus({preventScroll:true});}});
+ const update=()=>{
+  frame=0;const marker=header.getBoundingClientRect().bottom+42;
+  const section=['explore','research','method'].map(id=>$(`#${id}`)).find(el=>{const r=el.getBoundingClientRect();return r.top<=marker&&r.bottom>marker;});
+  const tab=$('[data-lab-tab][aria-pressed=true]')?.dataset.labTab;
+  $$('#primary-nav a').forEach(a=>{const match=section&&a.hash===`#${section.id}`&&(!a.dataset.labGo||tab===a.dataset.labGo);if(match)a.setAttribute('aria-current','location');else a.removeAttribute('aria-current');});
+ };
+ const schedule=()=>{if(!frame)frame=requestAnimationFrame(update);};
+ header.addEventListener('keydown',e=>{if(e.key==='Escape'){close();toggle.focus();}});
+ window.addEventListener('scroll',schedule,{passive:true});
+ window.addEventListener('resize',schedule);
+ document.addEventListener('labviewchange',schedule);
+ cleanupNavigation=()=>{cancelAnimationFrame(frame);window.removeEventListener('scroll',schedule);window.removeEventListener('resize',schedule);document.removeEventListener('labviewchange',schedule);};
+ schedule();
+}
 
-function header(){return `<header class="site-header"><a class="brand" href="#" aria-label="AI4Robot 首页"><span class="brand-mark" aria-hidden="true">a<span>4</span>r</span>AI4Robot<span class="brand-sub">RESEARCH PROJECT</span></a><nav aria-label="主导航"><a href="#explore">任务图谱 <span>22</span></a><a href="#method">评测方式</a><a href="#evidence">过程与结果</a><button class="nav-resource" data-action="resources">研究资料 ${arrow}</button></nav></header>`;}
+function header(){return `<header class="site-header"><a class="brand" href="#main" aria-label="AI4Robot 首页"><span class="brand-mark" aria-hidden="true">a<span>4</span>r</span>AI4Robot<span class="brand-sub">RESEARCH PROJECT</span></a><button class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">菜单 <span aria-hidden="true">☰</span></button><nav id="primary-nav" aria-label="主导航"><a href="#explore">任务图谱 <span>22</span></a><a href="#research" data-lab-go="board">排行榜</a><a href="#research" data-lab-go="compare">模型对比</a><a href="#research" data-lab-go="episodes">回合浏览</a><a href="#research" data-lab-go="run">运行配置</a><a href="#method">评测方式</a><a href="#research" data-lab-go="about">参与与资料</a></nav></header>`;}
 
 function drawing(id='T11', compact=false){
  const t=task(id); const c=group(t.group).color;
@@ -61,14 +82,15 @@ function mediaSection(){return `<section id="media-plan" class="media-plan secti
  ['可核查的完整回合','重点任务各一条','保留未剪辑原视频、任务版本与判定记录；宣传短片能追溯到完整证据。']
  ].map(([title,duration,desc])=>`<article><div><h3>${title}</h3><span class="mono">${duration}</span></div><p>${desc}</p></article>`).join('')}</div></section>`;}
 
-function footer(){return `<footer class="site-footer"><div><a class="brand" href="#">AI4Robot<span class="footer-cross" aria-hidden="true">↗</span></a><p>从代码，到物理结果。</p></div><div class="footer-right"><button class="text-link" data-action="resources">研究资料 ${arrow}</button><span>DESIGN DEMO · 2026</span><p>仅展示任务定义与视频策划；正式成绩、论文与作者信息待接入。</p></div></footer>`;}
+function footer(){return `<footer class="site-footer"><div><a class="brand" href="#">AI4Robot<span class="footer-cross" aria-hidden="true">↗</span></a><p>从代码，到物理结果。</p></div><div class="footer-right"><button class="text-link" data-action="resources">研究资料 ${arrow}</button><span>DESIGN DEMO · 2026</span><p>交互原型 · 示例数据为合成；正式报告、论文与作者信息待接入。</p></div></footer>`;}
 
-function desk(){return `<div class="desk-layout"><aside class="desk-sidebar"><p class="eyebrow">OBSERVATION DESK</p><h1 id="hero-title">把每次行动，<br>放到显微镜下。</h1><p>22 项任务。<br>目标、动作与结果，一起看。</p><a href="#explore" class="desk-side-link">任务索引 <span>22</span></a><a href="#evidence" class="desk-side-link">过程与结果 ${arrow}</a><a href="#method" class="desk-side-link">评测方式 <span>03</span></a><button class="desk-side-link" data-action="media">素材需求 ${arrow}</button><div class="desk-side-bottom"><span>PROJECT / AI4ROBOT</span><p>基于任务定义的交互档案<br>实测记录待接入</p></div></aside><div class="desk-main"><div class="desk-intro"><span>RESEARCH WORKSPACE</span><p>任务档案 / 物理能力的 22 个观察窗口</p></div>${explorer()}${evidence()}${method()}${mediaSection()}</div></div>`;}
+function desk(){return `<div class="desk-layout"><aside class="desk-sidebar"><p class="eyebrow">OBSERVATION DESK</p><h1 id="hero-title">把每次行动，<br>放到显微镜下。</h1><p>22 项任务。<br>目标、动作与结果，一起看。</p><a href="#explore" class="desk-side-link">任务索引 <span>22</span></a><a href="#research" class="desk-side-link" data-lab-go="board">排行榜 ${arrow}</a><a href="#evidence" class="desk-side-link">过程与结果 ${arrow}</a><a href="#method" class="desk-side-link">评测方式 <span>03</span></a><button class="desk-side-link" data-action="media">素材需求 ${arrow}</button><div class="desk-side-bottom"><span>PROJECT / AI4ROBOT</span><p>基于任务定义的交互档案<br>实测记录待接入</p></div></aside><div class="desk-main"><div class="desk-intro"><span>RESEARCH WORKSPACE</span><p>任务档案 / 物理能力的 22 个观察窗口</p></div>${explorer()}${Lab.html()}${evidence()}${method()}${mediaSection()}</div></div>`;}
 
 function render(){
+ Lab.stop();
  document.body.dataset.variant=state.variant;
- $('#app').innerHTML=`${header()}<main id="main">${state.variant==='A'?heroA()+explorer()+method()+evidence()+mediaSection():state.variant==='B'?heroB()+method()+explorer()+evidence()+mediaSection():desk()}</main>${footer()}`;
- collection();detail();updateBeat();syncFilters();renderSwitcher();
+ $('#app').innerHTML=`${header()}<main id="main">${state.variant==='A'?heroA()+explorer()+Lab.html()+method()+evidence()+mediaSection():state.variant==='B'?heroB()+method()+Lab.html()+explorer()+evidence()+mediaSection():desk()}</main>${footer()}`;
+ collection();detail();updateBeat();syncFilters();renderSwitcher();Lab.mount();initNavigation();
 }
 function syncFilters(){$$('[data-group]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.group===state.group)));$$('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===state.view)));}
 function renderSwitcher(){
@@ -99,7 +121,7 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('input',e=>{if(e.target.id==='task-search'){state.search=e.target.value;collection();}});
 document.addEventListener('keydown',e=>{
- if($('#dossier').open||e.target.closest('input,textarea,select,button,a,[contenteditable=true]'))return;
+ if($('#dossier').open||e.target.closest('input,textarea,select,button,a,video,summary,[tabindex],[contenteditable=true]'))return;
  if(e.key==='ArrowLeft'){e.preventDefault();cycle(-1);}
  if(e.key==='ArrowRight'){e.preventDefault();cycle(1);}
 });

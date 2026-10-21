@@ -10,7 +10,7 @@ Open index.html directly, or run the following in PowerShell if the browser bloc
 
     python -m http.server 4173 --bind 127.0.0.1
 
-Run this in the directory containing index.html, then visit http://127.0.0.1:4173/. In the original research workspace, run from its root and visit /website-prototype/. Choose a direction with ?variant=A, ?variant=B, or ?variant=C; use the desktop floating switcher, mobile footer switcher or left/right keys. The switcher works locally and on GitHub Pages. The demo has no external media or runtime packages.
+Run this in the directory containing index.html, then visit http://127.0.0.1:4173/. In the original research workspace, run from its root and visit /website-prototype/. Choose a direction with ?variant=A, ?variant=B, or ?variant=C; use the footer switcher or left/right keys. The switcher works locally and on GitHub Pages. A permanent top navigation provides access to tasks and research tools. The demo has no external media or runtime packages.
 
 ## Directions
 
@@ -18,7 +18,15 @@ Run this in the directory containing index.html, then visit http://127.0.0.1:417
 - B: long-form story that links three physical-world questions to representative tasks.
 - C: dark observation workspace with a left index and task-focused work area.
 
-Filtering, search, atlas/list views, task dossiers, a four-beat storyboard, protocol and video-brief dialogs are interactive. Visual frames are original CSS/SVG concept diagrams, not experiment footage. Model comparisons have no results data.
+Filtering, search, atlas/list views, task dossiers, a four-beat storyboard, protocol and video-brief dialogs are interactive. Visual frames are original CSS/SVG concept diagrams, not experiment footage. Model comparisons have no published measured data; the separate example mode uses synthetic values.
+
+## Research tools
+
+Six panels provide sortable/filterable rankings, up to three-model comparison, a task-by-model matrix, episode event browsing with optional local video, existing-CLI command generation, and participation/resources. Default official results are empty. Select “加载交互示例” to try synthetic values; real models are never assigned fabricated scores. Reports and videos remain in the current browser session.
+
+Use ?lab=board&data=demo#research to open the example leaderboard. Reports, tasks, comparison/matrix CSV, episode JSON and run configuration can be downloaded. JSON report import validates structure, ranges, references and episode consistency. See FEATURES.md for the reference-function comparison, reporting format and metric definitions.
+
+Run the meaningful data checks with `node --test tests/results.test.cjs` (no dependencies required).
 
 See DESIGN-NOTES.md for comparative research and the concept. See VIDEO-BRIEF.md for footage requirements and what the shots should show.
 
