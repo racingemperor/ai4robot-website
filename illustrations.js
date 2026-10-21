@@ -10,4 +10,3 @@ function drawing(id='T11', compact=false){
 }
 
 function media(id, extra='') {const t=task(id); return `<div class="media-slot ${extra}" style="--task-color:${group(t.group).color}"><div class="slot-top"><span>${t.id} / ${esc(t.robot)}</span><span>VIDEO TO COME</span></div>${drawing(id)}<div class="slot-bottom"><span class="slot-cross" aria-hidden="true">+</span><div><span class="mono">${t.en.toUpperCase()}</span><p>${t.name}</p></div><button class="slot-button" data-task="${t.id}" aria-label="查看${t.name}视频拍摄需求">查看镜头需求 ${arrow}</button></div><p class="diagram-note">概念示意 · 非实验画面</p></div>`;}
-
