@@ -1,47 +1,37 @@
-# AI4Robot 网站：设计与页面结构
+# Website design and content architecture
 
-## 设计判断
+## Research story
 
-使用纸白、墨色、锈红和技术线稿，主叙事是“从代码到物理结果”。首页从精密接触、具身控制和可交互重建三个具体问题引入研究。所有画面是概念示意，真实视频暂不接入。
+The site asks whether a general-purpose language model or coding agent can turn an instruction into a physical outcome. The home page establishes the question, lets visitors inspect the program-submission and direct-policy routes, and uses T06 to explain why visible progress can still fail the full instruction.
 
-原先的研究地图、叙事长卷、观察台是三种设计提案，不是三类研究内容，容易造成“每页没有区别”的感受，已全部移除。正式采用一个视觉系统与十个独立文档，不再把所有功能塞进一张长页。
+The visual language is paper, dark ink and rust red, with editorial typography and original technical SVG diagrams. Diagrams are labeled concept illustrations. No external experimental media is embedded.
 
-## 与参考站的关系
+## Distinct pages
 
-参考 RoboDojo 的任务展示、结果与过程追溯，以及 EFE 的任务目录、榜单、运行和参与入口。没有复制原站品牌、布局或素材，也不声称功能与两站完全相同。
+The task atlas describes what is tested. Method describes how the test is controlled. Leaderboard ranks complete reports, Compare shows capability differences on common tasks, Matrix exposes per-task gaps, and Episodes inspects evidence in time. Run generates commands; Resources explains access and reporting; Media plan specifies future evidence. All have real document URLs and their own H1.
 
-2026-10-21 通过 REA 观察 EFE 导航 `/leaderboard/`、`/suites/`、`/tasks/`、`/run/`、`/blogs/`、`/contribute/`；实际点击 leaderboard/tasks/run 观察到新文档请求，各自独立 URL、title、H1，后退返回正常。因此本站也采用文档导航，而非首页锚点或伪装成页面的内容切换。
+The header is fixed with mobile navigation. The four result pages share a secondary navigation because they are complementary views of one report. Cross-page links carry relevant task/model/source filters only. Legacy lab bookmarks redirect to the corresponding document.
 
-参考机制可以用普通静态链接实现：每个入口对应一个 HTML 文档，共享页头与样式。本站使用 `.html` 路径，兼容 GitHub Pages 仓库子目录；无需 SPA 重写、路由服务或构建工具。当前页使用 `aria-current="page"`。
+## Three separate concepts
 
-## 十页各司其职
+- Evaluation categories: manipulation (14), navigation (3), training (2), construction (3).
+- Delivery modes: control program (17), training code/weights (2), scene/motion artifact (3).
+- Capability facets: objects/contact, dexterity, body/control, spatial reasoning, world construction.
 
-| 页面 | 独特内容与交互 |
-|---|---|
-| 首页 | 研究问题、代表任务、阅读路径；不挂榜单或筛选工作台 |
-| 任务 | 22节点图谱/目录、分组搜索、任务档案、目标与判据 |
-| 排行榜 | 模型排名、区间、覆盖、指标排序、搜索与CSV |
-| 模型对比 | 最多3模型选择、共同覆盖任务、五类能力条形图 |
-| 任务矩阵 | 逐任务×模型热图与缺失项，格内链接相关回合 |
-| 回合 | 回合列表、状态筛选、事件定位、时间轴、本机视频 |
-| 方法 | 交付物、四步评测过程、统计定义与有效边界 |
-| 运行 | CLI表单、参数检查、命令复制与配置JSON |
-| 资料 | 报告模板、提交/反馈、FAQ、更新与网页引用 |
-| 拍摄 | 四类素材、T11分镜、同场景对照规范与22任务镜头 |
+These are separate axes. T12 includes a mobile base but is evaluated as manipulation. T11 submits a control program and belongs to manipulation, not policy training.
 
-榜单/对比/矩阵/回合共享一个真实链接组成的结果导航，方便逐层追溯。数据来源与适用筛选通过 URL 传递；模型与任务深链只携带目标页需要的上下文。每页主体只挂载自己的模块。
+## Sources and research maturity
 
-## 代码边界
+The research README, docs/TASKS.md, docs/AGENT_EVAL.md and task designs were reviewed on October 23, 2026. The project Notion notebook supplies task motivation and references. GitHub defines the current implementation; the user explicitly selected its crowd-navigation definition for T23 over the notebook's trajectory-collection alternative.
 
-- `site.js`：页面注册、固定导航/手机菜单、页头页脚、通用档案弹窗。
-- `app.js`：首页、任务、方法和拍摄的内容函数，按文档挂载一个。
-- `lab.js`：研究工具视图与事件，按文档挂载一个，不负责全站路由。
-- `results.js`：报告校验、汇总统计、CSV；与导航分离。
-- `tasks.js`：22项任务元数据；`illustrations.js`：概念图。
-- `styles.css`/`lab.css`：基础与研究组件；`site.css`：文档结构与响应式布局。
+The catalog states implementation limits: pre-segmented cutting, a single rotating cube layer, initial single-knot tying, standing G1 scope, frozen Go2 navigation and separately trained locomotion. Direct-policy support currently covers the ARX tools; replay checks exist for T02/T06/T19. None of these facts implies a completed 22-task model evaluation.
 
-## 状态与内容约束
+T06 outcome examples explain documented judge rules (0, approximately 60, 70 and 100), not observed model performance. References may use privileged state and are always distinct from evaluated agents.
 
-正式结果默认为空；合成示例明确标注，不给 Codex、Claude 编造分数。报告只在当前标签页 sessionStorage 保存并重新校验，界面可清除，不上传；本机视频仅当前页内存。共享 URL 不携带本机数据。
+## Reference websites
 
-T18排除；T04注明切割近似，T11要求接触/笔迹/归位证据，T23注明行人资产。论文、作者与正式名称待确认。拍摄需求见 VIDEO-BRIEF.md。
+Earlier public-page observations of RoboDojo and Embodied First Exam informed the independent task/results/method/reproduction page roles. This site does not copy their branding, media or distinctive visual presentation. It uses an atlas, a scoring case study and linked evidence tools to express this research's structure.
+
+## Accessibility and responsive behavior
+
+English metadata, lang=en, one H1 per document, sequential heading hierarchy, a skip link, labeled native controls, visible focus, aria-current navigation and reduced-motion support. Filter and selection state has textual labels and pressed states. Data tables scroll within labeled regions. Small screens use a menu and stacked narrative sections; the fixed header has matching document inset.

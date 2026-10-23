@@ -1,48 +1,45 @@
-# AI4Robot website demo
+# AI4Robot research website
 
 Live: https://racingemperor.github.io/ai4robot-website/
 
-A static research website with **10 separate documents**, based on 22 task definitions. T18 is excluded. Navigation loads a new document with its own URL, title and content; browser back, refresh and open-in-new-tab work without server routing or a framework.
+An English static research website with ten independent documents, a fixed header and 22 task dossiers. T18 is excluded. Research sources: https://github.com/ALEXander22568/AI4Robot and the project Notion notebook linked from Resources. Current task definitions follow GitHub; the user confirmed T23 is navigation among people.
 
-## Pages
+## Documents
 
-| Document | Responsibility |
+| Page | Purpose |
 |---|---|
-| index.html | Research introduction and representative questions |
-| tasks.html | 22-task atlas, search, directory and dossiers |
-| leaderboard.html | Rankings, statistics, coverage and exports |
-| compare.html | Up to three models, shared-task capability comparison |
-| matrix.html | Task × model results, links to relevant episodes |
-| episodes.html | Episode directory, events, timeline and local video |
-| method.html | Evaluation procedure, deliverables, metrics and boundaries |
-| run.html | Existing research CLI command configurator |
-| about.html | Report template, participation, FAQ, updates and citation |
-| footage.html | Filming brief, storyboard and per-task shot requirements |
+| index.html | Research question, interactive evaluation routes, T06 scoring case and four categories |
+| tasks.html | Category/capability filters, atlas/list, search, task scope and evidence requirements |
+| leaderboard.html | Balanced success, pooled success/intervals, progress, coverage and exports |
+| compare.html | Up to three models and common-task capability profiles |
+| matrix.html | Task/model outcomes and links to episode evidence |
+| episodes.html | Events, filters, timeline, local video and episode export |
+| method.html | Routes, information boundary, hidden evaluation and reporting rules |
+| run.html | Current development CLI and supported direct-policy evaluation commands |
+| about.html | Research sources, release status, reporting tools, contributions and FAQ |
+| footage.html | Video formats, T06 storyboard and all task shot lists |
 
-The fixed header and results navigation use real document links. The former three-direction switcher and six-tool panel switching have been removed. Old `?lab=board&data=demo#research` bookmarks redirect to their corresponding documents.
+Navigation uses document links, with independent titles and browser back/reload support. No framework, build or package installation is required.
 
-## Run and check
+## Serve and verify
 
-No build or package installation is required. Serve the directory containing these files:
+From this directory:
 
-    python -m http.server 4173 --bind 127.0.0.1
-
-Visit http://127.0.0.1:4173/. When serving from the research workspace root, use `/website-prototype/`.
-
+    python -m http.server 4174 --bind 127.0.0.1
     node --test tests/results.test.cjs
 
-Example leaderboard: `leaderboard.html?data=demo`. Official results are empty until reviewed reports are published. Synthetic values never assign scores to real models. CSS/SVG drawings are concept diagrams, not experiment footage.
+Open http://127.0.0.1:4174/. When serving the workspace root instead, use /website-prototype/.
 
-## Data and privacy
+## Data contract
 
-Validated imported reports are stored in **sessionStorage for the current tab**, enabling cross-page browsing and refresh. They remain local and unreviewed, can be cleared, and are not uploaded or included in shared URLs. Stored reports are validated again when a document loads. If browser storage is blocked/full, import remains usable on the current page and the interface explains the limitation. Local video is held only in the episode page's memory; leaving or refreshing requires reattachment.
+Official results are empty until reviewed reports are connected. Synthetic examples use generic names and never assign scores to real models. Imports are validated, local, unreviewed and stored in this tab's sessionStorage; a storage failure falls back to page memory. Video is page-memory only. Shared URLs contain view parameters, not file contents.
 
-`tasks.js` defines the task catalog. `results.js` owns validation/statistics. `site.js` owns shared navigation, document shell and dialogs. `app.js` mounts only the current information page; `lab.js` mounts only the current research tool. `illustrations.js` contains the concept diagrams.
+Scoring follows the current research plan: average task rates within each category, then average categories. Pooled success and its Wilson interval are separate. See FEATURES.md for the normalized report format and limitations.
 
-See FEATURES.md for reporting/metrics, DESIGN-NOTES.md for the page architecture and reference evidence, and VIDEO-BRIEF.md for filming requirements.
+The site does not execute robot commands or request provider credentials. Its run configurator covers check/solve/play and direct-policy eval for T02/T06/T19. Other tasks have varying readiness. Program submission and direct-policy evaluation must retain distinct protocol labels.
 
-## Publish
+## Modules and publication
 
-Repository: https://github.com/racingemperor/ai4robot-website
+site.js owns navigation and shared dialogs; app.js owns narrative pages; lab.js owns result/configuration tools; tasks.js owns the reviewed task catalog; results.js owns validation and aggregation; illustrations.js owns original SVG concept diagrams.
 
-GitHub Pages serves the root of `codex/website-publication`; `.nojekyll` enables direct static serving. Push website files to update. Robot code, experiments, progress records and credentials are outside this repository's scope.
+Publish only this website directory to the website repository. GitHub Pages serves the root of codex/website-publication. Research source code, operational setup, credentials and progress records are outside publication scope. See DESIGN-NOTES.md and VIDEO-BRIEF.md.

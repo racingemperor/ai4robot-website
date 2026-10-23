@@ -13,14 +13,23 @@ const clone=value=>JSON.parse(JSON.stringify(value));
 test('official data has no fabricated model scores; examples cover all 22 tasks',()=>{
   assert.equal(R.official.results.length,0);assert.equal(R.official.models.length,0);
   const d=R.validate(R.demo);assert.equal(d.results.length,88);assert.equal(d.episodes.length,88);
-  assert.ok(d.models.every(m=>m.name.startsWith('示例模型')));
+  assert.ok(d.models.every(m=>m.name.startsWith('Example model')));
 });
-test('aggregate metrics weight by trials and report an interval',()=>{
-  const data={models:[{id:'a'}],results:[{model_id:'a',task_id:'T01',trials:2,successes:1,progress_sum:1.5,duration_sum_s:30},{model_id:'a',task_id:'T02',trials:8,successes:2,progress_sum:4,duration_sum_s:120}]};
-  const row=R.summarize(data,['T01','T02'])[0];
-  assert.equal(row.score,.3);assert.equal(row.progress,.55);assert.equal(row.duration,15);assert.equal(row.complete,true);assert.ok(row.ci[0]<.3&&row.ci[1]>.3);
-  const partial=R.summarize(data,['T01','T02','T03'])[0];assert.equal(partial.complete,false);assert.equal(partial.coverage,2);assert.equal(partial.score,.3);
+test('category-balanced metrics differ from pooled trials and do not hide missing categories',()=>{
+  const result=(task,trials,successes,progress)=>({model_id:'a',task_id:task,trials,successes,progress_sum:progress,duration_sum_s:trials*15});
+  const data={models:[{id:'a'}],results:[result('T01',2,1,1.5),result('T02',8,2,4),result('T21',10,10,10),result('T16',5,0,1),result('T14',5,5,5)]};
+  const row=R.summarize(data,['T01','T02','T21','T16','T14'])[0];
+  assert.equal(row.score,(.375+1+0+1)/4);
+  assert.equal(row.progress,(.625+1+.2+1)/4);
+  assert.equal(row.pooled,18/30);assert.equal(row.duration,15);assert.equal(row.complete,true);assert.ok(row.ci[0]<row.pooled&&row.ci[1]>row.pooled);
+  const partial=R.summarize(data,['T01','T02','T03'])[0];assert.equal(partial.complete,false);assert.equal(partial.coverage,2);assert.equal(partial.score,.375);
+  assert.equal(R.summarize(data,['T01','T17'])[0].score,null);
   assert.equal(R.summarize(data,[])[0].score,null);
+});
+test('catalog preserves the confirmed scope, four categories and latest embodiments',()=>{
+  const ts=context.TASKS;assert.equal(ts.length,22);assert.ok(!ts.some(t=>t.id==='T18'));
+  assert.deepEqual(['manipulation','navigation','training','construction'].map(c=>ts.filter(t=>t.category===c).length),[14,3,2,3]);
+  assert.equal(ts.find(t=>t.id==='T11').track,'A');assert.equal(ts.find(t=>t.id==='T21').robot,'Unitree Go2');assert.equal(ts.find(t=>t.id==='T03').robot,'Franka Panda');
 });
 test('reject duplicate, excluded, malformed or contradictory results',()=>{
   const changes=[d=>d.results.push(d.results[0]),d=>d.results[0].task_id='T18',d=>d.results[0].successes=11,d=>d.results[0].trials=1.5,d=>d.results[0].duration_sum_s=NaN,d=>d.models[0].id='bad"id',d=>d.results[0].progress_sum=-1,d=>d.environment='real'];

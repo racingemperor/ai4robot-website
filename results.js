@@ -2,7 +2,7 @@
 window.Results = (() => {
   const version = 'preview-v1';
   const official = {schema_version:1,benchmark_version:version,protocol:'preview-v1 / simulation / fixed-interface',environment:'simulation',models:[],results:[],episodes:[]};
-  const demoModels = ['A','B','C','D'].map((n,i)=>({id:`example-${n.toLowerCase()}`,name:`示例模型 ${n}`,version:'synthetic-v1',agent:['示例编码智能体','示例视觉智能体','示例编码智能体','示例基线'][i]}));
+  const demoModels = ['A','B','C','D'].map((n,i)=>({id:`example-${n.toLowerCase()}`,name:`Example model ${n}`,version:'synthetic-v1',agent:['Synthetic coding agent','Synthetic visual agent','Synthetic coding agent','Synthetic baseline'][i]}));
   const demo = {...official,models:demoModels,results:[],episodes:[]};
   demoModels.forEach((m,mi)=>TASKS.forEach((t,ti)=>{
     const successes = Math.max(0,Math.min(10,9-mi-((ti*3+mi*2)%6)));
@@ -10,60 +10,67 @@ window.Results = (() => {
     const duration = 35+ti*7+mi*11;
     demo.results.push({model_id:m.id,task_id:t.id,trials:10,successes,progress_sum:Number(progress.toFixed(3)),duration_sum_s:duration*10});
     const success=successes>=5;
-    const texts=[`初态与任务：${t.goal}`,`允许的观测：相机与本体状态。`,`关键动作：${t.beats[1]}。`,`${success?'完成':'未完成'}的示例终态；实际判据：${t.proof}`];
-    demo.episodes.push({id:`example-${mi+1}-${t.id.toLowerCase()}`,model_id:m.id,task_id:t.id,status:success?'success':'failure',duration_s:duration,seed:0,layout:0,events:texts.map((text,i)=>({time_s:Math.round(duration*i/3),type:['任务','观测','动作','判定'][i],text}))});
+    const texts=[`Initial state and goal: ${t.goal}`,`Allowed observation: cameras and measured body state.`,`Key action: ${t.beats[1]}.`,`${success?'Success':'Failure'} synthetic outcome; actual criterion: ${t.proof}`];
+    demo.episodes.push({id:`example-${mi+1}-${t.id.toLowerCase()}`,model_id:m.id,task_id:t.id,status:success?'success':'failure',duration_s:duration,seed:0,layout:0,events:texts.map((text,i)=>({time_s:Math.round(duration*i/3),type:['Goal','Observation','Action','Judgment'][i],text}))});
   }));
   function validate(raw){
     const fail=m=>{throw new Error(m);};
-    if(!raw||typeof raw!=='object'||Array.isArray(raw))fail('报告必须是 JSON 对象。');
-    if(raw.schema_version!==1)fail('schema_version 必须为 1。');
-    const str=(v,label,max=160)=>{if(typeof v!=='string'||!v.trim()||v.length>max||/[\u0000-\u001f]/.test(v))fail(`${label} 必须是 1–${max} 字符的文本。`);return v;};
-    const num=(v,label,min=0,max=1e12)=>{if(typeof v!=='number'||!Number.isFinite(v)||v<min||v>max)fail(`${label} 超出有效范围。`);return v;};
-    const integer=(v,label,min=0,max=1000000)=>{num(v,label,min,max);if(!Number.isInteger(v))fail(`${label} 必须为整数。`);return v;};
-    if(raw.environment!=='simulation')fail('当前报告仅支持 simulation，不能混合真实与仿真结果。');
+    if(!raw||typeof raw!=='object'||Array.isArray(raw))fail('The report must be a JSON object.');
+    if(raw.schema_version!==1)fail('schema_version must be 1.');
+    const str=(v,label,max=160)=>{if(typeof v!=='string'||!v.trim()||v.length>max||/[\u0000-\u001f]/.test(v))fail(`${label} must contain 1–${max} text characters.`);return v;};
+    const num=(v,label,min=0,max=1e12)=>{if(typeof v!=='number'||!Number.isFinite(v)||v<min||v>max)fail(`${label} is outside its valid range.`);return v;};
+    const integer=(v,label,min=0,max=1000000)=>{num(v,label,min,max);if(!Number.isInteger(v))fail(`${label} must be an integer.`);return v;};
+    if(raw.environment!=='simulation')fail('Only simulation reports are supported; physical and simulated results cannot be mixed.');
     const clean={schema_version:1,benchmark_version:str(raw.benchmark_version,'benchmark_version'),protocol:str(raw.protocol,'protocol'),environment:'simulation',models:[],results:[],episodes:[]};
-    if(!Array.isArray(raw.models)||!raw.models.length||raw.models.length>30)fail('models 需要包含 1–30 个模型。');
+    if(!Array.isArray(raw.models)||!raw.models.length||raw.models.length>30)fail('models must contain 1–30 models.');
     const modelIds=new Set(),pairs=new Set(),episodeIds=new Set();
     for(const m of raw.models){
-      if(!m||typeof m!=='object')fail('模型定义无效。');
-      const id=str(m.id,'model.id',64);if(!/^[a-zA-Z0-9_-]+$/.test(id)||modelIds.has(id))fail('模型 ID 只能含字母、数字、横线或下划线，且必须唯一。');modelIds.add(id);
+      if(!m||typeof m!=='object')fail('Invalid model definition.');
+      const id=str(m.id,'model.id',64);if(!/^[a-zA-Z0-9_-]+$/.test(id)||modelIds.has(id))fail('Model IDs must be unique and use only letters, digits, hyphens or underscores.');modelIds.add(id);
       clean.models.push({id,name:str(m.name,'model.name',80),version:str(m.version,'model.version',80),agent:str(m.agent,'model.agent',80)});
     }
-    if(!Array.isArray(raw.results)||raw.results.length>660)fail('results 应为最多 660 条的数组。');
+    if(!Array.isArray(raw.results)||raw.results.length>660)fail('results must be an array of at most 660 aggregates.');
     for(const r of raw.results){
-      if(!r||!modelIds.has(r.model_id)||!TASKS.some(t=>t.id===r.task_id))fail('结果引用了未知模型或任务（不接受 T18）。');
-      const key=`${r.model_id}/${r.task_id}`;if(pairs.has(key))fail(`重复结果：${key}。请先合并回合统计。`);pairs.add(key);
+      if(!r||!modelIds.has(r.model_id)||!TASKS.some(t=>t.id===r.task_id))fail('A result references an unknown model or task; T18 is excluded.');
+      const key=`${r.model_id}/${r.task_id}`;if(pairs.has(key))fail(`Duplicate result: ${key}. Combine trial aggregates first.`);pairs.add(key);
       const trials=integer(r.trials,'trials',1),successes=integer(r.successes,'successes',0,trials);
       clean.results.push({model_id:r.model_id,task_id:r.task_id,trials,successes,progress_sum:num(r.progress_sum,'progress_sum',successes,trials),duration_sum_s:num(r.duration_sum_s,'duration_sum_s')});
     }
-    if(raw.episodes!==undefined&&!Array.isArray(raw.episodes))fail('episodes 必须为数组。');
-    if((raw.episodes||[]).length>500)fail('一次最多导入 500 条回合。');
+    if(raw.episodes!==undefined&&!Array.isArray(raw.episodes))fail('episodes must be an array.');
+    if((raw.episodes||[]).length>500)fail('Import at most 500 episodes.');
     const seenCounts=new Map();
     for(const e of raw.episodes||[]){
-      if(!e||!modelIds.has(e.model_id)||!TASKS.some(t=>t.id===e.task_id))fail('回合引用了未知模型或任务。');
-      const id=str(e.id,'episode.id',100);if(episodeIds.has(id))fail('回合 ID 重复。');episodeIds.add(id);
-      if(!pairs.has(`${e.model_id}/${e.task_id}`))fail('回合必须关联一条汇总结果。');
-      if(!['success','failure','incomplete'].includes(e.status))fail('回合状态必须为 success、failure 或 incomplete。');
+      if(!e||!modelIds.has(e.model_id)||!TASKS.some(t=>t.id===e.task_id))fail('An episode references an unknown model or task.');
+      const id=str(e.id,'episode.id',100);if(episodeIds.has(id))fail('Duplicate episode ID.');episodeIds.add(id);
+      if(!pairs.has(`${e.model_id}/${e.task_id}`))fail('Each episode must reference an aggregate result.');
+      if(!['success','failure','incomplete'].includes(e.status))fail('Episode status must be success, failure or incomplete.');
       const pairKey=`${e.model_id}/${e.task_id}`,aggregate=clean.results.find(r=>r.model_id===e.model_id&&r.task_id===e.task_id);
       const count=seenCounts.get(pairKey)||{total:0,success:0};count.total++;if(e.status==='success')count.success++;seenCounts.set(pairKey,count);
-      if(count.total>aggregate.trials||count.success>aggregate.successes||count.total-count.success>aggregate.trials-aggregate.successes)fail('回合数量或结果状态与对应汇总不一致。');
+      if(count.total>aggregate.trials||count.success>aggregate.successes||count.total-count.success>aggregate.trials-aggregate.successes)fail('Episode counts or outcomes contradict their aggregate.');
       const duration=num(e.duration_s,'duration_s',0.001,10000000);
-      if(!Array.isArray(e.events)||!e.events.length||e.events.length>200)fail('每回合需要 1–200 条事件。');
+      if(!Array.isArray(e.events)||!e.events.length||e.events.length>200)fail('Each episode requires 1–200 events.');
       let previous=-1;
-      const events=e.events.map(event=>{if(!event)fail('事件无效。');const time=num(event.time_s,'event.time_s',0,duration);if(time<previous)fail('事件时间须递增且位于回合时长内。');previous=time;return {time_s:time,type:str(event.type,'event.type',30),text:str(event.text,'event.text',1000)};});
+      const events=e.events.map(event=>{if(!event)fail('Invalid event.');const time=num(event.time_s,'event.time_s',0,duration);if(time<previous)fail('Event times must be ordered and within the episode duration.');previous=time;return {time_s:time,type:str(event.type,'event.type',30),text:str(event.text,'event.text',1000)};});
       clean.episodes.push({id,model_id:e.model_id,task_id:e.task_id,status:e.status,duration_s:duration,seed:integer(e.seed,'seed'),layout:integer(e.layout,'layout'),events});
     }
     return clean;
   }
   function summarize(data,ids){
+    const taskIds=[...new Set(ids)].filter(id=>TASKS.some(t=>t.id===id));
+    const categories=[...new Set(taskIds.map(id=>TASKS.find(t=>t.id===id).category))];
+    const mean=values=>values.length?values.reduce((a,b)=>a+b,0)/values.length:null;
     return data.models.map(model=>{
-      const rows=data.results.filter(r=>r.model_id===model.id&&ids.includes(r.task_id));
+      const rows=data.results.filter(r=>r.model_id===model.id&&taskIds.includes(r.task_id));
       const trials=rows.reduce((n,r)=>n+r.trials,0),successes=rows.reduce((n,r)=>n+r.successes,0);
-      const score=trials?successes/trials:null,coverage=rows.length;
+      const pooled=trials?successes/trials:null,coverage=rows.length;
+      const categoryRows=categories.map(c=>rows.filter(r=>TASKS.find(t=>t.id===r.task_id).category===c));
+      const hasCategories=categoryRows.length>0&&categoryRows.every(rs=>rs.length>0);
+      const score=hasCategories?mean(categoryRows.map(rs=>mean(rs.map(r=>r.successes/r.trials)))):null;
+      const progress=hasCategories?mean(categoryRows.map(rs=>mean(rs.map(r=>r.progress_sum/r.trials)))):null;
       const z=1.96,den=trials?1+z*z/trials:1;
-      const center=trials?(score+z*z/(2*trials))/den:0;
-      const margin=trials?z*Math.sqrt(score*(1-score)/trials+z*z/(4*trials*trials))/den:0;
-      return {...model,trials,successes,score,coverage,complete:ids.length>0&&coverage===ids.length,progress:trials?rows.reduce((n,r)=>n+r.progress_sum,0)/trials:null,duration:trials?rows.reduce((n,r)=>n+r.duration_sum_s,0)/trials:null,ci:trials?[center-margin,center+margin]:null};
+      const center=trials?(pooled+z*z/(2*trials))/den:0;
+      const margin=trials?z*Math.sqrt(pooled*(1-pooled)/trials+z*z/(4*trials*trials))/den:0;
+      return {...model,trials,successes,score,pooled,coverage,complete:taskIds.length>0&&coverage===taskIds.length,progress,duration:trials?rows.reduce((n,r)=>n+r.duration_sum_s,0)/trials:null,ci:trials?[center-margin,center+margin]:null};
     });
   }
   function csv(rows){return '\uFEFF'+rows.map(row=>row.map(v=>{let value=String(v??'');if(typeof v==='string'&&/^[=+\-@\t\r]/.test(value))value="'"+value;return '"'+value.replaceAll('"','""')+'"';}).join(',')).join('\r\n');}

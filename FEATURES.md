@@ -1,86 +1,79 @@
-# AI4Robot 网站功能与数据接口
+# Tools and report format
 
-## 功能范围
+## Available tools
 
-对照依据为 2026-10-21 对 RoboDojo 与 Embodied First Exam 首页的 DOM/公开脚本观察；表格表示覆盖的产品能力，不声称穷尽两站所有页面或功能。
+- Ten independent pages with a fixed navigation and mobile menu.
+- Twenty-two task dossiers with evaluation category, capability facets, embodiment, deliverable, current scope and filming requirements.
+- Home route switch and interactive T06 judge examples.
+- Leaderboard with sorting, model search, category/delivery/capability/embodiment filters, coverage and exports.
+- Up to three-model comparison on common capability-task coverage.
+- Numeric task/model matrix linked to matching episode records.
+- Episode filters, events, seeking, playback speed, local video and JSON export.
+- Existing check/solve/play and bounded direct-policy eval command configuration.
+- Local report validation, session-tab persistence, clear control and storage fallback.
+- CSV/JSON downloads, shareable view links, research sources, FAQ and website citation.
+- Video production formats, T06 storyboard and per-task shot lists.
 
-| 能力 | 本站实现 | 当前边界 |
-|---|---|---|
-| 常驻导航 | 固定顶部栏、移动菜单、独立文档链接与当前页高亮 | 桌面与手机均可用 |
-| 宣传与代表任务 | 独立研究首页、代表问题与概念图 | 实验媒体待提供 |
-| 任务探索 | 22项地图/目录、分组、搜索、详情、逐任务镜头 | T18不在范围 |
-| 排行榜 | 成功率/进度/时长/回合数/覆盖排序、模型搜索 | 正式报告尚未发布 |
-| 榜单筛选 | 任务形态、能力、本体、报告协议隔离 | 当前仅仿真，真实机器人结果需独立协议 |
-| 数据说明 | 加权指标、Wilson区间、覆盖不足不排名、来源标记 | 协议最终口径待冻结 |
-| 模型对比 | 最多3模型、分组条形图、共同任务覆盖 | 使用同一报告内的数据 |
-| 任务结果矩阵 | 任务×模型数值热图、缺失项、点击到回合 | 不使用旋转球体 |
-| 回合浏览 | 任务/模型/状态筛选、事件时间轴、定位、倍速与JSON | 合成示例不是仿真轨迹 |
-| 视频播放 | 本机视频附加、播放器与时间定位 | 不上传，需与回合同一时钟 |
-| 快速开始 | 仓库现有check/solve/play命令配置、复制与JSON | 不编造通用模型评测CLI |
-| 报告导入 | JSON校验、单报告替换、本机未审核状态 | 无后台自动认证或公开上传 |
-| 数据下载 | 当前汇总CSV、矩阵CSV、对比CSV、报告/回合/任务JSON | 每份结果导出保留来源与协议 |
-| 分享 | 当前页面、示例模式、筛选、排序、模型和回合URL | 本机文件不随URL分享 |
-| 参与与文档 | 报告模板、PR/反馈入口、FAQ、项目更新、网页引用 | 论文/作者/研究代码公开链接待确认 |
-| 视频策划 | 四类素材、22项镜头与完整回合要求 | 无外部媒体或未经验证的成绩 |
+These cover the main research-site capabilities observed in earlier public-page reviews of RoboDojo and Embodied First Exam. They are not an exhaustive claim about those websites.
 
-## 页面职责与跨页工作流
+## Research scope
 
-首页只介绍研究；任务页只浏览任务；榜单、对比、矩阵、回合各自独立。方法页解释协议，运行页生成命令，资料页负责参与与报告，拍摄页展示镜头策划。共享导航不意味着重复挂载全部功能；所有链接均为相对文档路径，适配Pages仓库子路径。
+Four categories: manipulation 14, navigation 3, training 2, construction 3. T18 is excluded. Task scope follows the research repository snapshot reviewed October 23, 2026; T23 is navigation among people. Current implementation and future targets are identified per task.
 
-榜单的“对比”进入compare.html并携带模型；矩阵单元格进入episodes.html并携带任务/模型；任务档案链接到指定任务的运行配置与回合。结果页面间保留数据来源与适用筛选。旧首页?lab=参数迁移至对应文档；?variant不再切换布局。
+## Result provenance
 
-## 正式结果、示例和导入
+The default official report contains no models or scores. The synthetic walkthrough contains four generic example models, 88 aggregates and 88 episodes. It is not evidence about actual models.
 
-默认是正式结果空状态，不能把空状态写成模型分数为零。点击「加载交互示例」使用4个明确命名的合成模型、88项汇总与88条事件示例。没有给 Codex、Claude 或其他真实模型编造结果。
+Only one report is active at a time. Imports replace the report and remain local and unreviewed. Known synthetic provenance persists through navigation and report export. Reports are revalidated on sessionStorage reload. No video URLs are accepted from imported reports; local attached video is held only in page memory. Files and provider credentials are not uploaded.
 
-校验后的导入报告保存在当前标签页的 sessionStorage，跨页与刷新可继续使用；读取时重新校验，可主动清除，关闭标签页后结束本次使用。浏览器存储禁用或容量不足时降级到当前页内存并提示。已知合成来源标记跨页保留。视频仅当前回合页内存有效，离开或刷新后重新附加。报告不是自动上传，不构成认证。每次导入替换整份报告，不混合不同协议或媒体。文件上限5MB，最多30模型、660项汇总、500回合，每回合200事件。文本按白名单字段校验并转义，不加载报告内的URL或执行内容。
+Limits: 5 MB per import, 30 models, 660 aggregates, 500 episodes and 200 events per episode. Only allowlisted fields survive validation. Text is escaped before display, CSV strings guard spreadsheet formula execution, and reports do not execute code.
 
-## JSON 报告格式 v1
+## Website report schema v1
 
-下载页面的模板填写。以下是字段示意（没有真实模型结果）：
+This format is separate from the research CLI's summary.json. Convert research aggregates explicitly; the website does not automatically certify experiment authenticity or protocol comparability.
 
 ```json
 {
   "schema_version": 1,
-  "benchmark_version": "preview-v1",
-  "protocol": "填写冻结的任务/场景/接口/评分协议版本",
+  "benchmark_version": "your-frozen-release",
+  "protocol": "your-frozen-route-interface-budget-and-judge-version",
   "environment": "simulation",
   "models": [
-    {"id": "your-model", "name": "填写名称", "version": "填写精确模型版本", "agent": "填写agent及harness版本"}
+    {"id": "your-model", "name": "Model name", "version": "Exact version", "agent": "Exact agent and harness version"}
   ],
   "results": [],
   "episodes": []
 }
 ```
 
-results每条记录必须包含model_id、task_id、trials（正整数）、successes（0至trials）、progress_sum（successes至trials）、duration_sum_s（非负仿真秒数）。同模型同任务只允许一条汇总；多seed/layout先在外部合并。进度归一化至0–1，成功回合的进度为1。
+Each result: model_id, task_id, trials (positive integer), successes (0 to trials), progress_sum (successes to trials), duration_sum_s (nonnegative simulation seconds). Normalize each task's 0–100 progress to 0–1 before summing. A successful trial has progress 1. Merge multiple seeds/layouts outside the website into one aggregate per model/task. Include all valid outcomes; rerun infrastructure-invalid trials rather than silently counting them as robot failures.
 
-episodes每条包含唯一id、model_id、task_id、status（success/failure/incomplete）、duration_s（正数）、seed/layout（非负整数）及events。每个事件包含time_s、type、text；时间顺序非递减，范围不超过回合时长。回合必须关联一条汇总结果，数量及状态不能超过对应汇总；公开演示回合可能只是汇总中的子集，不能从演示回合重新估算总体成功率。
+Each episode: unique id, model_id, task_id, status (success/failure/incomplete), positive duration_s, nonnegative integer seed/layout and events. Each event has time_s, type and text. Times are ordered and within the duration. Episode outcomes must be consistent with the corresponding aggregate. Displayed episodes may be a subset; do not infer population success from selected videos.
 
-同一报告的benchmark_version、protocol、environment覆盖所有模型；模型相关的harness差异必须写明，只有兼容且冻结的协议才应提交在同一报告。导入校验能检查结构和范围，无法自动证明实验真实或协议可比。
+Use one frozen benchmark/protocol/environment for all models in a report. Do not combine program submission, direct-policy and privileged solver runs under one protocol. Current imports support simulation only.
 
-## 指标口径
+## Metrics
 
-- 成功率 = successes总和 / trials总和，是回合加权，不是逐任务宏平均。
-- 平均进度 = progress_sum总和 / trials总和。
-- 平均时长 = duration_sum_s总和 / trials总和，包括成功、失败与未完成回合。
-- 只有当前任务子集完整覆盖才给名次；缺失不补零。不完整覆盖单列在完整模型之后。
-- 默认成功率高到低；可切换排序，平均时长默认低到高。同值并列名次。
-- 95%区间为二项Wilson区间，不涵盖任务/seed相关性或模型采样不确定性的全部来源。
-- 分组对比使用所选模型共同覆盖任务；概览卡片显示各自覆盖，勿跨不同覆盖范围直接下结论。
+1. Per task: successes / trials; normalized progress_sum / trials.
+2. Per category: average the available task values equally.
+3. Balanced score and progress: average represented selected categories equally. Progress is displayed in points out of 100.
+4. A selected category with no data makes the balanced summary unavailable. Partial task coverage is labeled and receives no rank. Missing tasks are never zero-filled.
+5. Pooled success is separately total successes / total trials. Its Wilson 95% interval is not an interval for the balanced score and does not model task/seed correlations.
+6. Mean simulation time is total simulation seconds / valid trials, including unsuccessful outcomes. Wall time and model latency are different measures.
+7. Complete coverage sorts first. The selected metric controls ranking, with ties sharing rank; mean time sorts ascending by default.
+8. Capability bars use only tasks covered by every selected model; summary cards show individual coverage. Do not treat different coverage as directly comparable.
 
-## 运行配置
+CSV success fields are fractions, progress_0_100 is points, and duration_s is simulation seconds. Exports retain source and protocol.
 
-界面依据研究仓库cli.py生成现有命令，不在网页执行：
+## CLI configuration
 
-- check使用第一个seed与全部layout。
-- solve使用全部seed×layout，可选--video head；具体本体必须存在该相机。
-- play使用第一个seed和第一个layout。
+- check: first seed, all selected layouts.
+- solve: all seeds × layouts, optional --video head.
+- play: first seed and layout.
+- eval: all seeds × layouts, explicit GPU, vlm/null/replay agent; this UI enables T02/T06/T19. mock exercises the pipeline offline. null/replay are controls, not model performance.
 
-这些是开发、自检和参考解入口，不是正式模型评测。运行前需要已有代码/环境权限和可用任务实现。下载JSON的字段反映实际生效的参数。
+Defaults: seed 0 and layouts 0,1,2. Commands are generated as text, never executed by the website. Model identifiers are restricted and shell-quoted. Agent/model controls are disabled when irrelevant. Downloaded configurations contain the effective mode parameters.
 
-## 发布与检查
+## Verification
 
-独立静态文件，无构建和依赖安装。Pages从codex/website-publication根目录发布。结果数据逻辑测试：`node --test tests/results.test.cjs`。正式发布前还需浏览器验证10个独立文档的导航/直达/刷新/返回、跨页导入/下载、视频时钟、URL恢复和响应式布局。
-
-后续正式数据由维护者审核后填入results.js的official，或改为版本化公开JSON读取。原始回合媒体与报告必须先核对授权和版本，再接入公共页面。
+Run node --test tests/results.test.cjs and syntax-check all six JS files. Validate desktop/mobile document navigation, category filters, task details, score/progress displays, exports, import/reload/clear, direct-policy guards and video controls. Publish only the website allowlist; verify Pages files after deployment.
