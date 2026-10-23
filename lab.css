@@ -66,7 +66,7 @@ main,section[id],#task-detail{scroll-margin-top: 20px;}
 .capability-bars{display: grid; grid-template-columns: 1fr 1fr; gap: 12px 40px;}
 .capability-bars article{border-top: 1px solid var(--line); padding: 21px 0px;}
 .capability-bars article > div:first-child{display: flex; justify-content: space-between; gap: 10px; align-items: center; margin-bottom: 22px;}
-.capability-bars h4{font-size: 14px; font-weight: 500;}
+.capability-bars h3{font-size: 14px; font-weight: 500;}
 .capability-bars article > div > span{font-size: 10px; color: var(--muted);}
 .capability-row{display: grid; grid-template-columns: 92px 1fr 50px; gap: 12px; align-items: center; margin-top: 17px; font-size: 11px;}
 .capability-track{height: 11px; background: var(--paper); border: 1px solid var(--line);}

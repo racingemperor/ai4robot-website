@@ -63,7 +63,7 @@ Use one frozen benchmark/protocol/environment for all models in a report. Do not
 7. Complete coverage sorts first. The selected metric controls ranking, with ties sharing rank; mean time sorts ascending by default.
 8. Capability bars use only tasks covered by every selected model; summary cards show individual coverage. Do not treat different coverage as directly comparable.
 
-CSV success fields are fractions, progress_0_100 is points, and duration_s is simulation seconds. Exports retain source and protocol.
+CSV success fields are fractions, progress_0_100 is points, and duration_s is simulation seconds. Leaderboard exports include pooled_success_rate and pooled_wilson_95_low/high separately from balanced_success_rate. Exports retain source and protocol.
 
 ## CLI configuration
 
