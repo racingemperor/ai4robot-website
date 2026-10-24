@@ -36,3 +36,208 @@ window.TASKS=[
  ['T22','Semantic room navigation','navigate','A','Ridgeback + Franka','Follow a semantic instruction across rooms, visit the required intermediate room and stop in the target region.','Synchronize instruction, head camera and overhead route; preserve room transitions and final position.','The required room is visited and the correct destination reached.','Semantic instruction / Cross-room route / Destination check','Task specification; implementation and evaluation pending.'],
  ['T23','Navigation among people','navigate','A','Ridgeback + Franka','Reach the destination among moving pedestrians while maintaining clearance, waiting or detouring when needed.','Pair overhead and first-person views; show crossing traffic, closest approach and safe arrival.','Goal completion and safe clearance; state whether people are animated humans or capsule proxies.','Crossing traffic / Wait or detour / Safe arrival','Initial plan uses capsule proxies on predefined paths; public evaluation pending.']
 ].map(([id,name,group,track,robot,goal,video,proof,beats,note])=>({id,name,en:name,group,track,robot,goal,video,proof,beats:beats.split(' / '),note,category:['T21','T22','T23'].includes(id)?'navigation':track==='B'?'training':track==='C'?'construction':'manipulation'}));
+
+/* Task-level explanations describe the intended test, not measured model abilities. */
+{
+ const details = {
+  T01: {
+   input: 'An interlocked pair of rigid parts, matching placement regions and the dual-arm interface.',
+   capabilities: [
+    ['Spatial reasoning', 'Understand how the parts constrain one another and find a path that frees them.'],
+    ['Bimanual coordination', 'Move both grippers together while maintaining useful grasps.'],
+    ['Contact-aware control', 'Separate and place the parts without using penetration as a shortcut.']
+   ],
+   checks: ['The two parts are physically separated.', 'Neither part passes through the other.', 'Both parts are released in their matching regions and remain stable.']
+  },
+  T02: {
+   input: 'A three-pin plug, a power strip, an insertion instruction and the robot interface.',
+   capabilities: [
+    ['Pose alignment', 'Match the plug orientation and approach direction to the socket.'],
+    ['Precision control', 'Make small corrections when the pins approach and enter the socket.'],
+    ['Contact reasoning', 'Distinguish touching the socket from a stable, completed insertion.']
+   ],
+   checks: ['The pins align with the intended socket.', 'The plug satisfies the task insertion and contact limits.', 'The plug stays seated after the gripper releases it.']
+  },
+  T03: {
+   input: 'A target string, a physical keyboard and the key-input feedback available to the agent.',
+   capabilities: [
+    ['Symbol-to-action mapping', 'Translate characters into positions and physical key presses.'],
+    ['Sequential precision', 'Press and release the intended keys in the required order.'],
+    ['Feedback and correction', 'Use the input buffer to identify mistakes before submitting.']
+   ],
+   checks: ['Characters are entered through physical key events.', 'The final input matches the requested string.', 'Enter submits the completed buffer.']
+  },
+  T04: {
+   input: 'A cucumber, a knife and an instruction specifying the requested sections.',
+   capabilities: [
+    ['Role assignment', 'Use one arm to stabilize the object while the other operates the knife.'],
+    ['Bimanual coordination', 'Keep the holding and cutting motions compatible throughout the action.'],
+    ['Geometric planning', 'Choose cut positions that match the requested sections.']
+   ],
+   checks: ['The holding arm supports the cutting process.', 'Cuts occur at the required segment boundaries.', 'The resulting sections satisfy the task specification under its stated approximation.']
+  },
+  T05: {
+   input: 'A supplied line drawing, a target canvas region and a brush-control interface.',
+   capabilities: [
+    ['Visual-to-motor mapping', 'Translate the reference drawing into paths in the canvas frame.'],
+    ['Stroke planning', 'Order separate strokes and lift the brush between disconnected marks.'],
+    ['Contact precision', 'Maintain drawing contact while limiting missing and unwanted marks.']
+   ],
+   checks: ['The intended strokes cover the reference drawing.', 'Extra marks and unintended connections are checked.', 'The drawing stays in the target area.']
+  },
+  T06: {
+   input: 'An instruction to select the longest baguette, a basket and several candidate objects.',
+   capabilities: [
+    ['Language grounding', 'Resolve “the longest” by comparing the visible candidates.'],
+    ['Grasp and placement', 'Transport the selected object into the basket and release it.'],
+    ['Constraint preservation', 'Complete the goal while keeping unrelated objects in place.']
+   ],
+   checks: ['The selected object is the longest baguette.', 'It is inside the basket in the settled final state.', 'Every other object moves no more than 5 cm.']
+  },
+  T07: {
+   input: 'An articulated cube and a specified face-rotation instruction.',
+   capabilities: [
+    ['Finger coordination', 'Redistribute fingertip contacts while retaining the cube.'],
+    ['Relative-motion reasoning', 'Rotate the specified layer relative to the rest of the cube.'],
+    ['Grasp stability', 'Keep the object supported through the required rotation.']
+   ],
+   checks: ['The specified layer rotates through the required angle.', 'The motion is relative to the cube body.', 'The hand retains the cube throughout the action.']
+  },
+  T08: {
+   input: 'An apple with a stem and an instruction to lift and hold it by the stem alone.',
+   capabilities: [
+    ['Fine target localization', 'Locate a small graspable stem rather than the larger fruit body.'],
+    ['Dexterous contact', 'Position the fingers on the stem without touching the apple.'],
+    ['Delicate manipulation', 'Lift and hold while preserving the stem and a stable grasp.']
+   ],
+   checks: ['Grasp contact is confined to the stem.', 'The apple clears the support and stays lifted for the required hold.', 'The stem remains intact and the fruit is not otherwise supported.']
+  },
+  T09: {
+   input: 'A ball at the task start position, a target region and the G1 control interface.',
+   capabilities: [
+    ['Whole-body coordination', 'Coordinate reaching, grasping and placement with body posture.'],
+    ['Object transport', 'Retain the ball while moving it to the target region.'],
+    ['Postural stability', 'Complete the manipulation and return to a stable configuration.']
+   ],
+   checks: ['The ball is picked up from its stated start position.', 'The ball reaches the target region.', 'The body remains stable through placement and recovery.']
+  },
+  T10: {
+   input: 'An ordered waypoint list, a shelf-retrieval instruction and a required final pose.',
+   capabilities: [
+    ['Long-horizon planning', 'Keep track of waypoint order, retrieval and the final pose requirement.'],
+    ['Navigation and manipulation', 'Connect travel through the scene with a shelf grasp.'],
+    ['Pose control', 'Finish at the requested position and orientation.']
+   ],
+   checks: ['All required waypoints are visited in order.', 'The requested can is retrieved from the shelf.', 'The final position and orientation satisfy the task.']
+  },
+  T11: {
+   input: 'A specified short program, a whiteboard and a standing G1 holding a pen.',
+   capabilities: [
+    ['Text-to-stroke planning', 'Convert the requested code into an ordered set of writing strokes.'],
+    ['Surface contact control', 'Use pen contact and lifts to produce distinct physical marks.'],
+    ['Upper-body coordination', 'Coordinate the arm and torso while keeping a stable standing pose.']
+   ],
+   checks: ['Marks result from physical pen–board contact.', 'The written characters or stroke template match the target.', 'The robot withdraws the pen and satisfies the final posture requirement.']
+  },
+  T12: {
+   input: 'A few supplied demonstrations, a new object layout and the mobile-manipulation interface.',
+   capabilities: [
+    ['In-context rule learning', 'Infer which object-selection rule explains the demonstrations.'],
+    ['Transfer to a new layout', 'Apply that rule when objects occupy unfamiliar positions.'],
+    ['Mobile manipulation', 'Reach, grasp and place the chosen object while preserving other objects.']
+   ],
+   checks: ['The selected object follows the demonstrated rule.', 'Placement satisfies the current task target.', 'Unrelated objects remain within the permitted disturbance limits.']
+  },
+  T13: {
+   input: 'A text specification of objects, dimensions, relationships and articulated parts.',
+   capabilities: [
+    ['Constraint translation', 'Turn language requirements into explicit scene geometry and relationships.'],
+    ['Scene construction', 'Produce a loadable scene with assets, scale and joints configured.'],
+    ['Physical validation', 'Check that support surfaces and requested interactions work when simulated.']
+   ],
+   checks: ['The generated scene loads and advances in simulation.', 'Objects, dimensions and spatial relationships meet the specification.', 'Required joints and support interactions pass the physical checks.']
+  },
+  T14: {
+   input: 'Multi-view RGB-D observations and the camera, coordinate and scale information supplied by the task.',
+   capabilities: [
+    ['Multi-view spatial reasoning', 'Combine observations into a consistent reconstruction.'],
+    ['Metric reconstruction', 'Preserve scene dimensions, clearances and navigable space.'],
+    ['Interactive world modeling', 'Represent cabinets and drawers as usable articulated structures.']
+   ],
+   checks: ['Geometry and dimensions agree with the reference constraints.', 'Required routes through the kitchen remain navigable.', 'Cabinet doors and drawers support the specified interactions.']
+  },
+  T15: {
+   input: 'Calibrated multi-view video of hand–object interaction and the required replay format.',
+   capabilities: [
+    ['Motion reconstruction', 'Recover coherent hand and object motion from multiple views.'],
+    ['Temporal reasoning', 'Align grasp, release and object motion with the source sequence.'],
+    ['Physical consistency', 'Reconstruct contacts that support the observed interaction without penetration.']
+   ],
+   checks: ['Reconstructed hand and object poses follow the source motion.', 'Contact transitions align with the reference timing.', 'The trajectory passes the task replay and physical-consistency checks.']
+  },
+  T16: {
+   input: 'A Go2 learning environment, locomotion objectives and a fixed training-resource budget.',
+   capabilities: [
+    ['Reward design', 'Express tracking, stability and movement objectives in trainable rewards.'],
+    ['Learning-system development', 'Write and configure a reinforcement-learning training procedure.'],
+    ['Policy generalization', 'Produce weights that work under fixed held-out evaluation conditions.']
+   ],
+   checks: ['Training stays within the declared budget.', 'Submitted weights perform velocity tracking, turning and terrain traversal.', 'Performance is measured by the fixed held-out evaluator.']
+  },
+  T17: {
+   input: 'A dexterous hand and pen learning environment, rotation objectives and a training budget.',
+   capabilities: [
+    ['Reward and curriculum design', 'Shape learning toward useful rotation while retaining the pen.'],
+    ['Dexterous policy learning', 'Train coordinated finger behavior rather than a text-only action plan.'],
+    ['Evaluation discipline', 'Check the learned behavior under the fixed test conditions.']
+   ],
+   checks: ['The pen reaches the required rotation under evaluation.', 'The policy retains the pen for the required duration.', 'Training budget, failures and fixed-test outcomes are recorded.']
+  },
+  T19: {
+   input: 'A pitcher, a cup, a target liquid level and the pouring-control interface.',
+   capabilities: [
+    ['Visual state estimation', 'Relate the observed liquid surface to the target level.'],
+    ['Dynamic control', 'Adjust pouring and stop in time for the final settled level.'],
+    ['Multi-constraint execution', 'Limit spillage and return the pitcher after filling the cup.']
+   ],
+   checks: ['The settled liquid level is within the task tolerance.', 'Spillage satisfies the declared limit.', 'The pitcher is returned to the required placement.']
+  },
+  T20: {
+   input: 'Threaded shoelaces, the required knot structure and the dual-arm interface.',
+   capabilities: [
+    ['Topological reasoning', 'Choose a threading sequence that creates the required knot.'],
+    ['Deformable-object control', 'Manage moving lace ends and changing rope shape.'],
+    ['Bimanual coordination', 'Coordinate threading and tightening before releasing both ends.']
+   ],
+   checks: ['The knot has the required structure.', 'The knot remains stable after the ends are released.', 'Any specified tightening or pull test passes; the current scope is one knot.']
+  },
+  T21: {
+   input: 'Five requested object identities, an unfamiliar indoor start and frozen Go2 locomotion controls.',
+   capabilities: [
+    ['Exploration planning', 'Search an unfamiliar environment without privileged object coordinates.'],
+    ['Visual grounding', 'Identify requested objects from the observations available to the agent.'],
+    ['Goal bookkeeping', 'Report all five targets and stop only after completing the search.']
+   ],
+   checks: ['All five requested objects are reported.', 'Each report satisfies the target visibility and proximity checks.', 'The agent issues STOP after the required reports.']
+  },
+  T22: {
+   input: 'A semantic navigation instruction specifying an intermediate room and a destination.',
+   capabilities: [
+    ['Semantic grounding', 'Relate room descriptions and goal language to the observed scene.'],
+    ['Route planning', 'Travel across rooms while honoring an intermediate destination.'],
+    ['Completion recognition', 'Stop in the requested goal region after the required visit.']
+   ],
+   checks: ['The required intermediate room is visited.', 'The route reaches the correct destination.', 'The robot stops inside the accepted target region.']
+  },
+  T23: {
+   input: 'A destination, moving pedestrians or declared proxies and the mobile-robot interface.',
+   capabilities: [
+    ['Dynamic spatial reasoning', 'Account for crossing traffic and changes in free space.'],
+    ['Reactive planning', 'Choose when to proceed, wait or detour as people move.'],
+    ['Safe goal completion', 'Reach the destination while maintaining the required clearance.']
+   ],
+   checks: ['The robot reaches the destination.', 'Collisions and minimum clearance satisfy the task criteria.', 'Timing and the pedestrian representation are recorded with the result.']
+  }
+ };
+ for (const t of window.TASKS) Object.assign(t, details[t.id]);
+}

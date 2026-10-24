@@ -29,12 +29,27 @@ window.Lab = (() => {
   const points=v=>v===null||v===undefined?'—':(v*100).toFixed(1);
   const pct=v=>v===null||v===undefined?'—':`${(v*100).toFixed(1)}%`;
   const fmt=v=>v===null||v===undefined?'—':`${v.toFixed(1)} s`;
+  function taskPerformance(id){
+    const report=data();
+    return {source:L.source,label:sourceLabel(),protocol:report.protocol,version:report.benchmark_version,
+      synthetic:L.source==='demo'||(L.source==='imported'&&L.importedSynthetic),
+      rows:Results.summarize(report,[id]).map(model=>({...model,episodeCount:report.episodes.filter(e=>e.task_id===id&&e.model_id===model.id).length}))};
+  }
+  function useTaskSource(source){
+    if(!['official','demo'].includes(source))return;
+    clearVideo();L.source=source;L.message='';L.compare=[];L.episode='';
+    render();
+  }
   function selectedTasks(){return TASKS.filter(t=>(L.category==='all'||t.category===L.category)&&(L.track==='all'||t.track===L.track)&&(L.group==='all'||t.group===L.group)&&(L.robot==='all'||t.robot===L.robot));}
   function summary(ids=selectedTasks().map(t=>t.id)){return Results.summarize(data(),ids);}
   function orderedRows(){return summary().filter(m=>`${m.name} ${m.agent} ${m.version}`.toLowerCase().includes(L.modelQuery.toLowerCase())).sort((a,b)=>Number(b.complete)-Number(a.complete)||((a[L.sort]??-Infinity)-(b[L.sort]??-Infinity))*L.direction||a.id.localeCompare(b.id));}
   function syncURL(){
-    if((currentPage==='tasks'&&Site.section!=='matrix')||(currentPage==='documents'&&Site.section==='method'))return;
     const p=new URLSearchParams(location.search);
+    if(currentPage==='tasks'&&Site.section!=='matrix'){
+      L.source!=='official'?p.set('data',L.source):p.delete('data');
+      history.replaceState({},'',location.pathname+(p.size?'?'+p:'')+location.hash);Site.refreshLinks();return;
+    }
+    if(currentPage==='documents'&&Site.section==='method')return;
     const resultKeys=['track','category','group','robot'];
     const pageKeys={board:[...resultKeys,'sort','modelQuery'],compare:[...resultKeys,'sort','modelQuery'],matrix:resultKeys,episodes:[...resultKeys,'episodeTask','episodeModel','status','episode'],run:[],about:[]};
     for(const key of ['lab','variant','track','category','group','robot','sort','modelQuery','episodeTask','episodeModel','status','episode','models','order'])p.delete(key);
@@ -110,6 +125,7 @@ window.Lab = (() => {
     if(L.tab==='run')updateCommand();if(L.tab==='episodes'){updateTime();wireVideo();}
     if(focusKey)q(focusKey)?.focus({preventScroll:true});
     syncURL();
+    document.dispatchEvent(new CustomEvent('lab:reportchange'));
   }
   function stop(){L.playing=false;cancelAnimationFrame(L.raf);const v=q('#episode-video');if(v)v.pause();}
   function updateTime(){
@@ -215,8 +231,11 @@ window.Lab = (() => {
       const source=p.get('data');L.source=source==='demo'?'demo':source==='imported'&&L.imported?'imported':'official';
       render();return;
     }
-    if(currentPage==='tasks'&&Site.section!=='matrix')return;
     const p=new URLSearchParams(location.search);
+    if(currentPage==='tasks'&&Site.section!=='matrix'){
+      const source=p.get('data');L.source=source==='demo'?'demo':source==='imported'&&L.imported?'imported':'official';
+      document.dispatchEvent(new CustomEvent('lab:reportchange'));return;
+    }
     L.category=CATEGORIES.some(c=>c.id===p.get('category'))?p.get('category'):'all';
     L.group=GROUPS.some(g=>g.id===p.get('group'))?p.get('group'):'all';
     L.track=['A','B','C'].includes(p.get('track'))?p.get('track'):'all';
@@ -230,7 +249,7 @@ window.Lab = (() => {
     }
     render();
   });
-  return {render,stop};
+  return {render,stop,taskPerformance,useTaskSource};
 })();
 
 Lab.render();

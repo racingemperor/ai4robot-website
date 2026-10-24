@@ -8,11 +8,11 @@ The visual language is paper, dark ink and rust red, with editorial typography a
 
 ## Distinct pages
 
-Tasks describes what is tested and exposes per-task result gaps through its matrix. Leaderboard contains rankings and model comparison on common tasks. Episodes inspects evidence in time. Documents brings together the evaluation method, run configuration and project resources. Home introduces the research. These five main pages have distinct document URLs and one H1 each.
+Tasks uses a narrow searchable directory and a wide task brief. Each task explains its objective, three capabilities, completion checks, input, execution stages and current scope. A per-task table reads the same report as the matrix, showing success, progress, trials, simulation time and matching episode evidence. Official results remain empty until reviewed reports exist; synthetic and local sources are labeled. Leaderboard contains rankings and model comparison on common tasks. Episodes inspects evidence in time. Documents brings together the evaluation method, run configuration and project resources. Home introduces the research. These five main pages have distinct document URLs and one H1 each.
 
 The fixed header has exactly four categories: Tasks, Leaderboard, Episodes and Documents. Home is reached through the logo. Ranking / Model comparison are local Leaderboard views; Task catalog / Results matrix are local Tasks views; Method / Run / Resources are local Documents views. Native buttons with pressed states and labeled regions switch content in the same document, keeping the parent header current. The section query parameter supports direct links, refresh and browser back/forward.
 
-Catalog and matrix share category/capability scope; catalog search, selected task and atlas/list layout are preserved. Report imports rebuild only the report host. Documents mounts the method separately from configuration and resource tools; imports and section switches never overwrite the method. The run configuration stays in memory between Documents views. Regular links between these sections are intercepted for local switching, while modified clicks retain native browser behavior.
+Catalog and matrix share category/capability scope; catalog search, selected task and active report source are preserved. The task selector folds into a native disclosure on smaller screens. Previous/next controls follow the filtered task selection. Report imports rebuild only the report host. Documents mounts the method separately from configuration and resource tools; imports and section switches never overwrite the method. The run configuration stays in memory between Documents views. Regular links between these sections are intercepted for local switching, while modified clicks retain native browser behavior.
 
 The leaderboard ranking table stays focused on metrics without comparison action columns. Explicit task evidence links remain regular document links. The header switches to a menu at 1100 px and below. Old compare.html and matrix.html URLs redirect to their parent sections; method.html, run.html and about.html redirect to Documents. The retired footage.html URL redirects to Documents. Legacy index.html?lab= bookmarks also remain supported. Media plan is removed from navigation and public flows; task dossiers retain evidence requirements. No Environment category has been added.
 
@@ -34,7 +34,7 @@ T06 outcome examples explain documented judge rules (0, approximately 60, 70 and
 
 ## Reference websites
 
-Earlier public-page observations of RoboDojo and Embodied First Exam informed the independent task/results/method/reproduction page roles. This site does not copy their branding, media or distinctive visual presentation. It uses an atlas, a scoring case study and linked evidence tools to express this research's structure.
+Earlier public-page observations of RoboDojo and Embodied First Exam informed the independent task/results/method/reproduction page roles. This site does not copy their branding, media or distinctive visual presentation. It uses detailed task briefs, a scoring case study and linked evidence tools to express this research's structure.
 
 ## Accessibility and responsive behavior
 

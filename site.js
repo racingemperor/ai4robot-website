@@ -12,7 +12,7 @@ const RESEARCH_NOTES='https://app.notion.com/p/gpt-robotllm-as-policy-benchmark-
 window.Site=(()=>{
  const pages={
   home:['index.html','Overview','AI4Robot','Code meets the physical world.','LLM EMBODIMENT BENCHMARK'],
-  tasks:['tasks.html','Tasks','Explore the tasks and their results.','Inspect 22 task specifications across four categories, then examine their model results in one task matrix.','BENCHMARK SCOPE'],
+  tasks:['tasks.html','Tasks','Inside each task.','Explore the goal, the capabilities it tests and how models perform. 22 tasks across four evaluation categories.','THE TASK COLLECTION'],
   leaderboard:['leaderboard.html','Leaderboard','How do models perform?','Compare success, progress and coverage under one recorded evaluation protocol.','MODEL PERFORMANCE'],
   episodes:['episodes.html','Episodes','Follow an action to its outcome.','Inspect observations, actions, feedback and final judgments on a shared timeline.','PROCESS EVIDENCE'],
   documents:['documents.html','Documents','Understand, reproduce, contribute.','Read the evaluation method, configure a research run and access the project resources.','RESEARCH DOCUMENTATION']

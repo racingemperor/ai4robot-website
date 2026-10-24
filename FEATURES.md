@@ -3,16 +3,16 @@
 ## Available tools
 
 - Five main pages with four fixed header categories: Tasks, Leaderboard, Episodes and Documents. Home opens through the logo; small screens use a menu. Model comparison is a local Leaderboard view; the results matrix is a local Tasks view; Method, Run and Resources are local Documents views. Switching preserves the parent document and header highlight, with shareable section links and browser history. Six old document URLs redirect to the current structure.
-- Twenty-two task dossiers with evaluation category, capability facets, embodiment, deliverable, current scope and filming requirements.
+- Twenty-two detailed task briefs with goals, three capability explanations, completion checks, embodiment, deliverable, input, execution stages and current scope. A compact searchable directory leaves the main area for the selected task; on mobile it folds into a disclosure.
 - Home route switch and interactive T06 judge examples.
 - Leaderboard ranking view with sorting, model search, category/delivery/capability/embodiment filters, coverage and exports. No cross-page comparison action is embedded in its table.
 - Up to three-model comparison on common capability-task coverage.
-- Numeric task/model matrix within Tasks, linked to matching episode records. Catalog and matrix share category/capability scope; switching preserves catalog search/selection/layout. Importing or clearing a report leaves the catalog intact.
+- Numeric task/model matrix within Tasks, linked to matching episode records. Catalog and matrix share category/capability scope; switching preserves catalog search/selection. Importing or clearing a report leaves the catalog intact.
 - Episode filters, events, seeking, playback speed, local video and JSON export.
 - Existing check/solve/play and bounded direct-policy eval command configuration.
 - Local report validation, session-tab persistence, clear control and storage fallback.
 - CSV/JSON downloads, shareable view links, research sources, FAQ and website citation.
-- Task dossiers retain per-task evidence requirements and shot lists. The standalone media plan has been retired.
+- Each task includes success rate, progress, trial count, mean simulation time and matching episode links from the active report. Official, synthetic and local sources remain distinct. The standalone media plan has been retired.
 
 These cover the main research-site capabilities observed in earlier public-page reviews of RoboDojo and Embodied First Exam. They are not an exhaustive claim about those websites.
 

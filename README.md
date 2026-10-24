@@ -9,7 +9,7 @@ An English static research website with five main pages and six compatibility re
 | Page | Purpose |
 |---|---|
 | index.html | Research question, interactive evaluation routes, T06 scoring case and four categories |
-| tasks.html | Task catalog with category/capability filters, atlas/list, search, dossiers, plus a task/model results matrix |
+| tasks.html | Compact searchable task selector, detailed goals/capabilities/completion checks, per-task model performance, plus a task/model results matrix |
 | leaderboard.html | Ranking with balanced/pooled success, progress, coverage and exports, plus up to three-model comparison |
 | compare.html | Compatibility redirect to leaderboard.html?section=comparison |
 | matrix.html | Compatibility redirect to tasks.html?section=matrix |
@@ -18,7 +18,7 @@ An English static research website with five main pages and six compatibility re
 | method.html / run.html / about.html | Compatibility redirects to the corresponding Documents section |
 | footage.html | Retired media-plan URL; redirects to Documents |
 
-The fixed header has exactly four categories: Tasks, Leaderboard, Episodes and Documents. The logo opens Home. Leaderboard contains Ranking / Model comparison; Tasks contains Task catalog / Results matrix; Documents contains Method / Run / Resources. These are local button-controlled views: the document and highlighted header stay the same. The section query parameter supports sharing, reload and browser back/forward. Catalog selection/search/layout and report source are retained; category/capability filters are shared between catalog and matrix. Documents keeps the current run configuration when switching sections; links between its sections stay in the same document. Media plan is no longer part of the public site. No framework, build or package installation is required.
+The fixed header has exactly four categories: Tasks, Leaderboard, Episodes and Documents. The logo opens Home. Leaderboard contains Ranking / Model comparison; Tasks contains Task catalog / Results matrix; Documents contains Method / Run / Resources. These are local button-controlled views: the document and highlighted header stay the same. The section query parameter supports sharing, reload and browser back/forward. Catalog selection/search and report source are retained; category/capability filters are shared between catalog and matrix. Documents keeps the current run configuration when switching sections; links between its sections stay in the same document. Media plan is no longer part of the public site. No framework, build or package installation is required.
 
 ## Serve and verify
 
