@@ -1,3 +1,43 @@
+/* Manuscript material follows the existing document and paper visual language. */
+.paper-home{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(35px,6vw,90px)}
+.paper-home-intro h2{font-size:clamp(29px,3vw,43px);line-height:1.2;max-width:17ch;margin:16px 0 25px}
+.paper-home-intro>p:not(.eyebrow){font-size:16px;line-height:1.85;max-width:50ch}
+.paper-home-intro>.text-link{margin-top:24px}
+.paper-contributions article{border-top:1px solid var(--line);padding:23px 0}
+.paper-contributions article:first-child{border-color:var(--ink)}
+.paper-contributions h3{font-size:23px;font-weight:500;line-height:1.4;margin-bottom:10px}
+.paper-contributions p{font-size:15px;line-height:1.85;max-width:65ch}
+.paper-summary{padding:15px 0 42px;margin-bottom:42px;border-bottom:1px solid var(--line);scroll-margin-top:calc(var(--nav-height) + 25px)}
+.paper-summary-heading{display:flex;justify-content:space-between;gap:25px;align-items:flex-start;margin-bottom:26px}
+.paper-summary-heading h2{font-size:clamp(29px,3vw,43px);font-weight:500;line-height:1.2;letter-spacing:-1px;margin:15px 0}
+.paper-summary-heading>span{font:11px var(--mono);color:var(--muted);white-space:nowrap;padding-top:5px}
+.paper-summary-subtitle{font-size:17px;line-height:1.7;max-width:65ch}
+.paper-summary-text{max-width:86ch;display:grid;gap:17px}
+.paper-summary-text p{font-size:15px;line-height:1.9}
+.paper-summary-links{display:flex;flex-wrap:wrap;gap:12px 30px;margin:24px 0}
+.paper-summary>.source-note{max-width:100ch;line-height:1.8}
+#benchmark-design{scroll-margin-top:calc(var(--nav-height) + 25px)}
+#benchmark-design>p+p,#task-creation>p+p,#fair-evaluation>p+p{margin-top:18px}
+.paper-package-grid,.paper-metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:25px 35px;margin:28px 0}
+.paper-package-grid article,.paper-metric-grid article{border-top:1px solid var(--line);padding-top:19px;min-width:0}
+.paper-package-grid h3,.paper-metric-grid h3{font-size:19px;font-weight:500;line-height:1.4;margin-bottom:10px}
+.paper-stage-heading{font-size:22px;font-weight:500;line-height:1.4;margin:30px 0 20px}
+.paper-stage-grid{list-style:none;counter-reset:stage;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:25px;margin:0 0 25px;padding:0}
+.paper-stage-grid li{counter-increment:stage;border-top:1px solid var(--line);padding-top:16px;min-width:0}
+.paper-stage-grid li::before{content:counter(stage,decimal-leading-zero);font:12px var(--mono);color:var(--accent)}
+.paper-stage-grid h4{font-size:17px;line-height:1.4;font-weight:500;margin:12px 0 10px}
+.paper-report-note{border-block:1px solid var(--line);padding:18px 0;font-size:13px!important}
+.task-package{border-block:1px solid var(--line);margin:24px 0;padding:5px 0}
+.task-package summary{cursor:pointer;min-height:44px;padding:11px 0;font-size:15px;font-weight:500}
+.task-package summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.task-package>p{font-size:13px;line-height:1.8;margin:12px 0 18px}
+.task-package dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 25px;margin:0 0 22px}
+.task-package dt{font-size:14px;font-weight:500;margin-bottom:6px}
+.task-package dd{font-size:13px;line-height:1.8;color:var(--muted);margin:0}
+@media(max-width:1100px){.paper-stage-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:750px){.paper-home{grid-template-columns:1fr;gap:28px}.paper-home-intro h2{max-width:23ch}.paper-summary-heading{display:block}.paper-summary-heading>span{display:block;margin-top:18px}.paper-summary-text p,.paper-home-intro>p:not(.eyebrow),.paper-contributions p{font-size:14px}}
+@media(max-width:600px){.paper-package-grid,.paper-metric-grid,.paper-stage-grid,.task-package dl{grid-template-columns:minmax(0,1fr);gap:22px}.paper-summary-heading h2{font-size:30px}.paper-summary-subtitle{font-size:15px}.paper-contributions h3{font-size:21px}.paper-summary{margin-bottom:30px;padding-bottom:30px}.paper-summary-links{display:grid;gap:10px}.paper-stage-grid{gap:16px}}
+
 /* Document layouts: one purpose per page. */
 .site-header nav>a[aria-current=page]{border-color:var(--accent);color:var(--accent)}
 .page-heading{padding:42px var(--gutter) 46px;border-bottom:1px solid var(--line)}

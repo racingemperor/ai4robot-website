@@ -1,20 +1,20 @@
-# AI4Robot research website
+# Embodied Generalist Exam — research website
 
 Live: https://racingemperor.github.io/ai4robot-website/
 
-An English static research website with five main pages and six compatibility redirects, a fixed header and 22 task dossiers. T18 is excluded. Research sources: https://github.com/ALEXander22568/AI4Robot and the project Notion notebook linked from Documents → Resources. Current task definitions follow GitHub; the user confirmed T23 is navigation among people.
+An English static research website with five main pages and six compatibility redirects, a fixed header and 22 task dossiers. T18 is excluded. The current EGE manuscript supplies the research motivation, benchmark design, task-creation process and evaluation goals. Implementation sources: https://github.com/ALEXander22568/AI4Robot and the project Notion notebook linked from Documents → Resources. Current task definitions follow GitHub; the user confirmed T23 is navigation among people.
 
 ## Documents
 
 | Page | Purpose |
 |---|---|
-| index.html | Research question, interactive evaluation routes, T06 scoring case and four categories |
+| index.html | Manuscript research question and three contributions, interactive evaluation routes, T06 scoring case and four categories |
 | tasks.html | Searchable visual task gallery, card-to-center floating task details, capabilities, evidence and model results, plus a task/model results matrix |
 | leaderboard.html | Ranking with balanced/pooled success, progress, coverage and exports, plus up to three-model comparison |
 | compare.html | Compatibility redirect to leaderboard.html?section=comparison |
 | matrix.html | Compatibility redirect to tasks.html?section=matrix |
 | episodes.html | Shared video/trace/code timeline, filters, local video and episode export |
-| documents.html | Evaluation method, research CLI configurator, sources, release status, report tools, contributions and FAQ |
+| documents.html | Manuscript overview, benchmark design, task sourcing, six-stage construction, fair evaluation and metrics, research CLI, resources and FAQ |
 | method.html / run.html / about.html | Compatibility redirects to the corresponding Documents section |
 | footage.html | Retired media-plan URL; redirects to Documents |
 
@@ -41,6 +41,12 @@ The site does not execute robot commands or request provider credentials. Its ru
 
 ## Modules and publication
 
-site.js owns navigation and shared dialogs; app.js owns narrative pages; lab.js owns result/configuration tools; tasks.js owns the reviewed task catalog; results.js owns validation and aggregation; illustrations.js supplies task visuals; evidence.js owns grid placeholders, playback symbols, separate preview events and time-based trace selection; motion.js owns scroll reveals and the card-to-window transition. Task images are original conceptual illustrations reserved for future experiment frames. Task detail windows use native modal focus handling, Escape/backdrop dismissal and reduced-motion alternatives.
+site.js owns navigation and shared dialogs; app.js owns narrative pages; lab.js owns result/configuration tools; tasks.js owns the reviewed task catalog; results.js owns validation and aggregation; illustrations.js supplies task visuals; evidence.js owns grid placeholders, playback symbols, separate preview events and time-based trace selection; motion.js owns scroll reveals and the card-to-window transition; paper.js owns curated manuscript text and its presentation. Task images are original conceptual illustrations reserved for future experiment frames. Task detail windows use native modal focus handling, Escape/backdrop dismissal and reduced-motion alternatives.
 
 Publish only this website directory to the website repository. GitHub Pages serves the root of codex/website-publication. Research source code, operational setup, credentials and progress records are outside publication scope. See DESIGN-NOTES.md. The internal VIDEO-BRIEF.md is excluded from publication.
+
+## Manuscript content
+
+The site uses the confirmed title Embodied Generalist Exam (EGE). The abstract, Introduction and Dataset sections inform the public overview. Draft name variants are normalized to EGE; the confirmed 22-task/four-category catalog and six concrete robot platforms are preserved. Raw manuscript sources, template PDFs, example authors, template references and unfinished results are excluded from publication. The manuscript describes a six-stage construction process with cross-checks by at least three authors per stage; this does not imply that every listed task has completed that process.
+
+Manuscript reporting goals include success, intermediate progress, total elapsed wall-clock time and token consumption. The existing report schema supports simulation duration; it does not yet store end-to-end wall-clock time or tokens. The site explains this distinction rather than inferring efficiency results. Foundation-model weights remain unchanged during evaluation; a policy-development task may train a separate robot policy.

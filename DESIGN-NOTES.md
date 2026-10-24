@@ -2,7 +2,7 @@
 
 ## Research story
 
-The site asks whether a general-purpose language model or coding agent can turn an instruction into a physical outcome. The home page establishes the question, lets visitors inspect the program-submission and direct-policy routes, and uses T06 to explain why visible progress can still fail the full instruction.
+The site asks whether a general-purpose language model or coding agent can turn an instruction into a physical outcome. The home page adapts the EGE manuscript’s motivation and three contributions, establishes the question, lets visitors inspect the program-submission and direct-policy routes, and uses T06 to explain why visible progress can still fail the full instruction.
 
 The visual language is paper, dark ink and rust red, with editorial typography. Dashed grid placeholders reserve video, observation, figure, document and output positions. Home has a hero recording slot, a reusable task-video strip and scoring evidence; each task has one demonstration video, three detail frames and a deliverable. Documents reserves method figures, execution output and publication material. No experimental media is published.
 
@@ -33,6 +33,8 @@ These are separate axes. T12 includes a mobile base but is evaluated as manipula
 ## Sources and research maturity
 
 The research README, docs/TASKS.md, docs/AGENT_EVAL.md and task designs were reviewed on October 23, 2026. The project Notion notebook supplies task motivation and references. GitHub defines the current implementation; the user explicitly selected its crowd-navigation definition for T23 over the notebook's trajectory-collection alternative.
+
+The manuscript archive reviewed October 24, 2026 supplies the abstract, Introduction and Dataset sections. Home presents the research framing; Documents separates the manuscript overview in Resources from benchmark design, source selection, six-stage construction and fair evaluation in Method. Task details have an expandable package definition. The confirmed title remains Embodied Generalist Exam. Draft task totals and naming variants do not override the user-confirmed catalog. No template PDF, placeholder authors, sample references, unsupported model claims or empirical findings are published. Wall-clock time and token usage are described as manuscript reporting goals, distinct from currently supported simulation time.
 
 The catalog states implementation limits: pre-segmented cutting, a single rotating cube layer, initial single-knot tying, standing G1 scope, frozen Go2 navigation and separately trained locomotion. Direct-policy support currently covers the ARX tools; replay checks exist for T02/T06/T19. None of these facts implies a completed 22-task model evaluation.
 

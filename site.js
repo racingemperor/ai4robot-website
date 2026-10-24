@@ -13,9 +13,9 @@ window.Site=(()=>{
  const pages={
   home:['index.html','Overview','AI4Robot','Code meets the physical world.','LLM EMBODIMENT BENCHMARK'],
   tasks:['tasks.html','Tasks','Inside each task.','Explore the goal, the capabilities it tests and how models perform. 22 tasks across four evaluation categories.','THE TASK COLLECTION'],
-  leaderboard:['leaderboard.html','Leaderboard','How do models perform?','Compare success, progress and coverage under one recorded evaluation protocol.','MODEL PERFORMANCE'],
-  episodes:['episodes.html','Episodes','Follow an action to its outcome.','Inspect observations, actions, feedback and final judgments on a shared timeline.','PROCESS EVIDENCE'],
-  documents:['documents.html','Documents','Understand, reproduce, contribute.','Read the evaluation method, configure a research run and access the project resources.','RESEARCH DOCUMENTATION']
+  leaderboard:['leaderboard.html','Leaderboard','How do models perform?','Measure reliability across repeated trials. Compare success, progress and coverage under one recorded evaluation protocol.','MODEL PERFORMANCE'],
+  episodes:['episodes.html','Episodes','Follow an action to its outcome.','Inspect observations, model inputs and outputs, code revisions and judgments on a shared timeline.','PROCESS EVIDENCE'],
+  documents:['documents.html','Documents','Understand, reproduce, contribute.','Explore the EGE manuscript, benchmark design and evaluation method, then configure a run or access the research resources.','RESEARCH DOCUMENTATION']
  };
  const page=document.body.dataset.page,resultPages=['tasks','leaderboard','compare','matrix','episodes'];
  const sections={tasks:[['catalog','Task catalog'],['matrix','Results matrix']],leaderboard:[['ranking','Ranking'],['comparison','Model comparison']],documents:[['method','Method'],['run','Run'],['resources','Resources']]};
@@ -34,7 +34,7 @@ window.Site=(()=>{
  const legacy=new URLSearchParams(location.search),old={board:'leaderboard',compare:'compare',matrix:'matrix',episodes:'episodes',run:'run',about:'about'};
  if(page==='home'&&Object.hasOwn(old,legacy.get('lab'))){const target=old[legacy.get('lab')];legacy.delete('lab');legacy.delete('variant');location.replace(href(target,Object.fromEntries(legacy))+location.hash);}
  const nav=['tasks','leaderboard','episodes','documents'];
- $('#app').innerHTML=`<header class="site-header"><a class="brand" data-site-page="home" href="${href('home')}" aria-label="AI4Robot overview"><span class="brand-mark" aria-hidden="true">a<span>4</span>r</span>AI4Robot<span class="brand-sub">RESEARCH PROJECT</span></a><button class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">Menu <span aria-hidden="true">☰</span></button><nav id="primary-nav" aria-label="Primary navigation">${nav.map(id=>link(id)).join('')}</nav></header><main id="main" tabindex="-1">${page==='home'?'':`<div class="page-heading"><div class="page-heading-meta"><span>${pages[page][4]}</span><span>AI4ROBOT / ${page.toUpperCase()}</span></div><h1>${pages[page][2]}</h1><p>${pages[page][3]}</p></div>`}<div id="page-content"></div></main><footer class="site-footer"><div><a class="brand" data-site-page="home" href="${href('home')}">AI4Robot ↗</a><p>Code meets the physical world.</p></div><div class="footer-right"><div class="footer-links">${['method','run','about'].map(id=>link(id)).join('')}<a href="${RESEARCH_REPO}" target="_blank" rel="noopener">Research repository ↗</a></div><span>RESEARCH PREVIEW · 2026</span><p>22 task specifications · Reviewed model results and footage forthcoming</p></div></footer>`;
+ $('#app').innerHTML=`<header class="site-header"><a class="brand" data-site-page="home" href="${href('home')}" aria-label="AI4Robot overview"><span class="brand-mark" aria-hidden="true">a<span>4</span>r</span>AI4Robot<span class="brand-sub">RESEARCH PROJECT</span></a><button class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">Menu <span aria-hidden="true">☰</span></button><nav id="primary-nav" aria-label="Primary navigation">${nav.map(id=>link(id)).join('')}</nav></header><main id="main" tabindex="-1">${page==='home'?'':`<div class="page-heading"><div class="page-heading-meta"><span>${pages[page][4]}</span><span>AI4ROBOT / ${page.toUpperCase()}</span></div><h1>${pages[page][2]}</h1><p>${pages[page][3]}</p></div>`}<div id="page-content"></div></main><footer class="site-footer"><div><a class="brand" data-site-page="home" href="${href('home')}">AI4Robot ↗</a><p>Embodied Generalist Exam · Beyond robot control.</p></div><div class="footer-right"><div class="footer-links">${['method','run','about'].map(id=>link(id)).join('')}<a href="${RESEARCH_REPO}" target="_blank" rel="noopener">Research repository ↗</a></div><span>RESEARCH PREVIEW · 2026</span><p>22 task specifications · Reviewed model results and footage forthcoming</p></div></footer>`;
  if(sections[page]){
   $('#page-content').innerHTML=`<div class="section-switch" role="group" aria-label="${pages[page][1]} views">${sections[page].map(([id,label])=>`<button type="button" data-section="${id}" aria-controls="${page}-${id}-panel" aria-pressed="${section()===id}">${label}</button>`).join('')}</div>${sections[page].map(([id,label])=>`<div id="${page}-${id}-panel" role="region" aria-label="${label}" ${section()===id?'':'hidden'}></div>`).join('')}`;
  }
@@ -57,7 +57,8 @@ window.Site=(()=>{
   const url=new URL(anchor.href),active=url.searchParams.get('section');
   if(url.origin!==location.origin||url.pathname!==location.pathname||!sections[page].some(([id])=>id===active)||active===section())return;
   e.preventDefault();$('#dossier').close();history.pushState({},'',url);updateSection();refreshLinks();
-  const destination=url.hash?document.getElementById(url.hash.slice(1)):$('#main');destination?.scrollIntoView();
+  const destination=url.hash?document.getElementById(url.hash.slice(1)):$('#main');
+  if(destination){destination.tabIndex=-1;destination.focus({preventScroll:true});destination.scrollIntoView();}
  });
  window.addEventListener('popstate',()=>{updateSection();refreshLinks();});
  const navEl=$('#primary-nav'),toggle=$('.nav-toggle');

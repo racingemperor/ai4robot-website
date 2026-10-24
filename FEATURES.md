@@ -94,3 +94,7 @@ Defaults: seed 0 and layouts 0,1,2. Commands are generated as text, never execut
 ## Verification
 
 Run node --test tests/results.test.cjs and syntax-check all eight JS files. The data/timeline suite currently has eight tests. Validate desktop/mobile document navigation, local section switching/history/legacy redirects, shared category filters, task details, score/progress displays, exports, import/reload/clear, Documents method anchors, retained run configuration, direct-policy guards and episode video controls. Publish only the website allowlist; verify Pages files after deployment.
+
+## Manuscript integration
+
+paper.js curates the EGE research overview, three contributions, four package components, six construction stages and four evaluation goals. Documents → Resources provides the adapted overview; Documents → Method explains design, sourcing, creation and fairness. Home has a concise research section, and task details expose the package definition without expanding the gallery. The current report schema and scoring remain unchanged. Wall-clock elapsed time and token consumption are not inferred from simulation seconds. The site publishes no manuscript source archive, template PDF, author placeholders or empirical results.
