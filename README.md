@@ -2,7 +2,7 @@
 
 Live: https://racingemperor.github.io/ai4robot-website/
 
-An English static research website with eight main pages and two compatibility redirects, a fixed header and 22 task dossiers. T18 is excluded. Research sources: https://github.com/ALEXander22568/AI4Robot and the project Notion notebook linked from Resources. Current task definitions follow GitHub; the user confirmed T23 is navigation among people.
+An English static research website with five main pages and six compatibility redirects, a fixed header and 22 task dossiers. T18 is excluded. Research sources: https://github.com/ALEXander22568/AI4Robot and the project Notion notebook linked from Documents → Resources. Current task definitions follow GitHub; the user confirmed T23 is navigation among people.
 
 ## Documents
 
@@ -14,12 +14,11 @@ An English static research website with eight main pages and two compatibility r
 | compare.html | Compatibility redirect to leaderboard.html?section=comparison |
 | matrix.html | Compatibility redirect to tasks.html?section=matrix |
 | episodes.html | Events, filters, timeline, local video and episode export |
-| method.html | Routes, information boundary, hidden evaluation and reporting rules |
-| run.html | Current development CLI and supported direct-policy evaluation commands |
-| about.html | Research sources, release status, reporting tools, contributions and FAQ |
-| footage.html | Video formats, T06 storyboard and all task shot lists |
+| documents.html | Evaluation method, research CLI configurator, sources, release status, report tools, contributions and FAQ |
+| method.html / run.html / about.html | Compatibility redirects to the corresponding Documents section |
+| footage.html | Retired media-plan URL; redirects to Documents |
 
-The fixed header has seven categories: Tasks, Leaderboard, Episodes, Method, Run, Resources and Media plan. The logo opens Home. Leaderboard contains Ranking / Model comparison; Tasks contains Task catalog / Results matrix. These are local button-controlled views, not links to other categories: the document and highlighted header stay the same. The section query parameter supports sharing, reload and browser back/forward. Catalog selection/search/layout and report source are retained; category/capability filters are shared between catalog and matrix. Other categories use independent documents. No framework, build or package installation is required.
+The fixed header has exactly four categories: Tasks, Leaderboard, Episodes and Documents. The logo opens Home. Leaderboard contains Ranking / Model comparison; Tasks contains Task catalog / Results matrix; Documents contains Method / Run / Resources. These are local button-controlled views: the document and highlighted header stay the same. The section query parameter supports sharing, reload and browser back/forward. Catalog selection/search/layout and report source are retained; category/capability filters are shared between catalog and matrix. Documents keeps the current run configuration when switching sections; links between its sections stay in the same document. Media plan is no longer part of the public site. No framework, build or package installation is required.
 
 ## Serve and verify
 
@@ -42,4 +41,4 @@ The site does not execute robot commands or request provider credentials. Its ru
 
 site.js owns navigation and shared dialogs; app.js owns narrative pages; lab.js owns result/configuration tools; tasks.js owns the reviewed task catalog; results.js owns validation and aggregation; illustrations.js owns original SVG concept diagrams.
 
-Publish only this website directory to the website repository. GitHub Pages serves the root of codex/website-publication. Research source code, operational setup, credentials and progress records are outside publication scope. See DESIGN-NOTES.md and VIDEO-BRIEF.md.
+Publish only this website directory to the website repository. GitHub Pages serves the root of codex/website-publication. Research source code, operational setup, credentials and progress records are outside publication scope. See DESIGN-NOTES.md. The internal VIDEO-BRIEF.md is excluded from publication.

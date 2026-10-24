@@ -2,7 +2,7 @@
 
 ## Available tools
 
-- Eight main pages with seven fixed header categories, a Home logo and a menu at 1100 px and below. Model comparison is a local Leaderboard view; the results matrix is a local Tasks view. View switches preserve the parent document and header highlight, with shareable section links and browser history. Two old document URLs redirect to the combined pages.
+- Five main pages with four fixed header categories: Tasks, Leaderboard, Episodes and Documents. Home opens through the logo; small screens use a menu. Model comparison is a local Leaderboard view; the results matrix is a local Tasks view; Method, Run and Resources are local Documents views. Switching preserves the parent document and header highlight, with shareable section links and browser history. Six old document URLs redirect to the current structure.
 - Twenty-two task dossiers with evaluation category, capability facets, embodiment, deliverable, current scope and filming requirements.
 - Home route switch and interactive T06 judge examples.
 - Leaderboard ranking view with sorting, model search, category/delivery/capability/embodiment filters, coverage and exports. No cross-page comparison action is embedded in its table.
@@ -12,7 +12,7 @@
 - Existing check/solve/play and bounded direct-policy eval command configuration.
 - Local report validation, session-tab persistence, clear control and storage fallback.
 - CSV/JSON downloads, shareable view links, research sources, FAQ and website citation.
-- Video production formats, T06 storyboard and per-task shot lists.
+- Task dossiers retain per-task evidence requirements and shot lists. The standalone media plan has been retired.
 
 These cover the main research-site capabilities observed in earlier public-page reviews of RoboDojo and Embodied First Exam. They are not an exhaustive claim about those websites.
 
@@ -76,4 +76,4 @@ Defaults: seed 0 and layouts 0,1,2. Commands are generated as text, never execut
 
 ## Verification
 
-Run node --test tests/results.test.cjs and syntax-check all six JS files. Validate desktop/mobile document navigation, local section switching/history/legacy redirects, shared category filters, task details, score/progress displays, exports, import/reload/clear, direct-policy guards and video controls. Publish only the website allowlist; verify Pages files after deployment.
+Run node --test tests/results.test.cjs and syntax-check all six JS files. Validate desktop/mobile document navigation, local section switching/history/legacy redirects, shared category filters, task details, score/progress displays, exports, import/reload/clear, Documents method anchors, retained run configuration, direct-policy guards and episode video controls. Publish only the website allowlist; verify Pages files after deployment.

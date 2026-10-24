@@ -3,22 +3,15 @@
 <head>
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1">
- <meta name="description" content="Task-specific video requirements for showing physical evidence.">
- <meta name="theme-color" content="#f5f3ed">
- <title>Video production plan — AI4Robot</title>
+ <title>Documentation — AI4Robot</title>
  <link rel="icon" href="data:,">
- <link rel="stylesheet" href="styles.css">
- <link rel="stylesheet" href="lab.css">
- <link rel="stylesheet" href="site.css?v=920e876cd9">
- <script defer src="tasks.js"></script>
-<script defer src="site.js?v=a5d921df03"></script>
-<script defer src="illustrations.js"></script>
-<script defer src="app.js?v=059eab0ebd"></script>
+ <script>
+  const target=new URL('documents.html',location.href);
+  target.search=location.search;target.searchParams.set('section','method');target.hash=location.hash;
+  location.replace(target.href);
+ </script>
 </head>
-<body data-page="footage">
- <a class="skip-link" href="#main">Skip to content</a>
- <div id="app"></div>
- <dialog id="dossier" aria-labelledby="dialog-title"><div id="dialog-content"></div></dialog>
- <noscript>Enable JavaScript to use the interactive tools. <a href="VIDEO-BRIEF.md">Read the video production brief</a>.</noscript>
+<body><p>The media plan has been retired. Continue to Documents. <a id="destination" href="documents.html?section=method">Continue to documentation</a>.</p>
+<script>document.getElementById('destination').href=target.href;</script>
 </body>
 </html>
