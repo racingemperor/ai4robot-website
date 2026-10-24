@@ -3,23 +3,15 @@
 <head>
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1">
- <meta name="description" content="Compare up to three models on common task coverage.">
- <meta name="theme-color" content="#f5f3ed">
  <title>Model comparison — AI4Robot</title>
  <link rel="icon" href="data:,">
- <link rel="stylesheet" href="styles.css">
- <link rel="stylesheet" href="lab.css">
- <link rel="stylesheet" href="site.css">
- <script defer src="tasks.js"></script>
-<script defer src="site.js"></script>
-<script defer src="illustrations.js"></script>
-<script defer src="results.js"></script>
-<script defer src="lab.js"></script>
+ <script>
+  const target=new URL('leaderboard.html',location.href);
+  target.search=location.search;target.searchParams.set('section','comparison');target.hash=location.hash;
+  location.replace(target.href);
+ </script>
 </head>
-<body data-page="compare">
- <a class="skip-link" href="#main">Skip to content</a>
- <div id="app"></div>
- <dialog id="dossier" aria-labelledby="dialog-title"><div id="dialog-content"></div></dialog>
- <noscript>Enable JavaScript to use the interactive tools. <a href="VIDEO-BRIEF.md">Read the video production brief</a>.</noscript>
+<body><p>Model comparison is now part of Leaderboard. <a id="destination" href="leaderboard.html?section=comparison">Continue to model comparison</a>.</p>
+<script>document.getElementById('destination').href=target.href;</script>
 </body>
 </html>

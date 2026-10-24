@@ -6,7 +6,7 @@ window.Lab = (() => {
   const reportPages=['board','compare','matrix','episodes'];
   const storageKey='ai4robot-imported-report-v1';
   const query=new URLSearchParams(location.search);
-  const L={tab:currentPage==='leaderboard'?'board':currentPage,source:query.get('data')==='demo'?'demo':'official',imported:null,importedSynthetic:false,importedSaved:false,track:'all',category:'all',group:'all',robot:'all',sort:'score',direction:-1,modelQuery:'',compare:[],episode:'',episodeTask:'all',episodeModel:'all',status:'all',time:0,playing:false,raf:0,last:0,videoURL:'',videoEpisode:'',message:'',runTask:'T06',runMode:'solve',runAgent:'vlm',runModel:'mock',gpu:'0',seeds:'0',layouts:'0,1,2',camera:'head'};
+  const L={tab:currentPage==='leaderboard'?(Site.section==='comparison'?'compare':'board'):currentPage==='tasks'?'matrix':currentPage,source:query.get('data')==='demo'?'demo':'official',imported:null,importedSynthetic:false,importedSaved:false,track:'all',category:'all',group:'all',robot:'all',sort:'score',direction:-1,modelQuery:'',compare:[],episode:'',episodeTask:'all',episodeModel:'all',status:'all',time:0,playing:false,raf:0,last:0,videoURL:'',videoEpisode:'',message:'',runTask:'T06',runMode:'solve',runAgent:'vlm',runModel:'mock',gpu:'0',seeds:'0',layouts:'0,1,2',camera:'head'};
   for(const key of ['track','category','group','robot','sort','modelQuery','episodeTask','episodeModel','status','episode']){const value=query.get(key);if(value&&value.length<160)L[key]=value;}
   if(!['all','A','B','C'].includes(L.track))L.track='all';
   if(!['all',...CATEGORIES.map(c=>c.id)].includes(L.category))L.category='all';
@@ -33,16 +33,17 @@ window.Lab = (() => {
   function summary(ids=selectedTasks().map(t=>t.id)){return Results.summarize(data(),ids);}
   function orderedRows(){return summary().filter(m=>`${m.name} ${m.agent} ${m.version}`.toLowerCase().includes(L.modelQuery.toLowerCase())).sort((a,b)=>Number(b.complete)-Number(a.complete)||((a[L.sort]??-Infinity)-(b[L.sort]??-Infinity))*L.direction||a.id.localeCompare(b.id));}
   function syncURL(){
+    if(currentPage==='tasks'&&Site.section!=='matrix')return;
     const p=new URLSearchParams(location.search);
     const resultKeys=['track','category','group','robot'];
-    const pageKeys={board:[...resultKeys,'sort','modelQuery'],compare:resultKeys,matrix:resultKeys,episodes:[...resultKeys,'episodeTask','episodeModel','status','episode'],run:[],about:[]};
+    const pageKeys={board:[...resultKeys,'sort','modelQuery'],compare:[...resultKeys,'sort','modelQuery'],matrix:resultKeys,episodes:[...resultKeys,'episodeTask','episodeModel','status','episode'],run:[],about:[]};
     for(const key of ['lab','variant','track','category','group','robot','sort','modelQuery','episodeTask','episodeModel','status','episode','models','order'])p.delete(key);
     L.source!=='official'?p.set('data',L.source):p.delete('data');
     for(const key of pageKeys[L.tab]){const v=L[key];if(v&&v!=='all')p.set(key,v);}
-    if(L.tab==='board')p.set('order',L.direction===1?'asc':'desc');
-    if(L.tab==='compare'&&L.compare.length)p.set('models',L.compare.join(','));
-    if(L.tab==='run')p.set('task',L.runTask);else p.delete('task');
-    history.replaceState({},'',location.pathname+(p.size?'?'+p:''));Site.refreshLinks();
+    if(currentPage==='leaderboard')p.set('order',L.direction===1?'asc':'desc');
+    if(currentPage==='leaderboard'&&L.compare.length)p.set('models',L.compare.join(','));
+    if(L.tab==='run')p.set('task',L.runTask);else if(currentPage!=='tasks')p.delete('task');
+    history.replaceState({},'',location.pathname+(p.size?'?'+p:'')+location.hash);Site.refreshLinks();
   }
   function pageLink(page,extra){return h(Site.href(page,extra));}
   const option=(value,text,active)=>`<option value="${h(value)}"${value===active?' selected':''}>${h(text)}</option>`;
@@ -94,7 +95,7 @@ window.Lab = (() => {
  ['Can I import raw research summary.json?','Not directly. Use the website schema: one model/task aggregate, normalized progress_sum, total valid trials and simulation duration. Preserve the protocol and provenance; do not relabel a reference solver as a model.']
  ].map(([a,b])=>`<details><summary>${a}</summary><p>${b}</p></details>`).join('')}</div><div class="downloads"><h2>Reporting materials</h2><button class="lab-button" data-lab-action="tasks-json">Download 22-task catalog</button><button class="lab-button" data-lab-action="demo-json">Synthetic report example</button><button class="lab-button" data-lab-action="citation">Copy website citation</button><a class="lab-button" href="FEATURES.md">Report format & tools ↗</a><p class="lab-note">The citation is for this website preview, not a benchmark paper. Paper title and authors will be added with the research release.</p></div>`;}
   function renderPanel(){
-    stop();const root=q('#research');if(!root)return;syncURL();
+    stop();const root=q('#research');if(!root)return;
     const focused=document.activeElement;
     const focusKey=focused?.id?`#${CSS.escape(focused.id)}`:focused?.dataset.labFilter?`[data-lab-filter="${focused.dataset.labFilter}"]`:focused?.dataset.sort?`[data-sort="${focused.dataset.sort}"]`:focused?.dataset.compareChoice?`[data-compare-choice="${CSS.escape(focused.dataset.compareChoice)}"]`:null;
     if(q('#source-label')){
@@ -163,7 +164,7 @@ window.Lab = (() => {
       if(action==='stored'&&L.imported){clearVideo();L.source='imported';L.compare=[];L.episode='';L.episodeTask=L.episodeModel=L.status='all';renderPanel();}
       if(action==='clear-import'){
         let cleared=true;try{sessionStorage.removeItem(storageKey);}catch{cleared=false;}
-        clearVideo();L.imported=null;L.importedSynthetic=false;L.importedSaved=false;if(L.source==='imported')L.source='official';L.message=cleared?'Cleared the imported report from this tab.':'Cleared the current page import. Storage could not be accessed; close this tab to end the session.';syncURL();q('#page-content').innerHTML=html();mount();
+        clearVideo();L.imported=null;L.importedSynthetic=false;L.importedSaved=false;if(L.source==='imported')L.source='official';L.message=cleared?'Cleared the imported report from this tab.':'Cleared the current page import. Storage could not be accessed; close this tab to end the session.';syncURL();render();
       }
       if(action==='share'){syncURL();copy(location.href);if(L.source==='imported')message('Only view parameters are shared. Imported report data is not uploaded or included in the link.');}
       if(['csv','matrix-csv','compare-csv'].includes(action))exportRows(action);
@@ -187,7 +188,7 @@ window.Lab = (() => {
         const file=el.files[0];try{if(file.size>5*1024*1024)throw new Error('The report exceeds 5 MB.');const raw=JSON.parse(await file.text());const checked=Results.validate(raw);clearVideo();L.imported=checked;L.importedSynthetic=raw.website_data_source==='demo';L.source='imported';L.compare=[];L.episode='';L.episodeTask=L.episodeModel=L.status='all';L.message=`Validated: ${L.imported.models.length} models, ${L.imported.results.length} task aggregates, ${L.imported.episodes.length} episodes. Local and unreviewed. ${raw.website_data_source==='demo'?'The file is labeled synthetic and cannot support model performance claims. ':''}`;
         L.importedSaved=false;try{sessionStorage.setItem(storageKey,JSON.stringify({report:checked,synthetic:L.importedSynthetic}));L.importedSaved=true;L.message+='Saved in this tab for navigation and reload.';}
         catch{try{sessionStorage.removeItem(storageKey);}catch{}L.message+='Storage unavailable; this page only. Import again after navigation.';}
-        syncURL();q('#page-content').innerHTML=html();mount();}catch(error){message(`Import failed: ${error.message}`);}finally{el.value='';}
+        syncURL();render();}catch(error){message(`Import failed: ${error.message}`);}finally{el.value='';}
       }
       if(el.id==='episode-video-upload'&&el.files[0]){const file=el.files[0];if(!file.type.startsWith('video/')){message('Select a video file.');return;}stop();if(L.videoURL)URL.revokeObjectURL(L.videoURL);L.videoURL=URL.createObjectURL(file);L.videoEpisode=currentEpisode().id;L.time=0;renderPanel();}
       if(el.id==='episode-speed'){const video=q('#episode-video');if(video)video.playbackRate=Number(el.value);}
@@ -201,8 +202,27 @@ window.Lab = (() => {
     root.addEventListener('submit',e=>{if(e.target.id==='run-form')e.preventDefault();});
   }
   document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();updateTime();}});
-  return {html,mount,stop};
+  function render(){
+    const host=currentPage==='tasks'?q('#tasks-matrix-panel'):currentPage==='leaderboard'?q(`#leaderboard-${Site.section}-panel`):q('#page-content');
+    q('#research')?.remove();host.innerHTML=html();mount();
+  }
+  document.addEventListener('site:sectionchange',()=>{
+    if(currentPage==='tasks'&&Site.section!=='matrix')return;
+    const p=new URLSearchParams(location.search);
+    L.category=CATEGORIES.some(c=>c.id===p.get('category'))?p.get('category'):'all';
+    L.group=GROUPS.some(g=>g.id===p.get('group'))?p.get('group'):'all';
+    L.track=['A','B','C'].includes(p.get('track'))?p.get('track'):'all';
+    L.robot=TASKS.some(t=>t.robot===p.get('robot'))?p.get('robot'):'all';
+    const source=p.get('data');L.source=source==='demo'?'demo':source==='imported'&&L.imported?'imported':'official';
+    if(currentPage==='leaderboard'){
+      L.tab=Site.section==='comparison'?'compare':'board';
+      L.sort=['score','pooled','progress','duration','trials','coverage'].includes(p.get('sort'))?p.get('sort'):'score';
+      L.direction=p.get('order')==='asc'?1:-1;L.modelQuery=(p.get('modelQuery')||'').slice(0,160);
+      L.compare=(p.get('models')||'').split(',').filter(Boolean).slice(0,3);
+    }
+    render();
+  });
+  return {render,stop};
 })();
 
-$('#page-content').innerHTML=Lab.html();
-Lab.mount();
+Lab.render();

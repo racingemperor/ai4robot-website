@@ -2,24 +2,24 @@
 
 Live: https://racingemperor.github.io/ai4robot-website/
 
-An English static research website with ten independent documents, a fixed header and 22 task dossiers. T18 is excluded. Research sources: https://github.com/ALEXander22568/AI4Robot and the project Notion notebook linked from Resources. Current task definitions follow GitHub; the user confirmed T23 is navigation among people.
+An English static research website with eight main pages and two compatibility redirects, a fixed header and 22 task dossiers. T18 is excluded. Research sources: https://github.com/ALEXander22568/AI4Robot and the project Notion notebook linked from Resources. Current task definitions follow GitHub; the user confirmed T23 is navigation among people.
 
 ## Documents
 
 | Page | Purpose |
 |---|---|
 | index.html | Research question, interactive evaluation routes, T06 scoring case and four categories |
-| tasks.html | Category/capability filters, atlas/list, search, task scope and evidence requirements |
-| leaderboard.html | Balanced success, pooled success/intervals, progress, coverage and exports |
-| compare.html | Up to three models and common-task capability profiles |
-| matrix.html | Task/model outcomes and links to episode evidence |
+| tasks.html | Task catalog with category/capability filters, atlas/list, search, dossiers, plus a task/model results matrix |
+| leaderboard.html | Ranking with balanced/pooled success, progress, coverage and exports, plus up to three-model comparison |
+| compare.html | Compatibility redirect to leaderboard.html?section=comparison |
+| matrix.html | Compatibility redirect to tasks.html?section=matrix |
 | episodes.html | Events, filters, timeline, local video and episode export |
 | method.html | Routes, information boundary, hidden evaluation and reporting rules |
 | run.html | Current development CLI and supported direct-policy evaluation commands |
 | about.html | Research sources, release status, reporting tools, contributions and FAQ |
 | footage.html | Video formats, T06 storyboard and all task shot lists |
 
-The fixed header lists every independent section, including Compare and Task matrix. No secondary result tabs are shown, and the leaderboard table stays focused on ranking. Navigation uses document links, with independent titles and browser back/reload support. Page-local filtering and sorting retain the current section. No framework, build or package installation is required.
+The fixed header has seven categories: Tasks, Leaderboard, Episodes, Method, Run, Resources and Media plan. The logo opens Home. Leaderboard contains Ranking / Model comparison; Tasks contains Task catalog / Results matrix. These are local button-controlled views, not links to other categories: the document and highlighted header stay the same. The section query parameter supports sharing, reload and browser back/forward. Catalog selection/search/layout and report source are retained; category/capability filters are shared between catalog and matrix. Other categories use independent documents. No framework, build or package installation is required.
 
 ## Serve and verify
 

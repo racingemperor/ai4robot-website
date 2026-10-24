@@ -8,9 +8,11 @@ The visual language is paper, dark ink and rust red, with editorial typography a
 
 ## Distinct pages
 
-The task atlas describes what is tested. Method describes how the test is controlled. Leaderboard ranks complete reports, Compare shows capability differences on common tasks, Matrix exposes per-task gaps, and Episodes inspects evidence in time. Run generates commands; Resources explains access and reporting; Media plan specifies future evidence. All have real document URLs and their own H1.
+The task atlas describes what is tested. Method describes how the test is controlled. Leaderboard contains rankings and comparison on common tasks. Tasks contains the catalog and a results matrix that exposes per-task gaps. Episodes inspects evidence in time. Run generates commands; Resources explains access and reporting; Media plan specifies future evidence. All have real document URLs and their own H1.
 
-The fixed header is the only page-category navigation. Tasks, Leaderboard, Compare, Task matrix, Episodes, Method, Run, Resources and Media plan are independent top-level destinations. There is no secondary result-page navigation. Leaderboard contains ranking, filters, metric explanations and exports; it has no comparison action column. Page-local controls keep the current document and its active header item. The header switches to a menu at 1100 px and below so every destination remains available. Explicit evidence and resource links remain regular document links. Cross-page links carry relevant task/model/source filters only. Legacy lab bookmarks redirect to the corresponding document.
+The fixed header has seven categories: Tasks, Leaderboard, Episodes, Method, Run, Resources and Media plan. Home is reached through the logo. Ranking / Model comparison are two local views within Leaderboard; Task catalog / Results matrix are two local views within Tasks. Native buttons with pressed states and labeled regions switch content in the same document. The parent header remains current. The section query parameter supports direct links, refresh and browser back/forward. Catalog and matrix share category/capability scope; catalog search, selected task and atlas/list layout are preserved. Report imports rebuild only the report host, leaving the catalog intact.
+
+The leaderboard ranking table stays focused on metrics without comparison action columns. Explicit evidence and resource links remain regular document links. The header switches to a menu at 1100 px and below. Old compare.html and matrix.html links preserve filters and redirect to their parent section, as do legacy index.html?lab= bookmarks.
 
 ## Three separate concepts
 

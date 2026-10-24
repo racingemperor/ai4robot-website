@@ -12,35 +12,53 @@ const RESEARCH_NOTES='https://app.notion.com/p/gpt-robotllm-as-policy-benchmark-
 window.Site=(()=>{
  const pages={
   home:['index.html','Overview','AI4Robot','Code meets the physical world.','LLM EMBODIMENT BENCHMARK'],
-  tasks:['tasks.html','Tasks','The task atlas.','22 tasks across manipulation, navigation, training and construction. Explore the goal, interface and evidence for each.','BENCHMARK SCOPE'],
+  tasks:['tasks.html','Tasks','Explore the tasks and their results.','Inspect 22 task specifications across four categories, then examine their model results in one task matrix.','BENCHMARK SCOPE'],
   leaderboard:['leaderboard.html','Leaderboard','How do models perform?','Compare success, progress and coverage under one recorded evaluation protocol.','MODEL PERFORMANCE'],
-  compare:['compare.html','Compare','Where do models differ?','Compare up to three models on tasks they all cover, then inspect their capability profiles.','SIDE BY SIDE'],
-  matrix:['matrix.html','Task matrix','Every task. Every result.','Inspect individual outcomes, identify gaps and follow a result into its episode record.','TASK × MODEL'],
   episodes:['episodes.html','Episodes','Follow an action to its outcome.','Inspect observations, actions, feedback and final judgments on a shared timeline.','PROCESS EVIDENCE'],
   method:['method.html','Method','What counts as embodied ability?','The evaluation routes, information boundaries and scoring rules behind the benchmark.','EVALUATION DESIGN'],
   run:['run.html','Run','From a task to a reproducible run.','Configure the current research CLI for development or supported direct-policy evaluation.','REPRODUCE & DEVELOP'],
   about:['about.html','Resources','Read, inspect, contribute.','Research sources, release status, reporting tools and ways to contribute evidence.','PROJECT RESOURCES'],
   footage:['footage.html','Media plan','What should the footage prove?','A production plan for showing decisions, physical interactions and verified outcomes.','VIDEO PRODUCTION']
  };
- const page=document.body.dataset.page,resultPages=['leaderboard','compare','matrix','episodes'];
+ const page=document.body.dataset.page,resultPages=['tasks','leaderboard','compare','matrix','episodes'];
+ const sections={tasks:[['catalog','Task catalog'],['matrix','Results matrix']],leaderboard:[['ranking','Ranking'],['comparison','Model comparison']]};
+ const section=()=>sections[page]?.find(([id])=>id===new URLSearchParams(location.search).get('section'))?.[0]||sections[page]?.[0][0];
  function href(id,overrides={}){
   const current=new URLSearchParams(location.search),p=new URLSearchParams();
   for(const key of ['data',...(resultPages.includes(id)?['track','category','group','robot']:[])])if(current.has(key))p.set(key,current.get(key));
   for(const [key,value]of Object.entries(overrides))if(value===null||value===undefined||value==='')p.delete(key);else p.set(key,String(value));
+  const aliases={compare:['leaderboard','comparison'],matrix:['tasks','matrix']};
+  if(aliases[id]){p.set('section',aliases[id][1]);id=aliases[id][0];}
   return pages[id][0]+(p.size?'?'+p:'');
  }
  function link(id,label){return `<a data-site-page="${id}" href="${esc(href(id))}" ${page===id?'aria-current="page"':''}>${label||pages[id][1]}</a>`;}
  function refreshLinks(){$$('[data-site-page]').forEach(a=>a.href=href(a.dataset.sitePage));}
  const legacy=new URLSearchParams(location.search),old={board:'leaderboard',compare:'compare',matrix:'matrix',episodes:'episodes',run:'run',about:'about'};
- if(page==='home'&&Object.hasOwn(old,legacy.get('lab'))){const target=old[legacy.get('lab')];legacy.delete('lab');legacy.delete('variant');location.replace(pages[target][0]+(legacy.size?'?'+legacy:''));}
- const nav=['tasks','leaderboard','compare','matrix','episodes','method','run','about','footage'];
+ if(page==='home'&&Object.hasOwn(old,legacy.get('lab'))){const target=old[legacy.get('lab')];legacy.delete('lab');legacy.delete('variant');location.replace(href(target,Object.fromEntries(legacy))+location.hash);}
+ const nav=['tasks','leaderboard','episodes','method','run','about','footage'];
  $('#app').innerHTML=`<header class="site-header"><a class="brand" data-site-page="home" href="${href('home')}" aria-label="AI4Robot overview"><span class="brand-mark" aria-hidden="true">a<span>4</span>r</span>AI4Robot<span class="brand-sub">RESEARCH PROJECT</span></a><button class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">Menu <span aria-hidden="true">☰</span></button><nav id="primary-nav" aria-label="Primary navigation">${nav.map(id=>link(id)).join('')}</nav></header><main id="main" tabindex="-1">${page==='home'?'':`<div class="page-heading"><div class="page-heading-meta"><span>${pages[page][4]}</span><span>AI4ROBOT / ${page.toUpperCase()}</span></div><h1>${pages[page][2]}</h1><p>${pages[page][3]}</p></div>`}<div id="page-content"></div></main><footer class="site-footer"><div><a class="brand" data-site-page="home" href="${href('home')}">AI4Robot ↗</a><p>Code meets the physical world.</p></div><div class="footer-right"><div class="footer-links">${['method','about','footage'].map(id=>link(id)).join('')}<a href="${RESEARCH_REPO}" target="_blank" rel="noopener">Research repository ↗</a></div><span>RESEARCH PREVIEW · 2026</span><p>22 task specifications · Reviewed model results and footage forthcoming</p></div></footer>`;
+ if(sections[page]){
+  $('#page-content').innerHTML=`<div class="section-switch" role="group" aria-label="${pages[page][1]} views">${sections[page].map(([id,label])=>`<button type="button" data-section="${id}" aria-controls="${page}-${id}-panel" aria-pressed="${section()===id}">${label}</button>`).join('')}</div>${sections[page].map(([id,label])=>`<div id="${page}-${id}-panel" role="region" aria-label="${label}" ${section()===id?'':'hidden'}></div>`).join('')}`;
+ }
+ function updateSection(){
+  if(!sections[page])return;
+  const active=section();
+  $$('[data-section]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.section===active)));
+  sections[page].forEach(([id])=>{$(`#${page}-${id}-panel`).hidden=id!==active;});
+  document.dispatchEvent(new CustomEvent('site:sectionchange',{detail:{section:active}}));
+ }
+ document.addEventListener('click',e=>{
+  const button=e.target.closest('[data-section]');if(!button||button.dataset.section===section())return;
+  const p=new URLSearchParams(location.search);p.set('section',button.dataset.section);
+  history.pushState({},'',location.pathname+'?'+p+location.hash);updateSection();refreshLinks();
+ });
+ window.addEventListener('popstate',()=>{updateSection();refreshLinks();});
  const navEl=$('#primary-nav'),toggle=$('.nav-toggle');
  const close=()=>{navEl.classList.remove('is-open');toggle.setAttribute('aria-expanded','false');};
  toggle.addEventListener('click',()=>{const open=toggle.getAttribute('aria-expanded')!=='true';toggle.setAttribute('aria-expanded',String(open));navEl.classList.toggle('is-open',open);});
  navEl.addEventListener('click',e=>{if(e.target.closest('a'))close();});
  $('.site-header').addEventListener('keydown',e=>{if(e.key==='Escape'){close();toggle.focus();}});
- return {href,refreshLinks,page};
+ return {href,refreshLinks,page,get section(){return section();}};
 })();
 function showDialog(html){$('#dialog-content').innerHTML=`<button class="dialog-close" data-action="close-dialog" aria-label="Close dialog">×</button>${html}`;$('#dossier').showModal();}
 function showTask(id){const t=task(id);showDialog(`<p class="eyebrow">${t.id} / TASK DOSSIER</p><h2 id="dialog-title">${t.name}</h2><p class="dialog-subtitle">${category(t.category).name} · ${t.robot} · ${tracks[t.track].output}</p><div class="dossier-grid"><div><h3>The goal</h3><p>${t.goal}</p><h3>Evidence to capture</h3><p>${t.video}</p><h3>What the viewer should verify</h3><p>${t.proof}</p></div><div class="shot-sheet"><span class="mono">SHOT LIST / ${t.id}</span>${t.beats.map((b,i)=>`<div><span>${String(i+1).padStart(2,'0')}</span><strong>${b}</strong></div>`).join('')}<p>Target edit: 12–25 seconds. Keep the full episode and all original camera streams. Label success, failure and incomplete outcomes from the actual judgment.</p></div></div><p class="dossier-notice"><strong>Current scope.</strong> ${t.note}</p><div class="task-crosslinks"><a href="${Site.href('episodes',{episodeTask:t.id})}">Episode evidence ↗</a><a href="${Site.href('run',{task:t.id})}">Configure a run ↗</a></div><p class="source-path">Task specification and filming plan · Research snapshot: October 23, 2026</p>`);}

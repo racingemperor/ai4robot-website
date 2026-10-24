@@ -2,12 +2,12 @@
 
 ## Available tools
 
-- Ten independent pages with one fixed top-level navigation and a menu at 1100 px and below. Compare and Task matrix have their own header entries; there are no secondary result-page tabs.
+- Eight main pages with seven fixed header categories, a Home logo and a menu at 1100 px and below. Model comparison is a local Leaderboard view; the results matrix is a local Tasks view. View switches preserve the parent document and header highlight, with shareable section links and browser history. Two old document URLs redirect to the combined pages.
 - Twenty-two task dossiers with evaluation category, capability facets, embodiment, deliverable, current scope and filming requirements.
 - Home route switch and interactive T06 judge examples.
-- A dedicated leaderboard with sorting, model search, category/delivery/capability/embodiment filters, coverage and exports. No cross-page comparison action is embedded in its table.
+- Leaderboard ranking view with sorting, model search, category/delivery/capability/embodiment filters, coverage and exports. No cross-page comparison action is embedded in its table.
 - Up to three-model comparison on common capability-task coverage.
-- Numeric task/model matrix linked to matching episode records.
+- Numeric task/model matrix within Tasks, linked to matching episode records. Catalog and matrix share category/capability scope; switching preserves catalog search/selection/layout. Importing or clearing a report leaves the catalog intact.
 - Episode filters, events, seeking, playback speed, local video and JSON export.
 - Existing check/solve/play and bounded direct-policy eval command configuration.
 - Local report validation, session-tab persistence, clear control and storage fallback.
@@ -76,4 +76,4 @@ Defaults: seed 0 and layouts 0,1,2. Commands are generated as text, never execut
 
 ## Verification
 
-Run node --test tests/results.test.cjs and syntax-check all six JS files. Validate desktop/mobile document navigation, category filters, task details, score/progress displays, exports, import/reload/clear, direct-policy guards and video controls. Publish only the website allowlist; verify Pages files after deployment.
+Run node --test tests/results.test.cjs and syntax-check all six JS files. Validate desktop/mobile document navigation, local section switching/history/legacy redirects, shared category filters, task details, score/progress displays, exports, import/reload/clear, direct-policy guards and video controls. Publish only the website allowlist; verify Pages files after deployment.
