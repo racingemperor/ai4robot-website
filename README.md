@@ -19,7 +19,7 @@ An English static research website with ten independent documents, a fixed heade
 | about.html | Research sources, release status, reporting tools, contributions and FAQ |
 | footage.html | Video formats, T06 storyboard and all task shot lists |
 
-Navigation uses document links, with independent titles and browser back/reload support. No framework, build or package installation is required.
+The fixed header lists every independent section, including Compare and Task matrix. No secondary result tabs are shown, and the leaderboard table stays focused on ranking. Navigation uses document links, with independent titles and browser back/reload support. Page-local filtering and sorting retain the current section. No framework, build or package installation is required.
 
 ## Serve and verify
 

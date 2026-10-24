@@ -2,10 +2,10 @@
 
 ## Available tools
 
-- Ten independent pages with a fixed navigation and mobile menu.
+- Ten independent pages with one fixed top-level navigation and a menu at 1100 px and below. Compare and Task matrix have their own header entries; there are no secondary result-page tabs.
 - Twenty-two task dossiers with evaluation category, capability facets, embodiment, deliverable, current scope and filming requirements.
 - Home route switch and interactive T06 judge examples.
-- Leaderboard with sorting, model search, category/delivery/capability/embodiment filters, coverage and exports.
+- A dedicated leaderboard with sorting, model search, category/delivery/capability/embodiment filters, coverage and exports. No cross-page comparison action is embedded in its table.
 - Up to three-model comparison on common capability-task coverage.
 - Numeric task/model matrix linked to matching episode records.
 - Episode filters, events, seeking, playback speed, local video and JSON export.

@@ -10,7 +10,7 @@ The visual language is paper, dark ink and rust red, with editorial typography a
 
 The task atlas describes what is tested. Method describes how the test is controlled. Leaderboard ranks complete reports, Compare shows capability differences on common tasks, Matrix exposes per-task gaps, and Episodes inspects evidence in time. Run generates commands; Resources explains access and reporting; Media plan specifies future evidence. All have real document URLs and their own H1.
 
-The header is fixed with mobile navigation. The four result pages share a secondary navigation because they are complementary views of one report. Cross-page links carry relevant task/model/source filters only. Legacy lab bookmarks redirect to the corresponding document.
+The fixed header is the only page-category navigation. Tasks, Leaderboard, Compare, Task matrix, Episodes, Method, Run, Resources and Media plan are independent top-level destinations. There is no secondary result-page navigation. Leaderboard contains ranking, filters, metric explanations and exports; it has no comparison action column. Page-local controls keep the current document and its active header item. The header switches to a menu at 1100 px and below so every destination remains available. Explicit evidence and resource links remain regular document links. Cross-page links carry relevant task/model/source filters only. Legacy lab bookmarks redirect to the corresponding document.
 
 ## Three separate concepts
 
