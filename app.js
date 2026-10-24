@@ -94,7 +94,7 @@ if(infoPage==='tasks'){
  const openLinkedTask=()=>{if(Site.section==='catalog'&&new URLSearchParams(location.search).has('task')){state.taskOpen=true;detail();taskWindow.open();}};
  openLinkedTask();
  document.addEventListener('site:sectionchange',()=>{
-  if(Site.section!=='catalog'){taskWindow.close(true);return;}
+  if(Site.section!=='catalog'){const wasOpen=state.taskOpen;taskWindow.close(true);if(wasOpen)$('[data-section="matrix"]')?.focus();return;}
   const p=new URLSearchParams(location.search);
   state.category=CATEGORIES.some(c=>c.id===p.get('category'))?p.get('category'):'all';
   state.group=GROUPS.some(g=>g.id===p.get('group'))?p.get('group'):'all';
