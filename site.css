@@ -270,3 +270,8 @@ h1,h2,h3{text-wrap:balance}
  .task-sequence{grid-template-columns:minmax(0,1fr)}.task-sequence li,.task-sequence li+li{padding:14px 0;border-left:0}.task-sequence li+li{border-top:1px solid var(--line)}.task-sequence li::before{margin-bottom:6px}
  .task-pagination{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}.task-pagination>span{grid-column:1/-1;grid-row:2;text-align:center}.task-pagination button strong{font-size:12px}
 }
+
+/* Provisional research title on Home. */
+.hero #hero-title{font-size:clamp(48px,5.35vw,82px);letter-spacing:-.045em;line-height:1.04}
+#hero-title>span{display:block}
+@media(max-width:600px){.hero #hero-title{font-size:clamp(44px,11vw,62px)}}
