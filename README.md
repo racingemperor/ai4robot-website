@@ -9,7 +9,7 @@ An English static research website with five main pages and six compatibility re
 | Page | Purpose |
 |---|---|
 | index.html | Research question, interactive evaluation routes, T06 scoring case and four categories |
-| tasks.html | Compact searchable task selector, detailed goals/capabilities/completion checks, per-task model performance, plus a task/model results matrix |
+| tasks.html | Searchable visual task gallery, card-to-center floating task details, capabilities, evidence and model results, plus a task/model results matrix |
 | leaderboard.html | Ranking with balanced/pooled success, progress, coverage and exports, plus up to three-model comparison |
 | compare.html | Compatibility redirect to leaderboard.html?section=comparison |
 | matrix.html | Compatibility redirect to tasks.html?section=matrix |
@@ -18,7 +18,7 @@ An English static research website with five main pages and six compatibility re
 | method.html / run.html / about.html | Compatibility redirects to the corresponding Documents section |
 | footage.html | Retired media-plan URL; redirects to Documents |
 
-The fixed header has exactly four categories: Tasks, Leaderboard, Episodes and Documents. The logo opens Home. Leaderboard contains Ranking / Model comparison; Tasks contains Task catalog / Results matrix; Documents contains Method / Run / Resources. These are local button-controlled views: the document and highlighted header stay the same. The section query parameter supports sharing, reload and browser back/forward. Catalog selection/search and report source are retained; category/capability filters are shared between catalog and matrix. Documents keeps the current run configuration when switching sections; links between its sections stay in the same document. Media plan is no longer part of the public site. No framework, build or package installation is required.
+The fixed header has exactly four categories: Tasks, Leaderboard, Episodes and Documents. The logo opens Home. Leaderboard contains Ranking / Model comparison; Tasks contains Task catalog / Results matrix; Documents contains Method / Run / Resources. These are local button-controlled views: the document and highlighted header stay the same. The section query parameter supports sharing, reload and browser back/forward. Gallery search and report source are retained; category/capability filters are shared between catalog and matrix. Documents keeps the current run configuration when switching sections; links between its sections stay in the same document. Media plan is no longer part of the public site. No framework, build or package installation is required.
 
 ## Serve and verify
 
@@ -41,6 +41,6 @@ The site does not execute robot commands or request provider credentials. Its ru
 
 ## Modules and publication
 
-site.js owns navigation and shared dialogs; app.js owns narrative pages; lab.js owns result/configuration tools; tasks.js owns the reviewed task catalog; results.js owns validation and aggregation; illustrations.js supplies task visuals; evidence.js owns grid placeholders, separate preview events and time-based trace selection.
+site.js owns navigation and shared dialogs; app.js owns narrative pages; lab.js owns result/configuration tools; tasks.js owns the reviewed task catalog; results.js owns validation and aggregation; illustrations.js supplies task visuals; evidence.js owns grid placeholders, playback symbols, separate preview events and time-based trace selection; motion.js owns scroll reveals and the card-to-window transition. Task images are original conceptual illustrations reserved for future experiment frames. Task detail windows use native modal focus handling, Escape/backdrop dismissal and reduced-motion alternatives.
 
 Publish only this website directory to the website repository. GitHub Pages serves the root of codex/website-publication. Research source code, operational setup, credentials and progress records are outside publication scope. See DESIGN-NOTES.md. The internal VIDEO-BRIEF.md is excluded from publication.

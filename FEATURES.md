@@ -3,14 +3,14 @@
 ## Available tools
 
 - Five main pages with four fixed header categories: Tasks, Leaderboard, Episodes and Documents. Home opens through the logo; small screens use a menu. Model comparison is a local Leaderboard view; the results matrix is a local Tasks view; Method, Run and Resources are local Documents views. Switching preserves the parent document and header highlight, with shareable section links and browser history. Six old document URLs redirect to the current structure.
-- Twenty-two detailed task briefs with goals, three capability explanations, completion checks, embodiment, deliverable, input, execution stages and current scope. A compact searchable directory leaves the main area for the selected task; on mobile it folds into a disclosure.
-- Home route switch and interactive T06 judge examples.
+- Twenty-two detailed task briefs with goals, three capability explanations, completion checks, embodiment, deliverable, input, execution stages and current scope. A searchable illustrated card gallery replaces the directory. Each card has three capability cells and a hover lift. Clicking moves and enlarges the card into a centered floating window with Overview, Capabilities, Model results and Evidence views. The window supports Escape, backdrop/close dismissal, focus return and reduced motion; it remains smaller than the screen.
+- Home route switch, interactive T06 judge examples and once-per-section scroll reveals. Reduced motion presents content immediately.
 - Leaderboard ranking view with sorting, model search, category/delivery/capability/embodiment filters, coverage and exports. No cross-page comparison action is embedded in its table.
 - Up to three-model comparison on common capability-task coverage.
 - Numeric task/model matrix within Tasks, linked to matching episode records. Catalog and matrix share category/capability scope; switching preserves catalog search/selection. Importing or clearing a report leaves the catalog intact.
 - Grid placeholders for Home video/evidence, per-task video/detail frames/deliverables and Documents figures/output/publication material.
 - Ten layout-only model rows in the empty official Leaderboard, and reserved comparison positions. No placeholder models, scores or ranks enter reports/exports.
-- Episode filters, shared video/event timeline, keyboard seeking, playback speed, model input/output, time-stamped code revisions, local video and JSON export. The empty official archive provides a clearly separate layout preview; preview episodes cannot be exported as results.
+- Episode filters, shared video/event timeline, symbol-only play/pause with accessible labels, keyboard seeking, playback speed, model input/output, time-stamped code revisions, local video and JSON export. The empty official archive provides a clearly separate layout preview; preview episodes cannot be exported as results.
 - Existing check/solve/play and bounded direct-policy eval command configuration.
 - Local report validation, session-tab persistence, clear control and storage fallback.
 - CSV/JSON downloads, shareable view links, research sources, FAQ and website citation.
@@ -93,4 +93,4 @@ Defaults: seed 0 and layouts 0,1,2. Commands are generated as text, never execut
 
 ## Verification
 
-Run node --test tests/results.test.cjs and syntax-check all seven JS files. The data/timeline suite currently has eight tests. Validate desktop/mobile document navigation, local section switching/history/legacy redirects, shared category filters, task details, score/progress displays, exports, import/reload/clear, Documents method anchors, retained run configuration, direct-policy guards and episode video controls. Publish only the website allowlist; verify Pages files after deployment.
+Run node --test tests/results.test.cjs and syntax-check all eight JS files. The data/timeline suite currently has eight tests. Validate desktop/mobile document navigation, local section switching/history/legacy redirects, shared category filters, task details, score/progress displays, exports, import/reload/clear, Documents method anchors, retained run configuration, direct-policy guards and episode video controls. Publish only the website allowlist; verify Pages files after deployment.
