@@ -13,7 +13,7 @@ An English static research website with five main pages and six compatibility re
 | leaderboard.html | Ranking with balanced/pooled success, progress, coverage and exports, plus up to three-model comparison |
 | compare.html | Compatibility redirect to leaderboard.html?section=comparison |
 | matrix.html | Compatibility redirect to tasks.html?section=matrix |
-| episodes.html | Events, filters, timeline, local video and episode export |
+| episodes.html | Shared video/trace/code timeline, filters, local video and episode export |
 | documents.html | Evaluation method, research CLI configurator, sources, release status, report tools, contributions and FAQ |
 | method.html / run.html / about.html | Compatibility redirects to the corresponding Documents section |
 | footage.html | Retired media-plan URL; redirects to Documents |
@@ -33,12 +33,14 @@ Open http://127.0.0.1:4174/. When serving the workspace root instead, use /websi
 
 Official results are empty until reviewed reports are connected. Synthetic examples use generic names and never assign scores to real models. Imports are validated, local, unreviewed and stored in this tab's sessionStorage; a storage failure falls back to page memory. Video is page-memory only. Shared URLs contain view parameters, not file contents.
 
+Grid placeholders reserve media and output positions across Home, Tasks and Documents. The empty official Leaderboard displays ten layout-only model slots with no scores. Episodes offers a separate, explicitly labeled 90-second layout preview until official records exist. These slots are never report models or exported results. Optional event input, output and code snapshots follow the same clock as local video; real recordings need matching timestamps. No public footage or observation frames are connected yet.
+
 Scoring follows the current research plan: average task rates within each category, then average categories. Pooled success and its Wilson interval are separate. See FEATURES.md for the normalized report format and limitations.
 
 The site does not execute robot commands or request provider credentials. Its run configurator covers check/solve/play and direct-policy eval for T02/T06/T19. Other tasks have varying readiness. Program submission and direct-policy evaluation must retain distinct protocol labels.
 
 ## Modules and publication
 
-site.js owns navigation and shared dialogs; app.js owns narrative pages; lab.js owns result/configuration tools; tasks.js owns the reviewed task catalog; results.js owns validation and aggregation; illustrations.js owns original SVG concept diagrams.
+site.js owns navigation and shared dialogs; app.js owns narrative pages; lab.js owns result/configuration tools; tasks.js owns the reviewed task catalog; results.js owns validation and aggregation; illustrations.js supplies task visuals; evidence.js owns grid placeholders, separate preview events and time-based trace selection.
 
 Publish only this website directory to the website repository. GitHub Pages serves the root of codex/website-publication. Research source code, operational setup, credentials and progress records are outside publication scope. See DESIGN-NOTES.md. The internal VIDEO-BRIEF.md is excluded from publication.

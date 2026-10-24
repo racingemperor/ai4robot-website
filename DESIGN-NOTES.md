@@ -4,7 +4,7 @@
 
 The site asks whether a general-purpose language model or coding agent can turn an instruction into a physical outcome. The home page establishes the question, lets visitors inspect the program-submission and direct-policy routes, and uses T06 to explain why visible progress can still fail the full instruction.
 
-The visual language is paper, dark ink and rust red, with editorial typography and original technical SVG diagrams. Diagrams are labeled concept illustrations. No external experimental media is embedded.
+The visual language is paper, dark ink and rust red, with editorial typography. Dashed grid placeholders reserve video, observation, figure, document and output positions. Home has a hero recording slot, a reusable task-video strip and scoring evidence; each task has one demonstration video, three detail frames and a deliverable. Documents reserves method figures, execution output and publication material. No experimental media is published.
 
 ## Distinct pages
 
@@ -15,6 +15,10 @@ The fixed header has exactly four categories: Tasks, Leaderboard, Episodes and D
 Catalog and matrix share category/capability scope; catalog search, selected task and active report source are preserved. The task selector folds into a native disclosure on smaller screens. Previous/next controls follow the filtered task selection. Report imports rebuild only the report host. Documents mounts the method separately from configuration and resource tools; imports and section switches never overwrite the method. The run configuration stays in memory between Documents views. Regular links between these sections are intercepted for local switching, while modified clicks retain native browser behavior.
 
 The leaderboard ranking table stays focused on metrics without comparison action columns. Explicit task evidence links remain regular document links. The header switches to a menu at 1100 px and below. Old compare.html and matrix.html URLs redirect to their parent sections; method.html, run.html and about.html redirect to Documents. The retired footage.html URL redirects to Documents. Legacy index.html?lab= bookmarks also remain supported. Media plan is removed from navigation and public flows; task dossiers retain evidence requirements. No Environment category has been added.
+
+## Evidence preview
+
+The official empty Leaderboard has ten model slots without ranks or scores; comparison has three model positions and a capability-chart slot. Episodes has a narrow index, a shared scrubber with event markers, video and observation positions, model input/output, the latest code snapshot and an indexed step directory. Clicking steps or dragging backward restores the trace at that time, including the latest earlier code revision. Layout events are explicitly illustrative and never enter the report or exports. Real imported records may supply input/output/code; code is escaped text and never executed. A locally attached video drives the same clock. Observation image positions remain placeholders; original footage and a public asset mapping are future work.
 
 ## Three separate concepts
 

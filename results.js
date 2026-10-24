@@ -50,7 +50,19 @@ window.Results = (() => {
       const duration=num(e.duration_s,'duration_s',0.001,10000000);
       if(!Array.isArray(e.events)||!e.events.length||e.events.length>200)fail('Each episode requires 1–200 events.');
       let previous=-1;
-      const events=e.events.map(event=>{if(!event)fail('Invalid event.');const time=num(event.time_s,'event.time_s',0,duration);if(time<previous)fail('Event times must be ordered and within the episode duration.');previous=time;return {time_s:time,type:str(event.type,'event.type',30),text:str(event.text,'event.text',1000)};});
+      const multiline=(value,label,max)=>{if(typeof value!=='string'||!value.trim()||value.length>max||/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value))fail(`${label} must be nonempty text of at most ${max} characters.`);return value;};
+      const events=e.events.map(event=>{
+        if(!event)fail('Invalid event.');
+        const time=num(event.time_s,'event.time_s',0,duration);
+        if(time<previous)fail('Event times must be ordered and within the episode duration.');previous=time;
+        const cleanEvent={time_s:time,type:str(event.type,'event.type',30),text:str(event.text,'event.text',1000)};
+        for(const key of ['input','output'])if(event[key]!==undefined)cleanEvent[key]=multiline(event[key],`event.${key}`,16000);
+        if(event.code!==undefined){
+          if(!event.code||typeof event.code!=='object'||Array.isArray(event.code))fail('event.code must contain a filename and content.');
+          cleanEvent.code={filename:str(event.code.filename,'code.filename',160),content:multiline(event.code.content,'code.content',64000)};
+        }
+        return cleanEvent;
+      });
       clean.episodes.push({id,model_id:e.model_id,task_id:e.task_id,status:e.status,duration_s:duration,seed:integer(e.seed,'seed'),layout:integer(e.layout,'layout'),events});
     }
     return clean;

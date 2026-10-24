@@ -7,6 +7,7 @@ const context={window:{}};vm.createContext(context);
 vm.runInContext(fs.readFileSync(path.join(__dirname,'../tasks.js'),'utf8'),context);
 context.TASKS=context.window.TASKS;
 vm.runInContext(fs.readFileSync(path.join(__dirname,'../results.js'),'utf8'),context);
+vm.runInContext(fs.readFileSync(path.join(__dirname,'../evidence.js'),'utf8'),context);
 const R=context.window.Results;
 const clone=value=>JSON.parse(JSON.stringify(value));
 
@@ -41,4 +42,31 @@ test('reject invalid episode references and out-of-order times; strip unknown fi
 });
 test('CSV escapes quotes and spreadsheet formulas while preserving numeric negatives',()=>{
   const text=R.csv([['a,"b','=1+1','@SUM(A1)',-2]]);assert.ok(text.startsWith('\uFEFF'));assert.ok(text.includes('a,""b'));assert.ok(text.includes("'=1+1"));assert.ok(text.includes("'@SUM"));assert.ok(text.includes('"-2"'));
+});
+
+test('episode input, output and code preserve multiline text and strip unknown fields',()=>{
+  const d=clone(R.demo),event=d.episodes[0].events[1];
+  event.input='Observation\nMeasured state\t0.5';event.output='<script>display only</script>\nResponse';
+  event.code={filename:'policy.py',content:'def policy():\n    pass\n',execute:true};event.private_token='not retained';
+  const clean=R.validate(d).episodes[0].events[1];
+  assert.equal(clean.input,event.input);assert.equal(clean.output,event.output);assert.equal(clean.code.content,event.code.content);
+  assert.equal(clean.code.execute,undefined);assert.equal(clean.private_token,undefined);
+  for(const change of [e=>e.output='x'.repeat(16001),e=>e.code.content='x'.repeat(64001),e=>e.input='bad\u0000text',e=>e.code=[],e=>e.code.filename='']){
+    const invalid=clone(d);change(invalid.episodes[0].events[1]);assert.throws(()=>R.validate(invalid));
+  }
+});
+
+test('timeline selection never exposes future output or code and retains the latest revision',()=>{
+  const E=context.window.Evidence;
+  const episode={events:[{time_s:5,type:'Input',input:'first'},{time_s:12,type:'Code',output:'response one',code:{filename:'policy.py',content:'revision one'}},{time_s:20,type:'Feedback',text:'feedback'},{time_s:35,type:'Code',output:'response two',code:{filename:'policy.py',content:'revision two'}}]};
+  assert.equal(E.atTime(episode,0).index,-1);assert.equal(E.atTime(episode,0).code,undefined);
+  assert.equal(E.atTime(episode,11).output,undefined);
+  assert.equal(E.atTime(episode,12).code.code.content,'revision one');
+  assert.equal(E.atTime(episode,30).code.code.content,'revision one');
+  assert.equal(E.atTime(episode,35).output.output,'response two');
+  assert.equal(E.atTime(episode,6).code,undefined);
+  const preview=E.preview(context.TASKS.find(t=>t.id==='T06'));
+  assert.equal(preview.preview,true);assert.equal(preview.status,'pending');
+  assert.equal(E.atTime(preview,58).code.code.content.includes('REVISION 02'),true);
+  assert.equal(R.official.episodes.length,0);
 });

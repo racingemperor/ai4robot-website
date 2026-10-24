@@ -8,7 +8,9 @@
 - Leaderboard ranking view with sorting, model search, category/delivery/capability/embodiment filters, coverage and exports. No cross-page comparison action is embedded in its table.
 - Up to three-model comparison on common capability-task coverage.
 - Numeric task/model matrix within Tasks, linked to matching episode records. Catalog and matrix share category/capability scope; switching preserves catalog search/selection. Importing or clearing a report leaves the catalog intact.
-- Episode filters, events, seeking, playback speed, local video and JSON export.
+- Grid placeholders for Home video/evidence, per-task video/detail frames/deliverables and Documents figures/output/publication material.
+- Ten layout-only model rows in the empty official Leaderboard, and reserved comparison positions. No placeholder models, scores or ranks enter reports/exports.
+- Episode filters, shared video/event timeline, keyboard seeking, playback speed, model input/output, time-stamped code revisions, local video and JSON export. The empty official archive provides a clearly separate layout preview; preview episodes cannot be exported as results.
 - Existing check/solve/play and bounded direct-policy eval command configuration.
 - Local report validation, session-tab persistence, clear control and storage fallback.
 - CSV/JSON downloads, shareable view links, research sources, FAQ and website citation.
@@ -48,9 +50,24 @@ This format is separate from the research CLI's summary.json. Convert research a
 
 Each result: model_id, task_id, trials (positive integer), successes (0 to trials), progress_sum (successes to trials), duration_sum_s (nonnegative simulation seconds). Normalize each task's 0–100 progress to 0–1 before summing. A successful trial has progress 1. Merge multiple seeds/layouts outside the website into one aggregate per model/task. Include all valid outcomes; rerun infrastructure-invalid trials rather than silently counting them as robot failures.
 
-Each episode: unique id, model_id, task_id, status (success/failure/incomplete), positive duration_s, nonnegative integer seed/layout and events. Each event has time_s, type and text. Times are ordered and within the duration. Episode outcomes must be consistent with the corresponding aggregate. Displayed episodes may be a subset; do not infer population success from selected videos.
+Each episode: unique id, model_id, task_id, status (success/failure/incomplete), positive duration_s, nonnegative integer seed/layout and events. Each event has time_s, type and text. Times are ordered and within the duration. Optional input and output fields preserve multiline text (up to 16,000 characters each). Optional code is an object containing filename (up to 160 characters) and content (multiline, up to 64,000 characters). Newlines and tabs are allowed in these multiline fields; other control characters are rejected. The viewer retains the latest supplied input, output and code at or before the current time. Before the first event, all remain absent. Missing fields show placeholders; code is never executed. Episode outcomes must be consistent with the corresponding aggregate. Displayed episodes may be a subset; do not infer population success from selected videos.
 
 Use one frozen benchmark/protocol/environment for all models in a report. Do not combine program submission, direct-policy and privileged solver runs under one protocol. Current imports support simulation only.
+
+For example, an event can include:
+
+```json
+{
+  "time_s": 22,
+  "type": "Code revision",
+  "text": "First submitted revision",
+  "input": "Instruction and permitted observation description",
+  "output": "Recorded response at this time",
+  "code": {"filename": "policy.py", "content": "# Exact submitted file snapshot\n# Additional lines"}
+}
+```
+
+Attach local footage with the same time origin as the event log. The video position drives the shared timeline and timeline seeking updates the video. Video attachments are page-memory only. Camera-frame slots remain reserved; imported reports do not load images or remote media. The 90-second layout preview is illustrative, separate from official/synthetic/local reports, and has no measured outcome.
 
 ## Metrics
 
@@ -76,4 +93,4 @@ Defaults: seed 0 and layouts 0,1,2. Commands are generated as text, never execut
 
 ## Verification
 
-Run node --test tests/results.test.cjs and syntax-check all six JS files. Validate desktop/mobile document navigation, local section switching/history/legacy redirects, shared category filters, task details, score/progress displays, exports, import/reload/clear, Documents method anchors, retained run configuration, direct-policy guards and episode video controls. Publish only the website allowlist; verify Pages files after deployment.
+Run node --test tests/results.test.cjs and syntax-check all seven JS files. The data/timeline suite currently has eight tests. Validate desktop/mobile document navigation, local section switching/history/legacy redirects, shared category filters, task details, score/progress displays, exports, import/reload/clear, Documents method anchors, retained run configuration, direct-policy guards and episode video controls. Publish only the website allowlist; verify Pages files after deployment.
