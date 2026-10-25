@@ -11,6 +11,55 @@ window.Motion = (() => {
   root.addEventListener('focusin',event=>event.target.closest('.scroll-reveal')?.classList.add('is-revealed'));
   preference.addEventListener('change',event=>{if(event.matches){observer.disconnect();sections.forEach(section=>section.classList.add('is-revealed'));}});
  }
+ // CSS moves the wall; this controller pauses it and decodes only visible clips.
+ function videoWall(hero) {
+  if(!hero)return;
+  const wall=hero.querySelector('.hero-wall'),toggle=hero.querySelector('.wall-motion-toggle');
+  const videos=[...wall.querySelectorAll('video')],visibleVideos=new Set();
+  let requested=!preference.matches,inView=true,focused=false;
+  function sync() {
+   const running=requested&&inView&&!document.hidden&&!focused;
+   hero.dataset.motion=running?'running':'paused';
+   toggle.setAttribute('aria-pressed',String(requested));
+   const label=requested?'Pause video wall':'Play video wall';
+   toggle.setAttribute('aria-label',label);toggle.title=label;
+   toggle.firstElementChild.textContent=requested?'Ⅱ':'▶';
+   videos.forEach(video=>{
+    if(running&&visibleVideos.has(video)){
+     if(video.paused)video.play().catch(()=>{});
+    }else video.pause();
+   });
+  }
+  toggle.addEventListener('click',()=>{requested=!requested;sync();});
+  wall.addEventListener('focusin',()=>{focused=true;sync();});
+  wall.addEventListener('focusout',event=>{if(!wall.contains(event.relatedTarget)){focused=false;sync();}});
+  // Bring a clipped tile into the wall viewport when reached by keyboard.
+  wall.addEventListener('focusin',event=>{
+   const tile=event.target.closest('.wall-tile');
+   if(tile?.matches(':focus-visible'))tile.scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});
+  });
+  videos.forEach(video=>{
+   const tile=video.closest('.wall-tile');
+   video.addEventListener('playing',()=>tile.classList.add('has-playing-video'));
+   video.addEventListener('error',()=>{
+    tile.classList.remove('has-playing-video');
+    tile.querySelector('[data-wall-media-label]').textContent='CONCEPT PREVIEW';
+   });
+  });
+  if('IntersectionObserver' in window){
+   const heroObserver=new IntersectionObserver(entries=>{inView=entries[0].isIntersecting;sync();});
+   heroObserver.observe(hero);
+   const clipObserver=new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{if(entry.isIntersecting)visibleVideos.add(entry.target);else visibleVideos.delete(entry.target);});sync();
+   },{root:hero,threshold:0.01});
+   videos.forEach(video=>clipObserver.observe(video));
+  }else videos.forEach(video=>visibleVideos.add(video));
+  preference.addEventListener('change',event=>{requested=!event.matches;sync();});
+  document.addEventListener('visibilitychange',sync);
+  window.addEventListener('pagehide',()=>{inView=false;sync();});
+  window.addEventListener('pageshow',()=>{inView=hero.getBoundingClientRect().bottom>0;sync();});
+  sync();
+ }
  function taskWindow(dialog,onClose) {
   let opener=null,phase='closed',animation=null;
   const finish=()=>{
@@ -56,5 +105,5 @@ window.Motion = (() => {
   preference.addEventListener('change',event=>{if(event.matches&&phase==='opening'){animation?.finish();}else if(event.matches&&phase==='closing')finish();});
   return {open,close};
  }
- return {revealHome,taskWindow};
+ return {revealHome,videoWall,taskWindow};
 })();

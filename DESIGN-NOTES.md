@@ -4,7 +4,7 @@
 
 The site asks whether a general-purpose language model or coding agent can turn an instruction into a physical outcome. The home page adapts the EGE manuscript’s motivation and three contributions, establishes the question, lets visitors inspect the program-submission and direct-policy routes, and uses T06 to explain why visible progress can still fail the full instruction.
 
-The visual language is paper, dark ink and rust red, with editorial typography. Dashed grid placeholders reserve video, observation, figure, document and output positions. Home has a hero recording slot, a reusable task-video strip and scoring evidence; each task has one demonstration video, three detail frames and a deliverable. Documents reserves method figures, execution output and publication material. No experimental media is published. Controls use a shared 10 px corner radius; video, image, output and task presentation frames use 14 px corners, with their contents following the frame. Task characteristic cells use 6 px corners.
+The visual language is paper, dark ink and rust red, with editorial typography. Dashed grid placeholders reserve video, observation, figure, document and output positions. Home has a dark, full-width hero with four tilted, continuously flowing columns of rounded task tiles, a reusable task-video strip and scoring evidence; each task has one demonstration video, three detail frames and a deliverable. Documents reserves method figures, execution output and publication material. No experimental media is published. Controls use a shared 10 px corner radius; video, image, output and task presentation frames use 14 px corners, with their contents following the frame. Task characteristic cells use 6 px corners.
 
 ## Distinct pages
 
@@ -15,6 +15,8 @@ The fixed header has exactly four categories: Tasks, Leaderboard, Episodes and D
 Gallery and matrix share category/capability scope; gallery search and active report source are preserved. The gallery becomes two columns on tablets and one on phones. The floating window has a scrollable interior, a persistent close control and a two-column view switch on phones. Previous/next controls follow the filtered task selection. Report imports rebuild only the report host. Documents mounts the method separately from configuration and resource tools; imports and section switches never overwrite the method. The run configuration stays in memory between Documents views. Regular links between these sections are intercepted for local switching, while modified clicks retain native browser behavior.
 
 The leaderboard ranking table stays focused on metrics without comparison action columns. Explicit task evidence links remain regular document links. The header switches to a menu at 1100 px and below. Old compare.html and matrix.html URLs redirect to their parent sections; method.html, run.html and about.html redirect to Documents. The retired footage.html URL redirects to Documents. Legacy index.html?lab= bookmarks also remain supported. Media plan is removed from navigation and public flows; task dossiers retain evidence requirements. No Environment category has been added.
+
+Home’s flowing wall links every tile to its task dossier. The title and primary links sit in the foreground; the scrim passes pointer events through to the task tiles. All 22 tasks have original concept previews, visibly labeled until reviewed clips are supplied through HOME_VIDEOS in app.js. Duplicate wall cycles have distinct SVG IDs and are excluded from keyboard order and accessibility output. Muted inline looping video is decoded only while its tile and hero are visible. A symbol-only play/pause control stops both the wall and video, and reduced-motion preferences start it paused. Keyboard focus pauses the wall and reveals a static, scrollable grid so clipped tiles can be reached.
 
 Home sections fade in and move upward as they enter the viewport, once per load, without controlling page scroll. Reduced motion shows the final readable state immediately. Native dialog behavior traps focus; closing returns focus to the opening card. Play and pause use symbols with accessible labels.
 
@@ -42,7 +44,7 @@ T06 outcome examples explain documented judge rules (0, approximately 60, 70 and
 
 ## Reference websites
 
-Earlier public-page observations of RoboDojo and Embodied First Exam informed the independent task/results/method/reproduction page roles. This site does not copy their branding, media or distinctive visual presentation. It uses detailed task briefs, a scoring case study and linked evidence tools to express this research's structure.
+Earlier public-page observations of RoboDojo and Embodied First Exam informed the independent task/results/method/reproduction page roles. This site uses its own branding, media and research presentation. The user’s First Exam reference informs the flowing, clickable Home video wall; the copy, task concepts, colors and implementation remain independent. It uses detailed task briefs, a scoring case study and linked evidence tools to express this research's structure.
 
 ## Accessibility and responsive behavior
 

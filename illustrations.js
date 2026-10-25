@@ -12,7 +12,7 @@ function drawing(id='T11', compact=false){
 function media(id,extra='') {const t=task(id);return Evidence.slot('VIDEO',t.name,`${t.id} · Representative task episode · 16:9`,extra);}
 
 /* Original task concepts. These are reserved image positions, not experiment frames. */
-function thumbnail(t) {
+function thumbnail(t,instance=t.id) {
  const arm='<path d="M58 183v-26l37-40 43 18 17-25m-5-7 12 12m-6-12 8 4"/><circle cx="95" cy="117" r="8"/><circle cx="138" cy="135" r="6"/><path d="M42 183h32v13H42z"/>';
  const hand='<path d="m128 196-24-41-20-27q-6-12 4-15t17 13l16 18V88q0-15 9-15t9 15v49-69q0-14 9-14t9 14v68-59q0-14 9-14t9 14v65-36q0-13 9-13t9 13v64l-18 30Z"/>';
  const human='<circle cx="125" cy="61" r="14"/><path d="M111 79h28l11 64h-50ZM112 143l-15 50m39-50 18 50M107 92l-28 32 25 28m38-60 30 27 21-22"/>';
@@ -41,5 +41,5 @@ function thumbnail(t) {
   T22:`<path d="M64 59h116v57h40V59h116v137H220v-44h-40v44H64Z"/><path d="m90 169 47-32 102-1 62-37" stroke-dasharray="5 5"/><text x="88" y="91">START</text><text x="246" y="181">GOAL</text><circle cx="301" cy="99" r="12"/>`,
   T23:`<path d="M54 67h291v119H54z" stroke-opacity=".4"/><path d="M76 164q83-109 137-25t112-46" stroke-dasharray="5 5"/>${[[125,110],[221,85],[275,162]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="9"/><path d="M${x-10} ${y+12}h20v25h-20Zm10 25v14m-20-1 10-13 10 13"/>`).join('')}<path d="m326 89 12-5v15"/>`
  };
- return `<svg class="task-thumbnail" viewBox="0 0 400 240" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><defs><pattern id="grid-${t.id}" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0v24" stroke="currentColor" stroke-opacity=".07" stroke-width="1"/></pattern></defs><path fill="url(#grid-${t.id})" stroke="none" d="M0 0h400v240H0z"/><g>${floor}${scenes[t.id]}</g><path d="M20 28h8m-4-4v8m348 180h8m-4-4v8" stroke-opacity=".45"/></svg>`;
+ return `<svg class="task-thumbnail" viewBox="0 0 400 240" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><defs><pattern id="grid-${instance}" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0v24" stroke="currentColor" stroke-opacity=".07" stroke-width="1"/></pattern></defs><path fill="url(#grid-${instance})" stroke="none" d="M0 0h400v240H0z"/><g>${floor}${scenes[t.id]}</g><path d="M20 28h8m-4-4v8m348 180h8m-4-4v8" stroke-opacity=".45"/></svg>`;
 }

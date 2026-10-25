@@ -98,3 +98,7 @@ Run node --test tests/results.test.cjs and syntax-check all eight JS files. The 
 ## Manuscript integration
 
 paper.js curates the EGE research overview, three contributions, four package components, six construction stages and four evaluation goals. Documents → Resources provides the adapted overview; Documents → Method explains design, sourcing, creation and fairness. Home has a concise research section, and task details expose the package definition without expanding the gallery. The current report schema and scoring remain unchanged. Wall-clock elapsed time and token consumption are not inferred from simulation seconds. The site publishes no manuscript source archive, template PDF, author placeholders or empirical results.
+
+## Home task wall
+
+Four flowing columns link to the 22 task dossiers. Tiles use original, labeled concept previews until reviewed footage is mapped in HOME_VIDEOS. Optional videos loop muted and inline, with visible-tile playback, page/hero suspension, a shared symbol-only pause control and a paused reduced-motion default. Keyboard focus exposes the original tiles as a static scrollable grid; duplicate cycles are hidden from the accessibility tree.
