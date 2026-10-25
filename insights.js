@@ -1,104 +1,197 @@
-/* Home chart data. Capability annotations describe requirements, never measured difficulty. */
+/* Qualitative task requirements, separate from measured model results. */
 window.Insights = (() => {
  const dimensions=[
-  {id:'grounding',name:'Perception & grounding',short:'Grounding'},
-  {id:'spatial',name:'Spatial reasoning',short:'Spatial reasoning'},
-  {id:'contact',name:'Contact & dexterity',short:'Contact'},
-  {id:'control',name:'Motion & coordination',short:'Motion & control'},
-  {id:'planning',name:'Planning & feedback',short:'Planning'},
-  {id:'learning',name:'Learning & adaptation',short:'Learning'},
-  {id:'construction',name:'World modeling',short:'World modeling'}
+  {id:'grounding',name:'Perception & grounding',short:'Grounding',lines:['Perception','& grounding'],description:'Connect observations, symbols and instructions to the right objects and actions.'},
+  {id:'spatial',name:'Spatial reasoning',short:'Spatial reasoning',lines:['Spatial','reasoning'],description:'Reason about geometry, relative poses, routes and changing free space.'},
+  {id:'contact',name:'Contact & dexterity',short:'Contact',lines:['Contact','& dexterity'],description:'Manage grasps, contact transitions and precise physical interactions.'},
+  {id:'control',name:'Motion & coordination',short:'Motion & control',lines:['Motion','& coordination'],description:'Coordinate joints, effectors and movement while maintaining stability.'},
+  {id:'planning',name:'Planning & feedback',short:'Planning',lines:['Planning','& feedback'],description:'Sequence actions, respect constraints and revise behavior using feedback.'},
+  {id:'learning',name:'Learning & adaptation',short:'Learning',lines:['Learning','& adaptation'],description:'Infer a new rule or develop policies that transfer to evaluation conditions.'},
+  {id:'construction',name:'World modeling',short:'World modeling',lines:['World','modeling'],description:'Construct or reconstruct executable geometry, motion and physical interactions.'}
  ];
- // Each existing task capability is assigned to one or more named dimensions.
- // A dimension's count is the number of the task's three tags that mention it.
- const annotations={
-  'Spatial reasoning':['spatial'],
-  'Bimanual coordination':['control'],
-  'Contact-aware control':['contact','control'],
-  'Pose alignment':['spatial'],
-  'Precision control':['control'],
-  'Contact reasoning':['contact'],
-  'Symbol-to-action mapping':['grounding'],
-  'Sequential precision':['control','planning'],
-  'Feedback and correction':['planning'],
-  'Role assignment':['planning'],
-  'Geometric planning':['spatial','planning'],
-  'Visual-to-motor mapping':['grounding','spatial'],
-  'Stroke planning':['planning'],
-  'Contact precision':['contact','control'],
-  'Language grounding':['grounding'],
-  'Grasp and placement':['contact','control'],
-  'Constraint preservation':['planning'],
-  'Finger coordination':['contact','control'],
-  'Relative-motion reasoning':['spatial'],
-  'Grasp stability':['contact'],
-  'Fine target localization':['grounding','spatial'],
-  'Dexterous contact':['contact'],
-  'Delicate manipulation':['contact','control'],
-  'Whole-body coordination':['control'],
-  'Object transport':['contact','control'],
-  'Postural stability':['control'],
-  'Long-horizon planning':['planning'],
-  'Navigation and manipulation':['spatial','contact'],
-  'Pose control':['control'],
-  'Text-to-stroke planning':['grounding','planning'],
-  'Surface contact control':['contact','control'],
-  'Upper-body coordination':['control'],
-  'In-context rule learning':['grounding','learning'],
-  'Transfer to a new layout':['spatial','learning'],
-  'Mobile manipulation':['contact','control'],
-  'Constraint translation':['grounding','spatial'],
-  'Scene construction':['construction'],
-  'Physical validation':['construction','contact'],
-  'Multi-view spatial reasoning':['grounding','spatial'],
-  'Metric reconstruction':['spatial','construction'],
-  'Interactive world modeling':['construction'],
-  'Motion reconstruction':['construction','control'],
-  'Temporal reasoning':['planning'],
-  'Physical consistency':['construction','contact'],
-  'Reward design':['learning'],
-  'Learning-system development':['learning'],
-  'Policy generalization':['learning'],
-  'Reward and curriculum design':['learning'],
-  'Dexterous policy learning':['contact','learning'],
-  'Evaluation discipline':['learning','planning'],
-  'Visual state estimation':['grounding'],
-  'Dynamic control':['control'],
-  'Multi-constraint execution':['planning'],
-  'Topological reasoning':['spatial','planning'],
-  'Deformable-object control':['contact','control'],
-  'Exploration planning':['spatial','planning'],
-  'Visual grounding':['grounding'],
-  'Goal bookkeeping':['planning'],
-  'Semantic grounding':['grounding'],
-  'Route planning':['spatial','planning'],
-  'Completion recognition':['grounding','planning'],
-  'Dynamic spatial reasoning':['spatial'],
-  'Reactive planning':['planning'],
-  'Safe goal completion':['control','planning']
+ const levels=[
+  {name:'Not a focus',description:'No dedicated requirement in the current task definition.'},
+  {name:'Supporting',description:'Helps execution, but is not a defining test requirement.'},
+  {name:'Important',description:'Explicitly supports a substantial part of the task.'},
+  {name:'Central',description:'A defining requirement for successful completion.'}
+ ];
+ // Order: grounding, spatial, contact, control, planning, learning, construction.
+ // Editorial judgments based on TASKS goals, capability descriptions and checks.
+ // These are ordinal demands, not tag counts, measured difficulty or model scores.
+ const demands={
+  T01:{values:[1,3,3,3,2,0,0],reasons:[
+   'Identify the interlocked parts and their matching placement regions.',
+   'Find a separation path through the constraints imposed by both parts.',
+   'Maintain grasps and avoid penetration while separating rigid parts.',
+   'Coordinate both grippers throughout separation and stable placement.',
+   'Sequence separation, transport and release while preserving valid contact.'
+  ]},
+  T02:{values:[1,3,3,3,2,0,0],reasons:[
+   'Identify the specified socket and plug in the observation.',
+   'Align plug orientation and approach direction with the socket.',
+   'Distinguish surface contact from a stable, completed insertion.',
+   'Make precise corrections as the pins enter the socket.',
+   'Use insertion feedback and confirm the plug stays seated after release.'
+  ]},
+  T03:{values:[3,2,2,3,3,0,0],reasons:[
+   'Translate each target character into the corresponding physical key.',
+   'Locate keys and approach them in the keyboard frame.',
+   'Press and release keys through physical contact events.',
+   'Execute precise, ordered key presses and releases.',
+   'Read the input buffer, correct mistakes and submit the completed string.'
+  ]},
+  T04:{values:[1,3,2,3,3,0,0],reasons:[
+   'Relate the section instruction to the cucumber and knife.',
+   'Choose cut positions that match the requested section boundaries.',
+   'Maintain support and tool contact under the stated segmentation approximation.',
+   'Coordinate the holding arm with the cutting arm.',
+   'Assign arm roles and sequence stabilization and cuts.'
+  ]},
+  T05:{values:[3,3,3,3,3,0,0],reasons:[
+   'Translate a supplied line drawing into physical brush paths.',
+   'Map reference geometry into the target canvas frame.',
+   'Maintain drawing contact while limiting unwanted marks.',
+   'Control brush paths and lifts precisely.',
+   'Order strokes and lift between disconnected marks.'
+  ]},
+  T06:{values:[3,2,3,2,3,0,0],reasons:[
+   'Ground “the longest” by comparing visible baguette candidates.',
+   'Reason about object extent and the basket placement region.',
+   'Grasp, transport and release the selected baguette into the basket.',
+   'Control transport and release without disturbing neighboring objects.',
+   'Preserve the 5 cm disturbance constraint throughout the action.'
+  ]},
+  T07:{values:[1,3,3,3,2,0,0],reasons:[
+   'Identify the specified cube layer and rotation instruction.',
+   'Rotate the selected layer relative to the cube body.',
+   'Redistribute fingertip contacts while retaining the cube.',
+   'Coordinate fingers through the face rotation.',
+   'Sequence regrasping and rotation without losing support.'
+  ]},
+  T08:{values:[3,2,3,3,2,0,0],reasons:[
+   'Locate the small stem instead of grasping the fruit body.',
+   'Align fingertips with the stem and avoid the fruit.',
+   'Use delicate stem-only contact without breaking the stem.',
+   'Lift and hold steadily with precise finger control.',
+   'Check clearance, stem integrity and the unsupported hold.'
+  ]},
+  T09:{values:[1,2,2,3,2,0,0],reasons:[
+   'Locate the ball and its target region.',
+   'Relate the reachable ball, body and placement region.',
+   'Retain the ball through pickup and transport.',
+   'Coordinate reaching and placement with a stable body posture.',
+   'Sequence pickup, placement and stable recovery.'
+  ]},
+  T10:{values:[2,3,2,3,3,0,0],reasons:[
+   'Connect waypoint instructions and the requested can to scene observations.',
+   'Navigate between waypoints and finish at the required pose.',
+   'Grasp and retain the can during shelf retrieval.',
+   'Connect locomotion and manipulation with final pose control.',
+   'Track waypoint order, retrieval and the final orientation requirement.'
+  ]},
+  T11:{values:[3,2,3,3,3,0,0],reasons:[
+   'Convert the requested short program into physical writing strokes.',
+   'Place strokes in the whiteboard frame.',
+   'Create marks using pen contact and controlled lifts.',
+   'Coordinate arm and torso while maintaining a standing pose.',
+   'Order strokes, withdraw the pen and satisfy the final posture requirement.'
+  ]},
+  T12:{values:[3,3,2,2,2,3,0],reasons:[
+   'Infer the demonstrated object-selection rule from example observations.',
+   'Transfer the selection rule to unfamiliar object positions.',
+   'Grasp and place the chosen object while preserving other objects.',
+   'Coordinate the mobile base and manipulator for execution.',
+   'Sequence rule application, reaching and constrained placement.',
+   'Learn a rule in context and apply it to a new layout.'
+  ]},
+  T13:{values:[3,3,2,0,2,0,3],reasons:[
+   'Translate text constraints into objects, dimensions and relationships.',
+   'Configure scene scale, geometry and articulated structures.',
+   'Validate support regions and requested physical interactions.',
+   null,
+   'Organize scene construction and run the required physical checks.',
+   null,
+   'Produce a loadable, executable scene with functioning joints.'
+  ]},
+  T14:{values:[3,3,2,0,1,0,3],reasons:[
+   'Combine multi-view observations into a consistent scene interpretation.',
+   'Preserve dimensions, clearances and navigable space.',
+   'Make cabinet and drawer interactions physically usable.',
+   null,
+   'Organize reconstruction and validate geometry, routes and joints.',
+   null,
+   'Reconstruct an interactive kitchen with articulated structures.'
+  ]},
+  T15:{values:[3,3,3,2,2,0,3],reasons:[
+   'Interpret calibrated multi-view hand–object video.',
+   'Recover coherent hand and object poses across views.',
+   'Reconstruct contact transitions without penetration.',
+   'Represent coordinated hand and object motion for replay.',
+   'Align grasp, release and object movement in time.',
+   null,
+   'Deliver reconstructed motion and contacts for physically constrained replay.'
+  ]},
+  T16:{values:[0,1,1,2,2,3,0],reasons:[
+   null,
+   'Account for terrain traversal in the locomotion objectives.',
+   'Support stable ground contact in learned locomotion.',
+   'Develop behavior for velocity tracking, turning and stable traversal.',
+   'Iterate on training code and evaluate within the fixed resource budget.',
+   'Design rewards and train policies for held-out generalization.'
+  ]},
+  T17:{values:[0,2,3,2,2,3,0],reasons:[
+   null,
+   'Represent the required pen rotation and its axis.',
+   'Learn dexterous retention through the required rotation.',
+   'Train coordinated finger behavior that rotates the pen.',
+   'Design curriculum and check outcomes under fixed evaluation conditions.',
+   'Develop rewards and train a policy within the declared budget.'
+  ]},
+  T19:{values:[3,2,2,3,3,0,0],reasons:[
+   'Estimate the observed liquid surface relative to the target line.',
+   'Relate pitcher orientation to the cup and final placement.',
+   'Maintain the pitcher grasp through pouring and return.',
+   'Adjust dynamic pouring and stop for the settled target level.',
+   'Use feedback to limit spillage and return the pitcher after filling.'
+  ]},
+  T20:{values:[1,3,3,3,3,0,0],reasons:[
+   'Identify lace ends and the required knot structure.',
+   'Reason about threading topology and changing lace geometry.',
+   'Control deformable lace ends through threading and tightening.',
+   'Coordinate both arms while forming and releasing the knot.',
+   'Choose a threading sequence that leaves a stable released knot.'
+  ]},
+  T21:{values:[3,3,0,1,3,0,0],reasons:[
+   'Recognize all five requested objects from available observations.',
+   'Explore an unfamiliar scene without privileged target coordinates.',
+   null,
+   'Execute discrete navigation using a frozen locomotion controller.',
+   'Plan exploration, record five valid reports and issue STOP.'
+  ]},
+  T22:{values:[3,3,0,1,3,0,0],reasons:[
+   'Ground semantic room descriptions in the observed scene.',
+   'Plan a route through the required intermediate room.',
+   null,
+   'Execute navigation commands to reach the accepted goal region.',
+   'Honor the intermediate visit and recognize when to stop.'
+  ]},
+  T23:{values:[2,3,0,2,3,0,0],reasons:[
+   'Observe the destination and moving people or declared proxies.',
+   'Reason about crossing traffic and changes in free space.',
+   null,
+   'Execute movement and maintain the required clearance.',
+   'Reactively choose when to proceed, wait or detour.'
+  ]}
  };
  function profile(task){
-  const tags=task.capabilities.map(([name,description])=>({name,description,dimensions:annotations[name]||[]}));
-  const counts=dimensions.map(d=>tags.filter(tag=>tag.dimensions.includes(d.id)).length);
-  const total=counts.reduce((a,b)=>a+b,0);
-  return {tags,counts,weights:counts.map(count=>total?count/total:0)};
+  const row=demands[task.id];
+  return dimensions.map((dimension,i)=>({
+   ...dimension,value:row.values[i],level:levels[row.values[i]].name,
+   reason:row.reasons[i]||levels[0].description
+  }));
  }
- function anchor(index,flat=false){
-  const angle=-Math.PI/2+index*2*Math.PI/dimensions.length;
-  const z=flat?0:.55*Math.sin(angle*2+.65);
-  const norm=Math.sqrt(1+z*z);
-  return [Math.cos(angle)/norm,Math.sin(angle)/norm,z/norm];
- }
- function position(task,flat=false){
-  return profile(task).weights.reduce((point,weight,i)=>{
-   const axis=anchor(i,flat);
-   return point.map((value,j)=>value+weight*axis[j]);
-  },[0,0,0]);
- }
- function project(point,yaw=0,pitch=0){
-  const [x,y,z]=point;
-  const xx=x*Math.cos(yaw)+z*Math.sin(yaw),zz=-x*Math.sin(yaw)+z*Math.cos(yaw);
-  return [xx,y*Math.cos(pitch)-zz*Math.sin(pitch),y*Math.sin(pitch)+zz*Math.cos(pitch)];
+ function waveform(dimensionId){
+  return TASKS.map(task=>({task,...profile(task).find(d=>d.id===dimensionId)}));
  }
  function topModels(report,metric='score',limit=5){
   const ids=TASKS.map(t=>t.id),key=metric==='progress'?'progress':'score';
@@ -109,5 +202,5 @@ window.Insights = (() => {
    return {id:category.id,value:row?.complete?row[key]:null};
   })}));
  }
- return {dimensions,profile,anchor,position,project,topModels};
+ return {dimensions,levels,profile,waveform,topModels};
 })();

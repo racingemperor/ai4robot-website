@@ -30,30 +30,34 @@ test('missing categories and incomplete reports never become top-five model clai
  partial.results=partial.results.filter(r=>tasks.find(t=>t.id===r.task_id).category!=='training');
  assert.equal(Insights.topModels(partial).length,0);
 });
-test('every catalog capability has an explicit mapping and normalized task vector',()=>{
- const ids=Insights.dimensions.map(d=>d.id);assert.equal(ids.length,7);assert.equal(tasks.length,22);
+test('all 22 tasks have explained qualitative demands across the same seven capabilities',()=>{
+ assert.equal(tasks.length,22);assert.equal(Insights.dimensions.length,7);
+ assert.ok(!tasks.some(t=>t.id==='T18'));
  for(const task of tasks){
-  const profile=Insights.profile(task);
-  assert.equal(profile.tags.length,3);assert.equal(profile.counts.length,7);
-  for(const tag of profile.tags){assert.ok(tag.dimensions.length,`${task.id}: ${tag.name}`);assert.ok(tag.dimensions.every(id=>ids.includes(id)));}
-  assert.ok(profile.counts.every(n=>Number.isInteger(n)&&n>=0&&n<=3));
-  assert.ok(Math.abs(profile.weights.reduce((a,b)=>a+b,0)-1)<1e-12);
- }
- const locomotion=Insights.profile(tasks.find(t=>t.id==='T16'));
- assert.equal(locomotion.counts[ids.indexOf('learning')],3);
- const navigation=Insights.profile(tasks.find(t=>t.id==='T23'));
- assert.equal(navigation.counts[ids.indexOf('planning')],2);
-});
-test('task points are derived from all annotated dimensions and rotation preserves geometry',()=>{
- for(const task of tasks){
-  for(const flat of [false,true]){
-   const weights=Insights.profile(task).weights;
-   const expected=[0,1,2].map(axis=>weights.reduce((sum,w,i)=>sum+w*Insights.anchor(i,flat)[axis],0));
-   const point=Insights.position(task,flat),rotated=Insights.project(point,.7,-.3);
-   assert.deepEqual(Array.from(point),expected);assert.ok(point.every(Number.isFinite));
-   assert.ok(Math.hypot(...point)<=1+1e-12);
-   assert.ok(Math.abs(Math.hypot(...point)-Math.hypot(...rotated))<1e-12);
-   if(flat)assert.equal(point[2],0);
+  const profile=Insights.profile(task);assert.equal(profile.length,7);
+  assert.deepEqual(Array.from(profile,d=>d.id),Array.from(Insights.dimensions,d=>d.id));
+  for(const demand of profile){
+   assert.ok(Number.isInteger(demand.value)&&demand.value>=0&&demand.value<=3);
+   assert.equal(demand.level,Insights.levels[demand.value].name);
+   assert.ok(demand.reason.length>20,`${task.id}: ${demand.id} needs a rationale`);
+   if(demand.value>0)assert.notEqual(demand.reason,Insights.levels[0].description);
   }
  }
+ // Independent examples from the task goals, not a count of capability tags.
+ const pick=Insights.profile(tasks.find(t=>t.id==='T06'));
+ assert.equal(pick.find(d=>d.id==='grounding').value,3);
+ assert.equal(pick.find(d=>d.id==='learning').value,0);
+ assert.equal(Insights.profile(tasks.find(t=>t.id==='T14')).find(d=>d.id==='construction').value,3);
+ assert.equal(Insights.profile(tasks.find(t=>t.id==='T16')).find(d=>d.id==='learning').value,3);
+});
+test('switching capabilities keeps every task in the same clockwise position, including zero-demand tasks',()=>{
+ const order=Array.from(tasks,t=>t.id);
+ for(const dimension of Insights.dimensions){
+  const wave=Insights.waveform(dimension.id);
+  assert.deepEqual(Array.from(wave,d=>d.task.id),order);
+  assert.equal(wave.length,22);
+ }
+ const learning=Insights.waveform('learning');
+ assert.equal(learning.find(d=>d.task.id==='T12').value,3);
+ assert.equal(learning.find(d=>d.task.id==='T21').value,0);
 });
