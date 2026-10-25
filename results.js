@@ -1,6 +1,7 @@
 /* Public reporting contract. Demo values are synthetic and never model claims. */
 window.Results = (() => {
   const version = 'preview-v1';
+  const storageKey='ai4robot-imported-report-v1';
   const official = {schema_version:1,benchmark_version:version,protocol:'preview-v1 / simulation / fixed-interface',environment:'simulation',models:[],results:[],episodes:[]};
   const demoModels = ['A','B','C','D','E'].map((n,i)=>({id:`example-${n.toLowerCase()}`,name:`Example model ${n}`,version:'synthetic-v1',agent:['Synthetic coding agent','Synthetic visual agent','Synthetic coding agent','Synthetic baseline','Synthetic visual agent'][i]}));
   const demo = {...official,models:demoModels,results:[],episodes:[]};
@@ -67,6 +68,13 @@ window.Results = (() => {
     }
     return clean;
   }
+  function readSaved(storage){
+    const saved=storage.getItem(storageKey);
+    if(!saved)return null;
+    if(saved.length>5*1024*1024)throw new Error('The saved report exceeds 5 MB.');
+    const parsed=JSON.parse(saved);
+    return {report:validate(parsed.report||parsed),synthetic:parsed.synthetic===true||parsed.website_data_source==='demo'};
+  }
   function summarize(data,ids){
     const taskIds=[...new Set(ids)].filter(id=>TASKS.some(t=>t.id===id));
     const categories=[...new Set(taskIds.map(id=>TASKS.find(t=>t.id===id).category))];
@@ -86,5 +94,5 @@ window.Results = (() => {
     });
   }
   function csv(rows){return '\uFEFF'+rows.map(row=>row.map(v=>{let value=String(v??'');if(typeof v==='string'&&/^[=+\-@\t\r]/.test(value))value="'"+value;return '"'+value.replaceAll('"','""')+'"';}).join(',')).join('\r\n');}
-  return {version,official,demo,validate,summarize,csv};
+  return {version,official,demo,validate,summarize,csv,storageKey,readSaved};
 })();

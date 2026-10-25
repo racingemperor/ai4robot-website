@@ -70,3 +70,18 @@ test('timeline selection never exposes future output or code and retains the lat
   assert.equal(E.atTime(preview,58).code.code.content.includes('REVISION 02'),true);
   assert.equal(R.official.episodes.length,0);
 });
+
+test('saved reports share validation, storage key and synthetic provenance across pages',()=>{
+ const read=raw=>R.readSaved({getItem:key=>{assert.equal(key,R.storageKey);return raw;}});
+ assert.equal(read(null),null);
+ for(const raw of [{report:R.demo,synthetic:true},{...R.demo,website_data_source:'demo'}]){
+  const saved=read(JSON.stringify(raw));assert.equal(saved.synthetic,true);assert.equal(saved.report.models.length,5);assert.equal(saved.report.results.length,110);
+ }
+ assert.equal(read(JSON.stringify({report:R.demo,synthetic:false})).synthetic,false);
+});
+test('saved report loading rejects corrupt, invalid, oversized or unavailable storage',()=>{
+ assert.throws(()=>R.readSaved({getItem:()=>'not json'}),/JSON/);
+ assert.throws(()=>R.readSaved({getItem:()=>JSON.stringify({report:{}})}),/schema_version/);
+ assert.throws(()=>R.readSaved({getItem:()=>' '.repeat(5*1024*1024+1)}),/exceeds 5 MB/);
+ assert.throws(()=>R.readSaved({getItem:()=>{throw new Error('Storage unavailable');}}),/Storage unavailable/);
+});

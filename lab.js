@@ -4,7 +4,7 @@ window.Lab = (() => {
   const q=(s,r=document)=>r.querySelector(s);
   const currentPage=document.body.dataset.page;
   const reportPages=['board','compare','matrix','episodes'];
-  const storageKey='ai4robot-imported-report-v1';
+  const storageKey=Results.storageKey;
   const query=new URLSearchParams(location.search);
   const L={tab:currentPage==='leaderboard'?(Site.section==='comparison'?'compare':'board'):currentPage==='tasks'?'matrix':currentPage==='documents'?(Site.section==='resources'?'about':'run'):currentPage,source:query.get('data')==='demo'?'demo':'official',imported:null,importedSynthetic:false,importedSaved:false,track:'all',category:'all',group:'all',robot:'all',sort:'score',direction:-1,modelQuery:'',compare:[],episode:'',episodeTask:'all',episodeModel:'all',status:'all',time:0,speed:'1',playing:false,raf:0,last:0,videoURL:'',videoEpisode:'',message:'',runTask:'T06',runMode:'solve',runAgent:'vlm',runModel:'mock',gpu:'0',seeds:'0',layouts:'0,1,2',camera:'head'};
   for(const key of ['track','category','group','robot','sort','modelQuery','episodeTask','episodeModel','status','episode']){const value=query.get(key);if(value&&value.length<160)L[key]=value;}
@@ -17,8 +17,8 @@ window.Lab = (() => {
   L.compare=(query.get('models')||'').split(',').filter(Boolean).slice(0,3);
   if(TASKS.some(t=>t.id===query.get('task')))L.runTask=query.get('task');
   try{
-    const saved=sessionStorage.getItem(storageKey);
-    if(saved){if(saved.length>5*1024*1024)throw new Error('The saved report exceeds 5 MB.');const parsed=JSON.parse(saved);L.imported=Results.validate(parsed.report||parsed);L.importedSynthetic=parsed.synthetic===true||parsed.website_data_source==='demo';L.importedSaved=true;}
+    const saved=Results.readSaved(sessionStorage);
+    if(saved){L.imported=saved.report;L.importedSynthetic=saved.synthetic;L.importedSaved=true;}
   }catch(error){L.message='The saved report could not be read. Please import it again.';}
   if(query.get('data')==='imported'){
     if(L.imported)L.source='imported';

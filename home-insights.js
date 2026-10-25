@@ -21,8 +21,8 @@ window.HomeInsights = (() => {
   const metric=document.querySelector('#home-result-metric');
   let imported=null,synthetic=false;
   try{
-   const saved=sessionStorage.getItem('ai4robot-imported-report-v1');
-   if(saved&&saved.length<=5*1024*1024){const raw=JSON.parse(saved);imported=Results.validate(raw.report||raw);synthetic=raw.synthetic===true||raw.website_data_source==='demo';}
+   const saved=Results.readSaved(sessionStorage);
+   if(saved){imported=saved.report;synthetic=saved.synthetic;}
   }catch{/* An unavailable or invalid local report never becomes public results. */}
   if(imported)source.insertAdjacentHTML('beforeend','<option value="imported">Local report · unreviewed</option>');
   const initial=new URLSearchParams(location.search).get('data');
