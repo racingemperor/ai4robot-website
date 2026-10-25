@@ -4,6 +4,7 @@ button,.button,.lab-button,.slot-button,.matrix-cell,.skip-link,input:is([type=b
 .research select,.research input:not([type="checkbox"]):not([type="range"]):not([type="file"]),.task-browser-tools input,.task-browser-tools select,.task-gallery-tools input,.task-gallery-tools select,.compare-slots select{border-radius:var(--control-radius)}
 .evidence-slot,.media-slot,.episode-stage,.task-card,.task-window-preview,.task-concept,.detail-art,.task-ability-grid>div,.task-results-empty,.task-results-scroll,.trace-text-block,.trace-code-block,.trace-feedback,.episode-timeline{border-radius:var(--panel-radius)}
 .evidence-slot,.episode-stage,.task-concept,.detail-art,.trace-text-block,.trace-code-block{overflow:hidden}
+.trace-code-block pre:focus-visible{outline:2px solid var(--paper);outline-offset:-4px;border-radius:0 0 var(--panel-radius) var(--panel-radius)}
 .task-card-image,.task-window-preview .task-card-image{border-top-left-radius:calc(var(--panel-radius) - 1px);border-top-right-radius:calc(var(--panel-radius) - 1px)}
 .task-trait-cells>span{border-radius:6px}
 .view-switch{gap:6px}.view-switch button+button{border-left:1px solid var(--line)}
