@@ -2,7 +2,7 @@
 window.Results = (() => {
   const version = 'preview-v1';
   const official = {schema_version:1,benchmark_version:version,protocol:'preview-v1 / simulation / fixed-interface',environment:'simulation',models:[],results:[],episodes:[]};
-  const demoModels = ['A','B','C','D'].map((n,i)=>({id:`example-${n.toLowerCase()}`,name:`Example model ${n}`,version:'synthetic-v1',agent:['Synthetic coding agent','Synthetic visual agent','Synthetic coding agent','Synthetic baseline'][i]}));
+  const demoModels = ['A','B','C','D','E'].map((n,i)=>({id:`example-${n.toLowerCase()}`,name:`Example model ${n}`,version:'synthetic-v1',agent:['Synthetic coding agent','Synthetic visual agent','Synthetic coding agent','Synthetic baseline','Synthetic visual agent'][i]}));
   const demo = {...official,models:demoModels,results:[],episodes:[]};
   demoModels.forEach((m,mi)=>TASKS.forEach((t,ti)=>{
     const successes = Math.max(0,Math.min(10,9-mi-((ti*3+mi*2)%6)));

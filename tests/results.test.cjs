@@ -13,7 +13,7 @@ const clone=value=>JSON.parse(JSON.stringify(value));
 
 test('official data has no fabricated model scores; examples cover all 22 tasks',()=>{
   assert.equal(R.official.results.length,0);assert.equal(R.official.models.length,0);
-  const d=R.validate(R.demo);assert.equal(d.results.length,88);assert.equal(d.episodes.length,88);
+  const d=R.validate(R.demo);assert.equal(d.models.length,5);assert.equal(d.results.length,110);assert.equal(d.episodes.length,110);
   assert.ok(d.models.every(m=>m.name.startsWith('Example model')));
 });
 test('category-balanced metrics differ from pooled trials and do not hide missing categories',()=>{

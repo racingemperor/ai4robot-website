@@ -6,11 +6,6 @@ window.Paper = (() => {
   'The Embodied Generalist Exam (EGE) is designed to evaluate this broader range of embodied capabilities through tasks with explicit objectives and verifiable outcomes. Models can plan, invoke tools, generate control programs or develop robot policies within task-specific constraints, without additional training or fine-tuning of the foundation model being evaluated.',
   'A common evaluation framework pairs task instructions, environments and interaction tools with independent evaluation functions. Repeated trials, including failures and timeouts, are intended to characterize both capability and reliability. Success, intermediate progress, total elapsed time and token consumption capture complementary aspects of performance.'
  ];
- const contributions=[
-  ['A broader capability test','Evaluate robot control alongside simulation construction, interaction reconstruction and policy development. The submitted answer may be an action, a program, a scene or learned robot weights.'],
-  ['Reproducible task packages','Specify the objective, environment, permitted interfaces and independent judgment together. Separate model-visible observations from the simulator state used for evaluation.'],
-  ['Reliability and efficiency','Compare repeated trials under the same task conditions and budgets. Retain failures and timeouts, and examine progress and resource use alongside success.']
- ];
  const stages=[
   ['Design','Define the objective, inputs, deliverable, physical constraints and success criteria.'],
   ['Review','Cross-check the specification, required capabilities and physical feasibility.'],
@@ -31,10 +26,6 @@ window.Paper = (() => {
   ['Total elapsed time','The complete solving process: model inference, environment interaction, execution and permitted retries. This is wall-clock time, separate from simulation time.'],
   ['Token consumption','Tokens consumed by the evaluated model during the solving process, recorded with the model, agent and evaluation protocol.']
  ];
- function home(){return `<section class="section paper-home" aria-labelledby="paper-home-title">
-  <div class="paper-home-intro"><p class="eyebrow">THE RESEARCH QUESTION</p><h2 id="paper-home-title">From a successful demonstration to repeatable evidence.</h2><p>A single success after many attempts does not establish reliability. EGE brings diverse embodied problems into a common framework for comparing foundation models.</p><a class="text-link" href="${Site.href('about')}#paper-summary">Read the research overview ↗</a></div>
-  <div class="paper-contributions">${contributions.map(([heading,text])=>`<article><h3>${heading}</h3><p>${text}</p></article>`).join('')}</div>
- </section>`;}
  function summary(){return `<section id="paper-summary" class="paper-summary" aria-labelledby="paper-summary-title">
   <div class="paper-summary-heading"><div><p class="eyebrow">MANUSCRIPT OVERVIEW</p><h2 id="paper-summary-title">${title}</h2><p class="paper-summary-subtitle">Evaluating the breadth, reliability and efficiency of embodied foundation models.</p></div><span>Research in progress</span></div>
   <div class="paper-summary-text">${overview.map(text=>`<p>${text}</p>`).join('')}</div>
@@ -45,5 +36,5 @@ window.Paper = (() => {
  function creation(){return `<section id="task-creation" class="document-section"><h2>From demonstrations to evaluation tasks.</h2><p>The manuscript describes collecting demonstrations from research projects, open-source repositories and online platforms, retaining their sources for traceability. Candidates are grouped by task type, embodiment and required capabilities, then screened and deduplicated.</p><p>Selection favors distinct capability requirements, clear objectives, physical feasibility and verifiable outcomes. Reference demonstrations motivate a task; they are separate from evaluation evidence produced by a tested model.</p><h3 class="paper-stage-heading">A six-stage construction process</h3><ol class="paper-stage-grid">${stages.map(([heading,text])=>`<li><h4>${heading}</h4><p>${text}</p></li>`).join('')}</ol><p class="source-note">The manuscript specifies cross-checks by at least three authors at each stage. This describes the task-creation process; current task implementation status remains visible in each task dossier.</p></section>`;}
  function setting(){return `<section id="fair-evaluation" class="document-section"><h2>Flexible strategies. Matched conditions.</h2><p>Models may interact with the environment, invoke tools, plan, write control programs or develop policies according to each task. Comparisons hold task-specific initial settings, available tools, time limits and attempt budgets constant.</p><p>A lightweight integration interface is intended to minimize model-specific adaptation. Predefined evaluation functions judge the outcome independently of the strategy used. Trusted functions can access simulator ground truth while that privileged state remains isolated from model observations.</p><div class="paper-metric-grid">${metrics.map(([heading,text])=>`<article><h3>${heading}</h3><p>${text}</p></article>`).join('')}</div><p class="paper-report-note">The current website reports success, progress, coverage and simulation time. Full-process wall-clock time and token consumption are manuscript reporting goals; measured values are not connected here yet.</p></section>`;}
  function taskPackage(t){return `<details class="task-package"><summary>What belongs in this evaluation package?</summary><p>The manuscript defines a task package around four components. For ${t.id}, the required deliverable is <strong>${tracks[t.track].output}</strong>; implementation readiness is described above.</p><dl>${packageParts.map(([heading,text])=>`<div><dt>${heading}</dt><dd>${text}</dd></div>`).join('')}</dl></details>`;}
- return {title,home,summary,design,creation,setting,taskPackage};
+ return {title,summary,design,creation,setting,taskPackage};
 })();

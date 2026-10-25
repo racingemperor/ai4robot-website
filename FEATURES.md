@@ -24,7 +24,7 @@ Four categories: manipulation 14, navigation 3, training 2, construction 3. T18 
 
 ## Result provenance
 
-The default official report contains no models or scores. The synthetic walkthrough contains four generic example models, 88 aggregates and 88 episodes. It is not evidence about actual models.
+The default official report contains no models or scores. The synthetic walkthrough contains five generic example models, 110 aggregates and 110 episodes. It is not evidence about actual models.
 
 Only one report is active at a time. Imports replace the report and remain local and unreviewed. Known synthetic provenance persists through navigation and report export. Reports are revalidated on sessionStorage reload. No video URLs are accepted from imported reports; local attached video is held only in page memory. Files and provider credentials are not uploaded.
 
@@ -97,7 +97,7 @@ Run node --test tests/results.test.cjs and syntax-check all ten JS files. The da
 
 ## Manuscript integration
 
-paper.js curates the EGE research overview, three contributions, four package components, six construction stages and four evaluation goals. Documents → Resources provides the adapted overview; Documents → Method explains design, sourcing, creation and fairness. Home has a concise research section, and task details expose the package definition without expanding the gallery. The current report schema and scoring remain unchanged. Wall-clock elapsed time and token consumption are not inferred from simulation seconds. The site publishes no manuscript source archive, template PDF, author placeholders or empirical results.
+paper.js curates the EGE research overview, four package components, six construction stages and four evaluation goals. Documents → Resources provides the adapted overview; Documents → Method explains design, sourcing, creation and fairness. Home uses top-five category charts and a seven-dimensional task capability constellation; research explanations stay in Documents. Task details expose the package definition without expanding the gallery. The current report schema and scoring remain unchanged. Wall-clock elapsed time and token consumption are not inferred from simulation seconds. The site publishes no manuscript source archive, template PDF, author placeholders or empirical results.
 
 ## Home task wall
 
@@ -106,3 +106,9 @@ Four flowing columns link to the 22 task dossiers. Tiles use original, labeled c
 ## Appearance
 
 A shared header sun/moon control switches all five pages, task windows, evidence frames, result tables, trace/code blocks and the run configurator. Saved preference is applied before styles, with system fallback and storage-error handling. Page snapshots fade for 500 ms, with registered semantic color properties interpolating for 650 ms as a fallback without remounting content or resetting a timeline, scroll position or form. Reduced motion disables the color/icon transition. Home fades its media wall into the page background; main sections and the footer share that canvas and use spacing in place of hard horizontal dividers.
+
+## Home insights
+
+The category charts show success or progress for up to five models with full 22-task coverage, selected by overall category-balanced success. They use Results.summarize rather than an independent scoring formula. The same cohort is retained for progress; incomplete models do not enter the chart. Official, synthetic and locally saved unreviewed reports remain separate, with visible provenance and an accessible values table. Official results have five empty positions until complete reports exist.
+
+The task constellation maps the three existing capability descriptions per task into seven explicit annotation dimensions: perception/grounding, spatial reasoning, contact/dexterity, motion/coordination, planning/feedback, learning/adaptation and world modeling. Counts normalize to a vector; weighted anchor positions are projected to Orbit or Flat. A capability can contribute to several dimensions. These are editorial annotations, not measured weights, difficulty or model outcomes. Rotation, category/capability filters, point/keyboard/menu selection, a task-detail link, individual capability explanations and the full count table make the projection inspectable. Marker separation avoids coincident selection targets without altering the underlying vectors.
