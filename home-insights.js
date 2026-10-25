@@ -55,7 +55,7 @@ window.HomeInsights = (() => {
   let displayed=Insights.waveform(dimensionId).map(d=>d.value);
   const point=(angle,radius)=>[center+Math.sin(angle)*radius,center-Math.cos(angle)*radius];
   const xy=p=>p.map(n=>n.toFixed(2)).join(' ');
-  plot.innerHTML=`<svg class="capability-ring" viewBox="0 0 620 620" role="group" aria-labelledby="ring-svg-title ring-svg-desc"><title id="ring-svg-title">Task demands for Perception &amp; grounding</title><desc id="ring-svg-desc">22 fixed task positions. Higher radial peaks indicate stronger qualitative demand on a shared zero-to-three scale. Use the task menu for an alternative to the diagram.</desc>
+  plot.innerHTML=`<svg class="capability-ring" viewBox="0 0 620 620" role="group" aria-labelledby="ring-svg-title" aria-describedby="ring-svg-desc"><title id="ring-svg-title">Task demands for Perception &amp; grounding</title><desc id="ring-svg-desc">22 fixed task positions. Higher radial peaks indicate stronger qualitative demand on a shared zero-to-three scale. Use the task menu for an alternative to the diagram.</desc>
    <g class="ring-guides" aria-hidden="true">${[0,1,2,3].map(level=>`<circle cx="310" cy="310" r="${base+7+level*step}"/>`).join('')}</g>
    <circle class="ring-disc" cx="310" cy="310" r="135" aria-hidden="true"/><circle class="ring-groove" cx="310" cy="310" r="126" aria-hidden="true"/>
    <g class="ring-notes">${TASKS.map((t,i)=>{
