@@ -14,23 +14,18 @@ window.Motion = (() => {
  // CSS moves the wall; this controller pauses it and decodes only visible clips.
  function videoWall(hero) {
   if(!hero)return;
-  const wall=hero.querySelector('.hero-wall'),toggle=hero.querySelector('.wall-motion-toggle');
+  const wall=hero.querySelector('.hero-wall');
   const videos=[...wall.querySelectorAll('video')],visibleVideos=new Set();
   let requested=!preference.matches,inView=true,focused=false;
   function sync() {
    const running=requested&&inView&&!document.hidden&&!focused;
    hero.dataset.motion=running?'running':'paused';
-   toggle.setAttribute('aria-pressed',String(requested));
-   const label=requested?'Pause video wall':'Play video wall';
-   toggle.setAttribute('aria-label',label);toggle.title=label;
-   toggle.firstElementChild.textContent=requested?'Ⅱ':'▶';
    videos.forEach(video=>{
     if(running&&visibleVideos.has(video)){
      if(video.paused)video.play().catch(()=>{});
     }else video.pause();
    });
   }
-  toggle.addEventListener('click',()=>{requested=!requested;sync();});
   wall.addEventListener('focusin',()=>{focused=true;sync();});
   wall.addEventListener('focusout',event=>{if(!wall.contains(event.relatedTarget)){focused=false;sync();}});
   // Bring a clipped tile into the wall viewport when reached by keyboard.

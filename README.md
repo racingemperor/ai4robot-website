@@ -29,11 +29,15 @@ From this directory:
 
 Open http://127.0.0.1:4174/. When serving the workspace root instead, use /website-prototype/.
 
+## Appearance
+
+The header’s sun/moon button switches every page between light and dark themes. The choice persists across navigation and reload; without a saved choice it follows the system. Unavailable browser storage falls back to an in-memory choice. Complete page snapshots fade over 500 ms where supported, with a 650 ms semantic-color fallback and immediate updates for reduced motion. The hero fades into the same page canvas as the following sections. Main sections and the footer use space rather than full-width divider lines; tables and controls retain their boundaries.
+
 ## Data contract
 
 Official results are empty until reviewed reports are connected. Synthetic examples use generic names and never assign scores to real models. Imports are validated, local, unreviewed and stored in this tab's sessionStorage; a storage failure falls back to page memory. Video is page-memory only. Shared URLs contain view parameters, not file contents.
 
-Grid placeholders reserve media and output positions across Home, Tasks and Documents. The empty official Leaderboard displays ten layout-only model slots with no scores. Episodes offers a separate, explicitly labeled 90-second layout preview until official records exist. These slots are never report models or exported results. Optional event input, output and code snapshots follow the same clock as local video; real recordings need matching timestamps. No public footage or observation frames are connected yet. Home shows explicitly labeled concept previews in its flowing wall. Add reviewed clips to HOME_VIDEOS in app.js as task-ID entries with src and optional poster; use the same task footage for Home and Tasks. Wall clips play silently in a loop when visible; pause, offscreen/tab suspension and reduced-motion defaults apply. Every tile opens its task dossier.
+Grid placeholders reserve media and output positions across Home, Tasks and Documents. The empty official Leaderboard displays ten layout-only model slots with no scores. Episodes offers a separate, explicitly labeled 90-second layout preview until official records exist. These slots are never report models or exported results. Optional event input, output and code snapshots follow the same clock as local video; real recordings need matching timestamps. No public footage or observation frames are connected yet. Home shows explicitly labeled concept previews in its flowing wall. Add reviewed clips to HOME_VIDEOS in app.js as task-ID entries with src and optional poster; use the same task footage for Home and Tasks. Wall clips play silently in a loop when visible; focus, offscreen/tab suspension and reduced-motion preferences pause them automatically. Every tile opens its task dossier.
 
 Scoring follows the current research plan: average task rates within each category, then average categories. Pooled success and its Wilson interval are separate. See FEATURES.md for the normalized report format and limitations.
 
@@ -41,7 +45,7 @@ The site does not execute robot commands or request provider credentials. Its ru
 
 ## Modules and publication
 
-site.js owns navigation and shared dialogs; app.js owns narrative pages; lab.js owns result/configuration tools; tasks.js owns the reviewed task catalog; results.js owns validation and aggregation; illustrations.js supplies task visuals; evidence.js owns grid placeholders, playback symbols, separate preview events and time-based trace selection; motion.js owns scroll reveals, video-wall playback and the card-to-window transition; paper.js owns curated manuscript text and its presentation. Task images are original conceptual illustrations reserved for future experiment frames. Task detail windows use native modal focus handling, Escape/backdrop dismissal and reduced-motion alternatives.
+theme.js applies the saved/system appearance before styles load and mounts the header switch; theme.css interpolates shared light/dark colors and softens section joins. site.js owns navigation and shared dialogs; app.js owns narrative pages; lab.js owns result/configuration tools; tasks.js owns the reviewed task catalog; results.js owns validation and aggregation; illustrations.js supplies task visuals; evidence.js owns grid placeholders, playback symbols, separate preview events and time-based trace selection; motion.js owns scroll reveals, video-wall playback and the card-to-window transition; paper.js owns curated manuscript text and its presentation. Task images are original conceptual illustrations reserved for future experiment frames. Task detail windows use native modal focus handling, Escape/backdrop dismissal and reduced-motion alternatives.
 
 Publish only this website directory to the website repository. GitHub Pages serves the root of codex/website-publication. Research source code, operational setup, credentials and progress records are outside publication scope. See DESIGN-NOTES.md. The internal VIDEO-BRIEF.md is excluded from publication.
 

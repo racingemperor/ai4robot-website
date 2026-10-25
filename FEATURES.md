@@ -93,7 +93,7 @@ Defaults: seed 0 and layouts 0,1,2. Commands are generated as text, never execut
 
 ## Verification
 
-Run node --test tests/results.test.cjs and syntax-check all eight JS files. The data/timeline suite currently has eight tests. Validate desktop/mobile document navigation, local section switching/history/legacy redirects, shared category filters, task details, score/progress displays, exports, import/reload/clear, Documents method anchors, retained run configuration, direct-policy guards and episode video controls. Publish only the website allowlist; verify Pages files after deployment.
+Run node --test tests/results.test.cjs and syntax-check all ten JS files. The data/timeline suite currently has eight tests. Validate desktop/mobile document navigation, local section switching/history/legacy redirects, shared category filters, task details, score/progress displays, exports, import/reload/clear, Documents method anchors, retained run configuration, direct-policy guards and episode video controls. Publish only the website allowlist; verify Pages files after deployment.
 
 ## Manuscript integration
 
@@ -101,4 +101,8 @@ paper.js curates the EGE research overview, three contributions, four package co
 
 ## Home task wall
 
-Four flowing columns link to the 22 task dossiers. Tiles use original, labeled concept previews until reviewed footage is mapped in HOME_VIDEOS. Optional videos loop muted and inline, with visible-tile playback, page/hero suspension, a shared symbol-only pause control and a paused reduced-motion default. Keyboard focus exposes the original tiles as a static scrollable grid; duplicate cycles are hidden from the accessibility tree.
+Four flowing columns link to the 22 task dossiers. Tiles use original, labeled concept previews until reviewed footage is mapped in HOME_VIDEOS. Optional videos loop muted and inline, with visible-tile playback, page/hero suspension, automatic focus suspension and a paused reduced-motion default. Keyboard focus exposes the original tiles as a static scrollable grid; duplicate cycles are hidden from the accessibility tree.
+
+## Appearance
+
+A shared header sun/moon control switches all five pages, task windows, evidence frames, result tables, trace/code blocks and the run configurator. Saved preference is applied before styles, with system fallback and storage-error handling. Page snapshots fade for 500 ms, with registered semantic color properties interpolating for 650 ms as a fallback without remounting content or resetting a timeline, scroll position or form. Reduced motion disables the color/icon transition. Home fades its media wall into the page background; main sections and the footer share that canvas and use spacing in place of hard horizontal dividers.
