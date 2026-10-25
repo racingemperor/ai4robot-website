@@ -71,7 +71,7 @@ button,a{transition: background-color 0.18s, color 0.18s, border-color 0.18s;}
 .hero-index{display: flex; gap: 25px; align-items: center; margin-top: 38px; border-top: 1px solid var(--line); padding-top: 19px;}
 .hero-index > span{display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 10px; white-space: nowrap;}
 .hero-index strong{font-family: var(--sans); font-size: 31px; font-weight: 400; color: var(--ink); line-height: 1;}
-.hero-index .index-note{margin-left: auto; font-size: 10px; max-width: 152px; white-space: normal; line-height: 1.8;}
+.hero-index .index-note{margin-left: auto; font-size: 10px;  white-space: normal; line-height: 1.8;}
 .section{padding: var(--section-space) var(--gutter); border-top: 1px solid var(--line);}
 .section-title{display: flex; justify-content: space-between; align-items: flex-end; gap: 30px; margin-bottom: 38px;}
 .section-title .eyebrow{margin-bottom: 13px; font-size: 10px;}
@@ -263,7 +263,7 @@ dialog h2{font-size: 31px; padding-right: 20px;}
 .feature-caption > p{font-size: 12px;}
 .feature-caption > .text-link{font-size: 9px; gap: 9px;}
 .section-title{align-items: flex-start;}
-.section-title > p{font-size: 11px; max-width: 220px;}
+.section-title > p{font-size: 11px;}
 .explorer-tools{flex-direction: column; align-items: stretch;}
 .explorer-secondary{justify-content: space-between;}
 .search-label input{width: 230px;}
@@ -271,7 +271,7 @@ dialog h2{font-size: 31px; padding-right: 20px;}
 .map-lane{grid-template-columns: 100px 1fr; gap: 14px;}
 .lane-title{gap: 7px;}
 .lane-title h3{font-size: 11px;}
-.lane-title div > span{font-size: 7px; max-width: 70px; line-height: 1.5;}
+.lane-title div > span{font-size: 7px;  line-height: 1.5;}
 .lane-count{display: none;}
 .lane-nodes{grid-template-columns: repeat(3, minmax(0px, 1fr)); gap: 9px;}
 .directory-row{grid-template-columns: 40px 1fr 18px 12px; gap: 10px;}
@@ -317,16 +317,15 @@ dialog h2{font-size: 31px; padding-right: 20px;}
 .hero-index > span{font-size: 8px;}
 .hero-media::before{font-size: 180px; letter-spacing: -13px; top: 21%;}
 .section-title{display: block;}
-.section-title > p{margin-top: 17px; max-width: none;}
+.section-title > p{margin-top: 17px;}
 .section-title > p br{display: none;}
 .atlas-layout{grid-template-columns: minmax(0px, 1fr) 240px; gap: 22px;}
 .map-lane{display: block;}
 .lane-title{padding-top: 0px; margin-bottom: 15px;}
 .lane-title > div{display: flex; gap: 12px; align-items: baseline;}
-.lane-title div > span{max-width: none;}
 .lane-nodes{grid-template-columns: repeat(3, minmax(0px, 1fr));}
 .atlas-status{font-size: 8px;}
-.atlas-status > span:nth-child(2){max-width: 180px; text-align: right; font-size: 8px;}
+.atlas-status > span:nth-child(2){text-align: right; font-size: 8px;}
 .task-node .node-label{font-size: 8px;}
 .track-grid{gap: 22px;}
 .track{padding: 23px 0px;}
@@ -347,7 +346,7 @@ dialog h2{font-size: 31px; padding-right: 20px;}
 .media-plan-heading > .button{margin-top: 20px;}
 .media-plan-list article{grid-template-columns: 170px 1fr;}
 .site-footer{padding-top: 35px;}
-.footer-right p{max-width: 220px; text-align: right;}
+.footer-right p{text-align: right;}
 }
 @media (max-width: 600px){
 :root{--gutter: 21px; --section-space: 48px;}
@@ -396,7 +395,7 @@ dialog h2{font-size: 31px; padding-right: 20px;}
 .search-label input{width: 100%; font-size: 11px;}
 .view-switch{flex-shrink: 0;}
 .atlas-status{padding: 16px 0px; font-size: 8px; gap: 15px;}
-.atlas-status > span:nth-child(2){max-width: 155px; font-size: 7px; line-height: 1.7;}
+.atlas-status > span:nth-child(2){font-size: 7px; line-height: 1.7;}
 .atlas-layout{grid-template-columns: 1fr; gap: 24px;}
 .map-lane{padding: 18px 0px;}
 .lane-title{margin-bottom: 13px;}
@@ -455,7 +454,7 @@ dialog h2{font-size: 31px; padding-right: 20px;}
 .site-footer{display: block; padding-bottom: 135px;}
 .site-footer .brand{font-size: 29px;}
 .footer-right{align-items: flex-start; margin-top: 25px;}
-.footer-right p{text-align: left; max-width: none;}
+.footer-right p{text-align: left;}
 dialog{padding: 33px 23px; width: calc(-24px + 100vw); max-height: 87vh;}
 dialog h2{font-size: 26px;}
 .dialog-subtitle{font-size: 11px; line-height: 1.9; margin-bottom: 24px;}
