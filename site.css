@@ -61,7 +61,7 @@ button,.button,.lab-button,.slot-button,.matrix-cell,.skip-link,input:is([type=b
 .matrix-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none}
 .footer-links{display:flex;gap:24px;flex-wrap:wrap;font-size:12px}
 .footer-links a{min-height:44px;display:inline-flex;align-items:center;border-bottom:1px solid #69756b}
-.footer-links a:hover{color:#e5ad91}
+.footer-links a:hover{color:var(--accent)}
 .site-footer{padding-bottom:40px}
 .home-questions{background:var(--surface)}
 .question-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px}
