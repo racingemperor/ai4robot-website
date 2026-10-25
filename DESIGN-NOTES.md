@@ -4,7 +4,7 @@
 
 The site asks whether a general-purpose language model or coding agent can turn an instruction into a physical outcome. The home page adapts the EGE manuscript’s motivation and three contributions, establishes the question, lets visitors inspect the program-submission and direct-policy routes, and uses T06 to explain why visible progress can still fail the full instruction.
 
-The visual language is paper, dark ink and rust red, with editorial typography. Dashed grid placeholders reserve video, observation, figure, document and output positions. Home has a hero recording slot, a reusable task-video strip and scoring evidence; each task has one demonstration video, three detail frames and a deliverable. Documents reserves method figures, execution output and publication material. No experimental media is published.
+The visual language is paper, dark ink and rust red, with editorial typography. Dashed grid placeholders reserve video, observation, figure, document and output positions. Home has a hero recording slot, a reusable task-video strip and scoring evidence; each task has one demonstration video, three detail frames and a deliverable. Documents reserves method figures, execution output and publication material. No experimental media is published. Controls use a shared 10 px corner radius; video, image, output and task presentation frames use 14 px corners, with their contents following the frame. Task characteristic cells use 6 px corners.
 
 ## Distinct pages
 
