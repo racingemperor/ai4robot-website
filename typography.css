@@ -1,0 +1,146 @@
+/* Type roles measured from LIBERO-Pro 2.0. Keep code separate from interface text. */
+@font-face{font-family:Lato;font-style:normal;font-weight:400;font-display:swap;src:url("fonts/lato-regular.woff2?v=d414a00ed3") format("woff2")}
+@font-face{font-family:Lato;font-style:normal;font-weight:500;font-display:swap;src:url("fonts/lato-medium.woff2?v=95a186cbac") format("woff2")}
+@font-face{font-family:Lato;font-style:normal;font-weight:600;font-display:swap;src:url("fonts/lato-semibold.woff2?v=bced4b2a58") format("woff2")}
+@font-face{font-family:Lato;font-style:normal;font-weight:700;font-display:swap;src:url("fonts/lato-bold.woff2?v=898fe22483") format("woff2")}
+@font-face{font-family:Lato;font-style:normal;font-weight:800;font-display:swap;src:url("fonts/lato-extrabold.woff2?v=791005e7cc") format("woff2")}
+@font-face{font-family:Lato;font-style:italic;font-weight:400;font-display:swap;src:url("fonts/lato-italic.woff2?v=3aba202626") format("woff2")}
+@font-face{font-family:Lato;font-style:italic;font-weight:700;font-display:swap;src:url("fonts/lato-bold-italic.woff2?v=907c7ec9d5") format("woff2")}
+
+:root{
+  --sans:Lato,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Consolas,"Liberation Mono",Menlo,monospace;
+  --type-body:16px;
+  --type-reading:18px;
+  --type-control:14px;
+  --type-caption:13px;
+  --type-meta:12px;
+}
+body{font-family:var(--sans);font-size:var(--type-body);font-weight:400;line-height:1.6;letter-spacing:normal}
+button,input,select,textarea{font-family:var(--sans);letter-spacing:normal}
+h1,h2,h3,h4{font-family:var(--sans);font-weight:650;line-height:1.2;letter-spacing:-.035em}
+strong,b{font-weight:700}
+
+/* Navigation uses the reference's final computed 15px / 24px, 700 rule. */
+.site-header nav>a:nth-child(n){font-family:var(--sans);font-size:15px;font-weight:700;line-height:24px;letter-spacing:normal}
+.site-header .brand{font-family:var(--sans);font-weight:800;letter-spacing:-.035em}
+.brand-mark,.brand-mark span{font-family:var(--sans);font-weight:800}
+.nav-toggle{font-size:16px;font-weight:400;line-height:1.6}
+
+/* Page and section titles retain their semantic levels across local views. */
+:is(.page-heading h1,[data-page=tasks] .page-heading h1){font-size:46px;font-weight:650;line-height:1.2;letter-spacing:-.035em}
+:is(.section-title h2,.research .section-title h2,.document-body h2,.document-body .section-title h2,
+  .document-section h2,.paper-home-intro h2,.paper-summary-heading h2,.case-intro h2,.home-paths h2,
+  .research-resources h2,.research-updates h2,.faq>h2,.downloads h2,.panel-heading h2){font-size:31px;font-weight:650;line-height:1.2;letter-spacing:-.035em}
+:is(.paper-contributions h3,.route-copy h3,.category-grid h3,.outcome-detail h3,.question-grid h3,
+  .method-routes h3,.visibility-grid h3,.category-method h3,.source-grid h3,.definition-list h3,
+  .panel-heading h3,.lab-empty h3,.capability-bars h3,.participate-grid h3,.track h3,
+  .document-body .track h3,.task-focus .task-completion h3,.task-focus .task-section-heading h3,
+  .task-completion h3,.task-article-section h3,.evidence-panel-heading h3,.episode-step-directory h3){font-size:21px;font-weight:650;line-height:1.2;letter-spacing:-.035em}
+:is(.paper-package-grid h3,.paper-metric-grid h3,.paper-stage-heading){font-size:21px;font-weight:650;line-height:1.2;letter-spacing:-.035em}
+:is(.paper-stage-grid h4,.task-focus .task-ability-grid h4,.task-ability-grid h4,.task-input h4,
+  .task-current-scope h4,.run-steps strong,.participate-grid h4,.downloads h4,.faq h4,.research-updates h4){font-size:17px;font-weight:650;line-height:1.4;letter-spacing:-.02em}
+
+.hero-cinema #hero-title{font-family:var(--sans);font-size:clamp(52px,7.5vw,96px);font-weight:800;line-height:1.06;letter-spacing:-.055em}
+.hero-cinema .hero-question{font-size:21.12px;font-weight:400;line-height:1.5;letter-spacing:normal}
+.hero-cinema .hero-desc{font-size:16px;font-weight:400;line-height:1.65;letter-spacing:normal}
+.hero-cinema .hero-copy{max-width:680px}
+
+/* Reading copy: 16px / 1.65; the Home research introduction uses 18px / 1.85. */
+:is(.page-heading>p,.section-title>p,.paper-contributions p,.paper-summary-text p,.paper-summary-subtitle,
+  .premise-grid p,.home-paths p:not(.eyebrow),.route-copy p,.case-intro>p:not(.eyebrow),.outcome-detail p,
+  .category-grid p,.question-grid p,.document-body p,.document-section>p,.protocol-flow p,
+  .definition-list p,.category-method p,.source-grid p,.visibility-grid ul,.boundary-list,
+  .track>p,.panel-heading p,.lab-empty p,.metric-notes p,.faq p,.run-steps p,.participate-grid p,
+  .research-updates p,.run-task-note,.task-focus .task-objective,.task-focus .task-completion p,
+  .task-focus .task-completion li,.task-focus .task-section-heading p,.task-focus .task-ability-grid p,
+  .task-section-heading p,.task-input p,.task-current-scope p,.task-sequence li,.task-package>p,
+  .task-package dd,.task-results-empty p,.trace-feedback p,.current-event p){font-size:var(--type-body);font-weight:400;line-height:1.65;letter-spacing:normal}
+.paper-home-intro>p:not(.eyebrow){font-size:var(--type-reading);font-weight:400;line-height:1.85;letter-spacing:normal;text-align:justify}
+.paper-summary-subtitle{font-size:18px;line-height:1.65}
+.task-package dt,.task-package summary{font-size:16px;font-weight:600;line-height:1.6}
+.task-focus .task-article-header h2{font-size:31px;font-weight:650;line-height:1.2;letter-spacing:-.035em}
+
+/* Interface controls and compact explanations use the reference's Lato hierarchy. */
+:is(.button,.hero-cinema .button,.lab-button,.lab-source .lab-button,.text-link,.footer-right .text-link,
+  .section-switch button,.task-detail-tabs button,.route-switch button,.outcome-controls button,
+  .beat-controls button,.filter-buttons>button,.view-switch button,.task-results-empty .button,
+  .task-results-actions .text-link,.task-detail-links a,.metric-notes summary,.faq summary){font-size:var(--type-control);font-weight:600;line-height:1.6;letter-spacing:normal}
+:is(.research select,.research input:not([type=checkbox]):not([type=range]):not([type=file]),
+  .task-gallery-tools input,.task-gallery-tools select,.task-browser-tools input,.task-browser-tools select,
+  .catalog-intro select,.compare-slots select,.search-label input){font-family:var(--sans);font-size:16px;font-weight:400;line-height:1.6;letter-spacing:normal}
+:is(.lab-filters label,.episode-filters label,.run-form label,.task-gallery-tools label,.task-browser-tools>label,
+  .model-search,.model-choices legend,.catalog-intro label,.compare-slots label,.episode-timeline .playback label){font-size:13px;font-weight:600;line-height:1.5;letter-spacing:normal}
+:is(.lab-source strong,.model-choices label,.path-list strong,.protocol-flow strong,.agent-loop strong){font-size:16px;font-weight:600;line-height:1.5;letter-spacing:normal}
+:is(.lab-source span,.lab-message,.lab-note,.lab-filters>p,.lab-filters>p span,.layout-preview-note,
+  .episode-scope,.episode-timeline>p,.task-gallery-note,.task-report-context,.task-metric-note,
+  .task-unavailable,.command-box p,.route-note,.case-footnote,.feature-caption>p,.path-list span,
+  .agent-loop span,.compare-metrics p,.compare-metrics small,.empty-comparison span){font-size:var(--type-caption);font-weight:400;line-height:1.65;letter-spacing:normal}
+:is(.source-note,.document-section .source-note,.paper-report-note){font-size:13px!important;line-height:1.65;letter-spacing:normal}
+
+/* Task gallery, floating details, media captions and report tables. */
+.task-card-title{font-size:21px;font-weight:650;line-height:1.2;letter-spacing:-.02em}
+.task-card-goal{font-size:16px;font-weight:400;line-height:1.65;letter-spacing:normal}
+:is(.task-trait-cells>span,.task-focus .task-identity,.task-focus .task-facts dt,.task-card-bottom,
+  .task-card-category,.task-card-id,.task-image-note,.task-window-bar>span,.task-gallery-tools #result-count,
+  .task-list-count,.task-data-source,.task-pagination>span,.task-pagination button span){font-family:var(--sans);font-size:var(--type-meta);font-weight:400;line-height:1.6;letter-spacing:normal}
+.task-card-category{font-weight:600}
+.task-image-note{font-size:11px;letter-spacing:.04em}
+.task-focus .task-facts dd{font-size:14px;font-weight:500;line-height:1.5}
+.task-pagination button strong{font-size:14px;font-weight:600;line-height:1.5;letter-spacing:normal}
+.task-demonstration figcaption{font-size:14px;font-weight:500;line-height:1.65}
+.task-demonstration figcaption span{font-size:13px;line-height:1.65}
+:is(.evidence-slot-center strong,.hero .evidence-slot-center strong,.home-video-flow .evidence-slot-center strong,
+  .task-evidence-grid .evidence-slot-center strong,.episode-camera-grid .evidence-slot-center strong,
+  .episode-stage .evidence-slot-center strong){font-size:17px;font-weight:600;line-height:1.4;letter-spacing:-.02em}
+:is(.evidence-slot-center p,.task-evidence-grid .evidence-slot-center p,.document-body .evidence-slot p,
+  .episode-camera-grid .evidence-slot-center p,.episode-stage .evidence-slot-center p){font-size:13px;font-weight:400;line-height:1.65;letter-spacing:normal}
+:is(.evidence-kind,.evidence-slot-footer,.episode-camera-grid .evidence-slot-footer,.evidence-panel-heading span,
+  .evidence-panel-heading output,.episode-meta,.episode-index small,.episode-trace .current-event span,
+  .trace-text-block>div>span,.trace-code-block>div>span){font-family:var(--sans);font-size:12px;font-weight:400;line-height:1.6;letter-spacing:normal}
+:is(.results-table,.task-results-table){font-family:var(--sans);font-size:14px;line-height:1.6;font-variant-numeric:tabular-nums}
+:is(.results-table thead th,.task-results-table thead th){font-size:13px;font-weight:700;line-height:1.5;letter-spacing:normal}
+.results-table strong{font-weight:700}
+:is(.results-table small,.task-results-table small,.results-table caption,.matrix-legend,.matrix-legend i){font-family:var(--sans);font-size:12px;line-height:1.6;letter-spacing:normal}
+:is(.results-table .rank,.matrix-cell,.matrix-cell small,.matrix-table tbody th>button,.matrix-table th strong,
+  .capability-row,.capability-row strong){font-family:var(--sans);font-size:14px;line-height:1.6;letter-spacing:normal}
+:is(.compare-metrics strong,.outcome-number strong){font-family:var(--sans);font-weight:700;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
+.compare-metrics strong{font-size:37px;line-height:1.2}
+.outcome-number strong{font-size:60px;line-height:1.06}
+
+/* Labels are Lato too; only literal code and command output are monospaced. */
+:is(.mono,.eyebrow,.page-heading-meta,.paper-summary-heading>span,.category-count,.category-method article>span,
+  .source-grid>a>span,.atlas-status,.outcome-status,.outcome-number span,.storyboard-head,
+  .storyboard-head>span,.feature-overline,.slot-top,.diagram-note,.beat-stage-note span,
+  .footer-right>span,.command-box>div>span){font-family:var(--sans);font-size:12px;font-weight:500;line-height:1.6;letter-spacing:.04em}
+:is(.section-title .eyebrow,.hero-cinema .hero-copy .eyebrow){font-size:13px;font-weight:600;line-height:1.5;letter-spacing:.07em}
+:is(.site-footer p,.footer-right p,.footer-links,.hero-research-link){font-size:14px;font-weight:400;line-height:1.65;letter-spacing:normal}
+.document-index>.mono{font-size:12px}
+.research-updates>div>span,.research-updates time{font-family:var(--sans);font-size:12px;line-height:1.6;letter-spacing:normal}
+:is(.wall-tile-top,.wall-tile-caption>span){font-family:var(--sans);font-size:11px;font-weight:500;line-height:1.6;letter-spacing:.04em}
+.wall-tile-caption strong{font-size:15px;font-weight:650;line-height:1.4;letter-spacing:-.01em}
+.task-thumbnail text,.wall-tile .task-thumbnail text{font-family:var(--sans);font-size:12px}
+:is(.episode-workspace .episode-caption,.episode-caption span){font-family:var(--sans);font-size:13px;font-weight:400;line-height:1.65;letter-spacing:normal}
+:is(.episode-index strong,.episode-concept>strong,.event-list button,.trace-text-block h4,.trace-code-block h4,
+  .trace-feedback h4){font-size:14px;font-weight:600;line-height:1.6;letter-spacing:normal}
+.episode-index span{font-size:13px;line-height:1.6}
+:is(.playback output,.episode-timeline .playback output,.event-list time,.episode-time-markers button){font-family:var(--sans);font-size:12px;font-weight:500;line-height:1.6;letter-spacing:normal;font-variant-numeric:tabular-nums}
+:is(code,pre,.command-box pre,.trace-text-block pre,.trace-code-block pre,.copy-fallback){font-family:var(--mono);font-size:13px;font-weight:400;line-height:1.75;letter-spacing:normal}
+.trace-text-block pre{white-space:pre-wrap;overflow-wrap:anywhere}
+
+@media(max-width:760px){
+  :is(.page-heading h1,[data-page=tasks] .page-heading h1){font-size:32px}
+  :is(.section-title h2,.research .section-title h2,.document-body h2,.document-body .section-title h2,
+    .document-section h2,.paper-home-intro h2,.paper-summary-heading h2,.case-intro h2,.home-paths h2,
+    .research-resources h2,.research-updates h2,.faq>h2,.downloads h2,.panel-heading h2){font-size:27px}
+  .paper-home-intro>p:not(.eyebrow){font-size:16px;line-height:1.8;text-align:left}
+  .hero-cinema #hero-title{font-size:clamp(42px,11.2vw,70px)}
+  .hero-cinema .hero-question{font-size:20px}
+  .hero-cinema .hero-desc{font-size:16px}
+  .task-focus .task-article-header h2{font-size:27px}
+  .task-card-title{font-size:21px}
+  .task-trait-cells>span{font-size:12px}
+  .episode-camera-grid{grid-template-columns:1fr}
+  .task-focus .task-pagination{grid-template-columns:1fr 1fr}
+  .task-focus .task-pagination>span{grid-column:1/-1;grid-row:2;text-align:center}
+}

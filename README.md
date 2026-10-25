@@ -33,6 +33,8 @@ Open http://127.0.0.1:4174/. When serving the workspace root instead, use /websi
 
 The header’s sun/moon button switches every page between light and dark themes. The choice persists across navigation and reload; without a saved choice it follows the system. Unavailable browser storage falls back to an in-memory choice. Complete page snapshots fade over 500 ms where supported, with a 650 ms semantic-color fallback and immediate updates for reduced motion. The hero fades into the same page canvas as the following sections. Main sections and the footer use space rather than full-width divider lines; tables and controls retain their boundaries.
 
+Typography follows [LIBERO-Pro 2.0](https://racingemperor.github.io/LIBERO-Pro2.0/): locally hosted Lato, 16 px body text, 18 px research introduction, 15 px / 700 navigation and a shared heading hierarchy. Buttons, cards, captions, tables and form fields use the same family; literal commands and trace/code snapshots retain the reference's system monospace stack. `typography.css` owns these roles and responsive adjustments. Lato font files are distributed unmodified under the [SIL Open Font License](fonts/OFL-Lato.txt); the files and license originate from the reference site's `assets/fonts/` directory.
+
 ## Data contract
 
 Official results are empty until reviewed reports are connected. Synthetic examples use generic names and never assign scores to real models. Imports are validated, local, unreviewed and stored in this tab's sessionStorage; a storage failure falls back to page memory. Video is page-memory only. Shared URLs contain view parameters, not file contents.
