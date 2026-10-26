@@ -8,6 +8,12 @@ window.HomeInsights = (() => {
   <div class="home-results-panel"><div class="insight-toolbar"><label>Results<select id="home-result-source" aria-label="Results"><option value="official">Official results</option><option value="demo">Synthetic preview</option></select></label><label>Show<select id="home-result-metric" aria-label="Show"><option value="score">Success rate</option><option value="progress">Progress / 100</option></select></label><p id="home-chart-status" role="status"></p></div>
   <div id="home-category-chart"></div>
   </div>
+  <div class="home-category-explorer" aria-labelledby="home-category-explorer-title">
+   <div class="home-category-explorer-heading"><div><p class="eyebrow">EXPLORE THE TASK SET</p><h3 id="home-category-explorer-title">Choose a category to see what it asks.</h3><p>Each selection connects the category, its tasks and any available model results.</p></div><a class="text-link" href="${Site.href('tasks')}">Browse all 22 tasks ↗</a></div>
+   <div id="home-category-picker" class="home-category-picker" role="group" aria-label="Choose a task category">${categories.map((c,i)=>`<button type="button" data-home-category="${c.id}" aria-pressed="${i===0}" aria-controls="home-category-detail"><span class="home-category-index">${String(i+1).padStart(2,'0')}</span><span class="home-category-name">${h(c.name)}</span><span class="home-category-count">${c.count} task${c.count===1?'':'s'}</span></button>`).join('')}</div>
+   <div id="home-category-detail" class="home-category-detail" aria-live="off"></div>
+   <p id="home-category-selection-status" class="sr-only" role="status" aria-live="polite"></p>
+  </div>
  </section>
  <section id="home-capabilities" class="section home-capabilities" data-capability-tone="${Insights.dimensions[0].id}" aria-labelledby="home-capabilities-title">
   <div class="insight-heading"><div><h2 id="home-capabilities-title">Every task has its own rhythm.</h2><p>Seven capabilities. Twenty-two tasks. Switch a capability to see where the task demands rise.</p></div><a class="text-link" href="${Site.href('tasks')}">Explore all tasks ↗</a></div>
@@ -28,28 +34,54 @@ window.HomeInsights = (() => {
   if(imported)source.insertAdjacentHTML('beforeend','<option value="imported">Local report · unreviewed</option>');
   const initial=new URLSearchParams(location.search).get('data');
   source.value=initial==='demo'?'demo':initial==='imported'&&imported?'imported':'official';
+  let activeCategory=categories[0].id,selectedModelId=null;
+  const categoryDetail=document.querySelector('#home-category-detail');
+  function categoryLinks(category,categoryTasks,sourceId,selected){
+   const taskLinks=categoryTasks.map(t=>`<li><a href="${Site.href('tasks',{task:t.id,category:category.id})}"><span>${t.id}</span><strong>${h(t.name)}</strong><span aria-hidden="true">↗</span></a></li>`).join('');
+   const dataParam=sourceId==='official'?null:sourceId;
+   return `<ul class="home-category-task-list" aria-label="Tasks in ${h(category.name)}">${taskLinks}</ul><div class="home-category-links"><a class="text-link" href="${Site.href('tasks',{category:category.id})}">Open these tasks in Tasks ↗</a><a class="text-link" href="${Site.href('leaderboard',{category:category.id,modelQuery:selected?.name,data:dataParam})}">${selected?'Compare this model':'Compare this category'} ↗</a><a class="text-link" href="${Site.href('episodes',{episodeModel:selected?.id,category:category.id,data:dataParam})}">${selected?'Inspect this model’s episodes':'Inspect category episodes'} ↗</a></div>`;
+  }
+  function drawCategoryDetail(rows,sourceId,metricId){
+   const category=categories.find(c=>c.id===activeCategory)||categories[0];
+   const categoryTasks=TASKS.filter(t=>t.category===category.id);
+   const selected=rows.find(model=>model.id===selectedModelId);
+   const categoryResult=selected?.categories.find(item=>item.id===category.id);
+   const provenance=sourceId==='demo'?'Synthetic preview · not measured':sourceId==='imported'?`Local report · ${synthetic?'Synthetic · ':''}Unreviewed`:'Official results';
+   const modelPanel=selected&&categoryResult?.value!==null&&categoryResult?.value!==undefined
+    ? `<div class="home-category-result"><span class="home-category-result-label">SELECTED MODEL · ${h(provenance)}</span><strong>${h(selected.name)}</strong><b>${metricId==='progress'?(categoryResult.value*100).toFixed(1):pct(categoryResult.value)}</b><span>${metricId==='progress'?'Progress / 100':'Success rate'} · ${h(category.name)}</span></div>`
+    : rows.length?`<div class="home-category-result home-category-result-empty"><span class="home-category-result-label">MODEL RESULT</span><strong>Choose a model above</strong><span>Its score for ${h(category.name)} will appear here.</span></div>`
+    : `<div class="home-category-result home-category-result-empty"><span class="home-category-result-label">MODEL RESULT</span><strong>${sourceId==='official'?'Reviewed results are forthcoming':'No complete model cohort'}</strong><span>${sourceId==='official'?'No model scores are published in the official view yet.':sourceId==='demo'?'Synthetic examples are available for layout preview; no complete 22-task cohort is present.':'This local report does not contain a complete 22-task cohort for ranking.'}</span></div>`;
+   categoryDetail.innerHTML=`<div class="home-category-detail-main"><div class="home-category-summary"><span class="home-category-overline">${category.count} TASK${category.count===1?'':'S'} · TASK CATEGORY</span><h4>${h(category.name)}</h4><p>Primary deliverable: <strong>${h(category.output)}</strong></p><p>${h(category.hidden)}</p>${modelPanel}</div><div class="home-category-task-browser"><div class="home-category-task-heading"><h4>Tasks in this category</h4><span>${categoryTasks.length} tasks</span></div>${categoryLinks(category,categoryTasks,sourceId,selected)}</div></div>`;
+   document.querySelectorAll('[data-home-category]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.homeCategory===activeCategory)));
+   document.querySelector('#home-category-selection-status').textContent=`${category.name}: ${categoryTasks.length} tasks. ${selected?`${selected.name} ${metricId==='progress'?'progress':'success rate'} ${categoryResult?.value===null||categoryResult?.value===undefined?'not available':metricId==='progress'?(categoryResult.value*100).toFixed(1)+' out of 100':pct(categoryResult.value)}.`:'Category details updated.'}`;
+  }
   function drawChart(){
    const report=source.value==='demo'?Results.demo:source.value==='imported'?imported:Results.official;
    const rows=Insights.topModels(report,metric.value),empty=!rows.length;
+   if(!rows.some(model=>model.id===selectedModelId))selectedModelId=null;
    const label=source.value==='demo'?'Synthetic preview · Not measured':source.value==='imported'?`Local report · ${synthetic?'Synthetic · ':''}Unreviewed`:'Official results';
    const models=empty?Array.from({length:5},(_,i)=>({name:`Model slot ${String(i+1).padStart(2,'0')}`,categories:[]})):rows;
    const progress=metric.value==='progress';
    document.querySelector('#home-chart-status').textContent=`${label}${empty?' · Awaiting complete 22-task results':` · ${rows.length} models · 22 / 22 tasks`}`;
    document.querySelector('#home-leaderboard-link').href=Site.href('leaderboard',{data:source.value==='official'?null:source.value,category:null,group:null,robot:null,track:null});
    const url=new URL(location.href);if(source.value==='official')url.searchParams.delete('data');else url.searchParams.set('data',source.value);history.replaceState({},'',url);Site.refreshLinks();
-   document.querySelector('#home-category-chart').innerHTML=`<div class="model-legend">${models.map((m,i)=>`<span><i style="--model-color:var(--model-${i})" aria-hidden="true">${String.fromCharCode(65+i)}</i>${h(m.name)}</span>`).join('')}</div><div class="category-bar-grid">${CATEGORIES.map((c,ci)=>{
+   document.querySelector('#home-category-chart').innerHTML=`<div class="model-legend" role="group" aria-label="Focus a model in the category chart">${empty?models.map((m,i)=>`<span><i style="--model-color:var(--model-${i})" aria-hidden="true">${String.fromCharCode(65+i)}</i>${h(m.name)}</span>`).join(''):models.map((m,i)=>`<button type="button" class="model-focus" data-home-model="${h(m.id)}" aria-pressed="${m.id===selectedModelId}" aria-label="${m.id===selectedModelId?'Stop focusing':'Focus'} ${h(m.name)} in the category chart"><i style="--model-color:var(--model-${i})" aria-hidden="true">${String.fromCharCode(65+i)}</i>${h(m.name)}</button>`).join('')}</div><div class="category-bar-grid">${CATEGORIES.map((c,ci)=>{
     const barWidth=30,gap=13,start=48,baseline=223,scale=1.8;
-    return `<figure><figcaption><strong>${c.name}</strong><span>${c.count} task${c.count===1?'':'s'} · ${progress?'Progress / 100':'Success rate'}</span></figcaption><svg class="category-bar-chart" viewBox="0 0 270 260" role="img" aria-label="${h(c.name)}: ${empty?'five model positions awaiting results':`${label}; ${progress?'progress':'success rate'} for the top ${rows.length} models`}">
+    return `<figure class="${c.id===activeCategory?'is-active-category':''}"><figcaption><button type="button" class="home-category-chart-select" data-home-category="${c.id}" aria-pressed="${c.id===activeCategory}" aria-controls="home-category-detail">${h(c.name)}</button><span>${c.count} task${c.count===1?'':'s'} · ${progress?'Progress / 100':'Success rate'}</span></figcaption><svg class="category-bar-chart" viewBox="0 0 270 260" role="img" aria-label="${h(c.name)}: ${empty?'five model positions awaiting results':`${label}; ${progress?'progress':'success rate'} for the top ${rows.length} models`}">
      ${[0,50,100].map(t=>`<line x1="35" x2="265" y1="${baseline-t*scale}" y2="${baseline-t*scale}" class="chart-grid"/><text x="29" y="${baseline-t*scale+4}" text-anchor="end" class="chart-axis">${t}</text>`).join('')}
-     ${models.map((m,i)=>{const value=m.categories[ci]?.value??null,x=start+i*(barWidth+gap),height=value===null?0:value*100*scale;return `<g><title>${h(m.name)}: ${value===null?'Awaiting results':progress?(value*100).toFixed(1)+' / 100':pct(value)}</title>${value===null?`<rect x="${x}" y="43" width="${barWidth}" height="180" rx="5" class="chart-empty-bar"/><text x="${x+barWidth/2}" y="130" text-anchor="middle" class="chart-value">—</text>`:`<rect x="${x}" y="${baseline-height}" width="${barWidth}" height="${height}" rx="4" fill="var(--model-${i})"/><text x="${x+barWidth/2}" y="${baseline-height-9}" text-anchor="middle" class="chart-value">${(value*100).toFixed(1)}</text>`}<text x="${x+barWidth/2}" y="246" text-anchor="middle" class="chart-model-key">${String.fromCharCode(65+i)}</text></g>`;}).join('')}</svg></figure>`;
+     ${models.map((m,i)=>{const value=m.categories[ci]?.value??null,x=start+i*(barWidth+gap),height=value===null?0:value*100*scale,dimmed=selectedModelId&&selectedModelId!==m.id;return `<g class="${dimmed?'is-muted-series':''}"><title>${h(m.name)}: ${value===null?'Awaiting results':progress?(value*100).toFixed(1)+' / 100':pct(value)}</title>${value===null?`<rect x="${x}" y="43" width="${barWidth}" height="180" rx="5" class="chart-empty-bar"/><text x="${x+barWidth/2}" y="130" text-anchor="middle" class="chart-value">—</text>`:`<rect x="${x}" y="${baseline-height}" width="${barWidth}" height="${height}" rx="4" fill="var(--model-${i})"/><text x="${x+barWidth/2}" y="${baseline-height-9}" text-anchor="middle" class="chart-value">${(value*100).toFixed(1)}</text>`}<text x="${x+barWidth/2}" y="246" text-anchor="middle" class="chart-model-key">${String.fromCharCode(65+i)}</text></g>`;}).join('')}</svg></figure>`;
    }).join('')}</div><p class="insight-note">${empty?'Five model series are reserved. No rankings or scores have been published. Choose Synthetic preview to inspect the chart layout.':`Models are selected by overall balanced success; the same five appear in every category. Each category averages its task ${progress?'progress':'success rates'} equally. ${source.value==='demo'?'All values are synthetic examples and make no claim about real models.':source.value==='imported'?'Local imports have not been reviewed.':''}`}</p>
     ${empty?'':`<details class="home-chart-table"><summary>View chart values</summary><p class="insight-note">${h(report.benchmark_version)} · ${h(report.protocol)} · ${label}</p><div class="table-scroll" role="region" tabindex="0" aria-label="Model category results; horizontally scrollable"><table class="atlas-annotation-table"><caption>${label} · ${progress?'Progress / 100':'Success rate'} · Complete catalog coverage</caption><thead><tr><th scope="col">Model / agent</th><th scope="col">Overall success</th>${CATEGORIES.map(c=>`<th scope="col">${c.name}</th>`).join('')}</tr></thead><tbody>${rows.map(m=>`<tr><th scope="row">${h(m.name)}<small>${h(m.version)} · ${h(m.agent)}</small></th><td>${pct(m.score)}</td>${m.categories.map(c=>`<td>${progress?(c.value*100).toFixed(1):pct(c.value)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></details>`}`;
+   drawCategoryDetail(rows,source.value,metric.value);
   }
+  document.querySelector('#home-category-picker').addEventListener('click',event=>{const button=event.target.closest('[data-home-category]');if(!button)return;activeCategory=button.dataset.homeCategory;drawChart();});
+  document.querySelector('#home-category-chart').addEventListener('click',event=>{const categoryButton=event.target.closest('[data-home-category]');if(categoryButton){activeCategory=categoryButton.dataset.homeCategory;drawChart();document.querySelector(`#home-category-chart [data-home-category="${activeCategory}"]`)?.focus({preventScroll:true});return;}const modelButton=event.target.closest('[data-home-model]');if(modelButton){const id=modelButton.dataset.homeModel;selectedModelId=selectedModelId===id?null:id;drawChart();document.querySelector(`#home-category-chart [data-home-model="${id}"]`)?.focus({preventScroll:true});}});
   source.addEventListener('change',drawChart);metric.addEventListener('change',drawChart);drawChart();
-  mountRing();
+  mountRing(source);
  }
- function mountRing(){
+ function mountRing(source){
   const plot=document.querySelector('#capability-ring'),taskSelect=document.querySelector('#ring-task');
+  if(!plot||!taskSelect)return;
   const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
   const base=155,step=29,center=310,angleStep=2*Math.PI/TASKS.length;
   let dimensionId=Insights.dimensions[0].id,selected='T06',animation=0;
@@ -83,7 +115,8 @@ window.HomeInsights = (() => {
   function showTask(){
    const task=TASKS.find(t=>t.id===selected),profile=Insights.profile(task),current=profile.find(d=>d.id===dimensionId);
    taskSelect.value=selected;
-   document.querySelector('#ring-task-detail').innerHTML=`<p class="ring-task-id">${task.id} · ${h(categories.find(c=>c.id===task.category).name)}</p><h3>${h(task.name)}</h3><p>${h(task.goal)}</p><div class="ring-demand-detail"><span>${current.name}</span><strong>${current.value} / 3 · ${current.level}</strong><p>${h(current.reason)}</p></div><details class="ring-task-demands"><summary>All seven capability demands</summary><ul>${profile.map(d=>`<li data-capability-tone="${d.id}"><div><span>${d.name}</span><b>${d.value} · ${d.level}</b></div><p>${h(d.reason)}</p></li>`).join('')}</ul></details><a class="text-link" href="${Site.href('tasks',{task:task.id})}">Open ${task.id} task details ↗</a>`;
+   const data=source.value==='official'?null:source.value;
+   document.querySelector('#ring-task-detail').innerHTML=`<p class="ring-task-id">${task.id} · ${h(categories.find(c=>c.id===task.category).name)}</p><h3>${h(task.name)}</h3><p>${h(task.goal)}</p><div class="ring-demand-detail"><span>${current.name}</span><strong>${current.value} / 3 · ${current.level}</strong><p>${h(current.reason)}</p></div><details class="ring-task-demands"><summary>All seven capability demands</summary><ul>${profile.map(d=>`<li data-capability-tone="${d.id}"><div><span>${d.name}</span><b>${d.value} · ${d.level}</b></div><p>${h(d.reason)}</p></li>`).join('')}</ul></details><div class="ring-task-links"><a class="text-link" href="${Site.href('tasks',{task:task.id,category:task.category})}">Open ${task.id} in Tasks ↗</a><a class="text-link" href="${Site.href('leaderboard',{category:task.category,data})}">Compare its category ↗</a><a class="text-link" href="${Site.href('episodes',{episodeTask:task.id,category:task.category,data})}">Inspect task episodes ↗</a></div>`;
   }
   function updateMeaning(){
    const dimension=Insights.dimensions.find(d=>d.id===dimensionId),index=Insights.dimensions.indexOf(dimension);
@@ -121,6 +154,7 @@ window.HomeInsights = (() => {
   function choose(id){selected=id;showTask();draw();}
   document.querySelectorAll('[data-capability]').forEach(button=>button.addEventListener('click',()=>switchCapability(button.dataset.capability)));
   taskSelect.addEventListener('change',()=>choose(taskSelect.value));
+  source.addEventListener('change',showTask);
   plot.addEventListener('click',event=>{const note=event.target.closest('[data-ring-task]');if(note)choose(note.dataset.ringTask);});
   plot.addEventListener('keydown',event=>{
    const note=event.target.closest('[data-ring-task]');if(!note)return;

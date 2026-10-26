@@ -93,7 +93,7 @@ Defaults: seed 0 and layouts 0,1,2. Commands are generated as text, never execut
 
 ## Verification
 
-Run node --test tests/results.test.cjs tests/insights.test.cjs and syntax-check the changed JS files. The reporting and Home-insight suites contain 14 tests. Validate desktop/mobile document navigation, local section switching/history/legacy redirects, shared category filters, task details, score/progress displays, exports, import/reload/clear, Documents method anchors, retained run configuration, direct-policy guards and episode video controls. Publish only the website allowlist; verify Pages files after deployment.
+Run node --test tests/*.test.cjs and syntax-check the changed JS files. The reporting, Home-insight and Home-interaction suites contain 17 tests. Validate desktop/mobile document navigation, local section switching/history/legacy redirects, shared category filters, task details, score/progress displays, exports, import/reload/clear, Documents method anchors, retained run configuration, direct-policy guards and episode video controls. Publish only the website allowlist; verify Pages files after deployment.
 
 ## Manuscript integration
 
@@ -114,3 +114,7 @@ The category charts show success or progress for up to five models with full 22-
 The capability rings keep all 22 tasks in fixed clockwise positions, excluding T18. Seven editorial dimensions describe intended task requirements; they are not a taxonomy defined by the paper. Each task has explicit 0–3 ordinal annotations and rationales based on its goal, capability descriptions and checks. The common scale is Not a focus / Supporting / Important / Central. Higher radial peaks mean stronger demand; intermediate waveform strokes are decorative. These annotations never represent model performance or measured difficulty. A task selector, arrow-key marker navigation, per-task rationales and the complete table provide alternatives to reading the diagram.
 
 Capability changes interpolate the 22 persistent task markers from their currently displayed heights, with a short clockwise stagger. Rapid switches cancel the previous animation without resetting heights. Reduced motion and hidden documents settle immediately. There is no automatic spin or random bounce. The model charts retain their separate report selection and scoring behavior.
+
+## Linked Home exploration
+
+Category selectors and chart headings update the same in-place category dossier, including deliverable, hidden checks and task links. Model legend buttons highlight one model across all five charts and show its score for the selected category. Metric and source changes retain valid selections; source provenance stays visible. Category and capability task details link to scoped Tasks, Leaderboard and Episodes views. Both evaluation routes expose four selectable stages with their inputs, system actions and evidence requirements. Keyboard focus remains on the activated control after updates; reduced motion disables entry effects.
