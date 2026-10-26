@@ -158,7 +158,8 @@ h1,h2,h3,h4{text-wrap:wrap}
 .outcome-number strong{font-size:60px;line-height:1;font-weight:400;letter-spacing:-3px;display:block;color:var(--accent)}
 .outcome-number span{font:9px var(--sans);display:block;margin-top:12px}.outcome-status{font:10px var(--sans);text-transform:uppercase;color:var(--muted)}
 .outcome-detail h3{font-size:24px;font-weight:500;margin:12px 0}.outcome-detail p{font-size:14px;line-height:1.85}.case-footnote{font-size:11px;margin-top:18px;line-height:1.8}
-.category-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:30px}.category-grid>a{border-top:1px solid var(--ink);padding-top:20px;display:flex;flex-direction:column;align-items:flex-start}
+.category-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:30px}
+@media(max-width:1450px){.category-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}.category-grid>a{border-top:1px solid var(--ink);padding-top:20px;display:flex;flex-direction:column;align-items:flex-start}
 .category-count{font:11px var(--sans);color:var(--muted)}.category-grid h3{font-size:25px;font-weight:500;margin:23px 0 12px}.category-grid p{font-size:13px;margin-bottom:25px}.category-grid .text-link{margin-top:auto}
 .catalog-intro{display:flex;gap:60px;justify-content:space-between;align-items:center;padding:35px var(--gutter);border-bottom:1px solid var(--line)}
 .catalog-intro h2{font-size:24px}.catalog-intro p{font-size:13px;margin-top:12px}.catalog-intro label{font-size:11px;display:grid;gap:8px;min-width:230px}

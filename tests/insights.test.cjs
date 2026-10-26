@@ -27,8 +27,11 @@ test('missing categories and incomplete reports never become top-five model clai
  const partial=JSON.parse(JSON.stringify(Results.demo));
  partial.results=partial.results.filter(r=>!(r.model_id==='example-a'&&r.task_id==='T01'));
  assert.equal(Insights.topModels(partial).length,4);assert.ok(!Insights.topModels(partial).some(m=>m.id==='example-a'));
- partial.results=partial.results.filter(r=>tasks.find(t=>t.id===r.task_id).category!=='training');
- assert.equal(Insights.topModels(partial).length,0);
+ for(const category of ['scene-generation','reconstruction','policy-development']){
+  const missingCategory=JSON.parse(JSON.stringify(Results.demo));
+  missingCategory.results=missingCategory.results.filter(r=>tasks.find(t=>t.id===r.task_id).category!==category);
+  assert.equal(Insights.topModels(missingCategory).length,0);
+ }
 });
 test('all 22 tasks have explained qualitative demands across the same seven capabilities',()=>{
  assert.equal(tasks.length,22);assert.equal(Insights.dimensions.length,7);

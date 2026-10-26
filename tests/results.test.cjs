@@ -18,18 +18,28 @@ test('official data has no fabricated model scores; examples cover all 22 tasks'
 });
 test('category-balanced metrics differ from pooled trials and do not hide missing categories',()=>{
   const result=(task,trials,successes,progress)=>({model_id:'a',task_id:task,trials,successes,progress_sum:progress,duration_sum_s:trials*15});
-  const data={models:[{id:'a'}],results:[result('T01',2,1,1.5),result('T02',8,2,4),result('T21',10,10,10),result('T16',5,0,1),result('T14',5,5,5)]};
-  const row=R.summarize(data,['T01','T02','T21','T16','T14'])[0];
-  assert.equal(row.score,(.375+1+0+1)/4);
-  assert.equal(row.progress,(.625+1+.2+1)/4);
-  assert.equal(row.pooled,18/30);assert.equal(row.duration,15);assert.equal(row.complete,true);assert.ok(row.ci[0]<row.pooled&&row.ci[1]>row.pooled);
+  const data={models:[{id:'a'}],results:[result('T01',2,1,1.5),result('T02',8,2,4),result('T21',10,10,10),result('T16',5,0,1),result('T13',5,0,1),result('T14',5,5,5),result('T15',5,0,2)]};
+  const row=R.summarize(data,['T01','T02','T21','T16','T13','T14','T15'])[0];
+  assert.equal(row.score,.375); // Five category means: .375, 1, 0, .5, 0.
+  assert.ok(Math.abs(row.progress-.545)<1e-12); // Means: .625, 1, .2, .7, .2.
+  assert.equal(row.pooled,18/40);assert.equal(row.duration,15);assert.equal(row.complete,true);assert.ok(row.ci[0]<row.pooled&&row.ci[1]>row.pooled);
   const partial=R.summarize(data,['T01','T02','T03'])[0];assert.equal(partial.complete,false);assert.equal(partial.coverage,2);assert.equal(partial.score,.375);
   assert.equal(R.summarize(data,['T01','T17'])[0].score,null);
   assert.equal(R.summarize(data,[])[0].score,null);
 });
-test('catalog preserves the confirmed scope, four categories and latest embodiments',()=>{
+test('catalog follows the five manuscript abstract categories and preserves task scope and embodiments',()=>{
   const ts=context.TASKS;assert.equal(ts.length,22);assert.ok(!ts.some(t=>t.id==='T18'));
-  assert.deepEqual(['manipulation','navigation','training','construction'].map(c=>ts.filter(t=>t.category===c).length),[14,3,2,3]);
+  assert.deepEqual(Array.from(context.window.CATEGORIES,c=>[c.id,c.name,c.count]),[
+    ['manipulation','Robotic manipulation',14],['navigation','Navigation',3],
+    ['scene-generation','Scene generation',1],['reconstruction','Scene and interaction reconstruction',2],
+    ['policy-development','Policy development',2]
+  ]);
+  assert.deepEqual(Array.from(context.window.CATEGORIES,c=>ts.filter(t=>t.category===c.id).length),[14,3,1,2,2]);
+  assert.equal(ts.find(t=>t.id==='T13').category,'scene-generation');
+  assert.equal(ts.find(t=>t.id==='T14').category,'reconstruction');
+  assert.equal(ts.find(t=>t.id==='T15').category,'reconstruction');
+  assert.equal(ts.find(t=>t.id==='T12').category,'manipulation');
+  assert.equal(ts.find(t=>t.id==='T17').category,'policy-development');
   assert.equal(ts.find(t=>t.id==='T11').track,'A');assert.equal(ts.find(t=>t.id==='T21').robot,'Unitree Go2');assert.equal(ts.find(t=>t.id==='T03').robot,'Franka Panda');
 });
 test('reject duplicate, excluded, malformed or contradictory results',()=>{

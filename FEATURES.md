@@ -20,7 +20,7 @@ These cover the main research-site capabilities observed in earlier public-page 
 
 ## Research scope
 
-Four categories: manipulation 14, navigation 3, training 2, construction 3. T18 is excluded. Task scope follows the research repository snapshot reviewed October 23, 2026; T23 is navigation among people. Current implementation and future targets are identified per task.
+Five categories from the EGE abstract: Robotic manipulation 14, Navigation 3, Scene generation 1 (T13), Scene and interaction reconstruction 2 (T14/T15), and Policy development 2 (T16/T17). T18 is excluded. Task scope follows the research repository snapshot reviewed October 23, 2026; T23 is navigation among people. Current implementation and future targets are identified per task.
 
 ## Result provenance
 
@@ -73,7 +73,7 @@ Attach local footage with the same time origin as the event log. The video posit
 
 1. Per task: successes / trials; normalized progress_sum / trials.
 2. Per category: average the available task values equally.
-3. Balanced score and progress: average represented selected categories equally. Progress is displayed in points out of 100.
+3. Balanced score and progress: average represented selected categories equally. The full catalog uses five separate category means from the EGE abstract; generation and reconstruction each receive their own weight. Earlier four-category balanced scores are not directly comparable. Progress is displayed in points out of 100.
 4. A selected category with no data makes the balanced summary unavailable. Partial task coverage is labeled and receives no rank. Missing tasks are never zero-filled.
 5. Pooled success is separately total successes / total trials. Its Wilson 95% interval is not an interval for the balanced score and does not model task/seed correlations.
 6. Mean simulation time is total simulation seconds / valid trials, including unsuccessful outcomes. Wall time and model latency are different measures.
@@ -93,11 +93,11 @@ Defaults: seed 0 and layouts 0,1,2. Commands are generated as text, never execut
 
 ## Verification
 
-Run node --test tests/results.test.cjs and syntax-check all ten JS files. The data/timeline suite currently has eight tests. Validate desktop/mobile document navigation, local section switching/history/legacy redirects, shared category filters, task details, score/progress displays, exports, import/reload/clear, Documents method anchors, retained run configuration, direct-policy guards and episode video controls. Publish only the website allowlist; verify Pages files after deployment.
+Run node --test tests/results.test.cjs tests/insights.test.cjs and syntax-check the changed JS files. The reporting and Home-insight suites contain 14 tests. Validate desktop/mobile document navigation, local section switching/history/legacy redirects, shared category filters, task details, score/progress displays, exports, import/reload/clear, Documents method anchors, retained run configuration, direct-policy guards and episode video controls. Publish only the website allowlist; verify Pages files after deployment.
 
 ## Manuscript integration
 
-paper.js curates the EGE research overview, four package components, six construction stages and four evaluation goals. Documents → Resources provides the adapted overview; Documents → Method explains design, sourcing, creation and fairness. Home uses top-five category charts and a seven-capability task-demand rings; research explanations stay in Documents. Task details expose the package definition without expanding the gallery. The current report schema and scoring remain unchanged. Wall-clock elapsed time and token consumption are not inferred from simulation seconds. The site publishes no manuscript source archive, template PDF, author placeholders or empirical results.
+paper.js curates the EGE research overview, four package components, six construction stages and four evaluation goals. Documents → Resources provides the adapted overview; Documents → Method explains design, sourcing, creation and fairness. Home uses top-five category charts and a seven-capability task-demand rings; research explanations stay in Documents. Task details expose the package definition without expanding the gallery. The report schema remains unchanged; scores are computed from task aggregates using the five manuscript categories. Wall-clock elapsed time and token consumption are not inferred from simulation seconds. The site publishes no manuscript source archive, template PDF, author placeholders or empirical results.
 
 ## Home task wall
 

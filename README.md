@@ -8,7 +8,7 @@ An English static research website with five main pages and six compatibility re
 
 | Page | Purpose |
 |---|---|
-| index.html | Flowing clickable task-video wall, top-five category charts, seven-capability task-demand rings, interactive evaluation routes, T06 scoring case and four categories |
+| index.html | Flowing clickable task-video wall, top-five category charts, seven-capability task-demand rings, interactive evaluation routes, T06 scoring case and five manuscript task categories |
 | tasks.html | Searchable visual task gallery, card-to-center floating task details, capabilities, evidence and model results, plus a task/model results matrix |
 | leaderboard.html | Ranking with balanced/pooled success, progress, coverage and exports, plus up to three-model comparison |
 | compare.html | Compatibility redirect to leaderboard.html?section=comparison |
@@ -37,7 +37,7 @@ Typography follows [LIBERO-Pro 2.0](https://racingemperor.github.io/LIBERO-Pro2.
 
 ## Data contract
 
-Home selects up to five models with complete coverage of all 22 tasks, ordered by category-balanced success; switching to progress retains that cohort. Category charts use the same aggregation as the Leaderboard. The official chart reserves five positions while results are empty. The optional synthetic report contains five example models; local saved reports are explicitly unreviewed.
+Home selects up to five models with complete coverage of all 22 tasks, ordered by category-balanced success; switching to progress retains that cohort. Category charts use the same aggregation as the Leaderboard. The EGE abstract defines five categories: Robotic manipulation (14), Navigation (3), Scene generation (1; T13), Scene and interaction reconstruction (2; T14/T15), and Policy development (2; T16/T17). Scene generation and reconstruction are never merged. Full-scope scores give each of these five category means equal weight; previous four-category aggregate scores are not directly comparable. The official chart reserves five positions while results are empty. The optional synthetic report contains five example models; local saved reports are explicitly unreviewed.
 
 The capability rings keep all 22 tasks in fixed clockwise positions, excluding T18. Seven editorial dimensions describe intended task requirements; they are not a taxonomy defined by the paper. Each task has explicit 0–3 ordinal annotations and rationales based on its goal, capability descriptions and checks. The common scale is Not a focus / Supporting / Important / Central. Higher radial peaks mean stronger demand; intermediate waveform strokes are decorative. These annotations never represent model performance or measured difficulty. A task selector, arrow-key marker navigation, per-task rationales and the complete table provide alternatives to reading the diagram.
 
@@ -57,6 +57,6 @@ Publish only this website directory to the website repository. GitHub Pages serv
 
 ## Manuscript content
 
-The site uses the confirmed title Embodied Generalist Exam (EGE). The abstract, Introduction and Dataset sections inform the public overview. Draft name variants are normalized to EGE; the confirmed 22-task/four-category catalog and six concrete robot platforms are preserved. Raw manuscript sources, template PDFs, example authors, template references and unfinished results are excluded from publication. The manuscript describes a six-stage construction process with cross-checks by at least three authors per stage; this does not imply that every listed task has completed that process.
+The site uses the confirmed title Embodied Generalist Exam (EGE). The abstract, Introduction and Dataset sections inform the public overview. Draft name variants are normalized to EGE; the confirmed 22-task/five-category catalog and six concrete robot platforms are preserved. Raw manuscript sources, template PDFs, example authors, template references and unfinished results are excluded from publication. The manuscript describes a six-stage construction process with cross-checks by at least three authors per stage; this does not imply that every listed task has completed that process.
 
 Manuscript reporting goals include success, intermediate progress, total elapsed wall-clock time and token consumption. The existing report schema supports simulation duration; it does not yet store end-to-end wall-clock time or tokens. The site explains this distinction rather than inferring efficiency results. Foundation-model weights remain unchanged during evaluation; a policy-development task may train a separate robot policy.

@@ -32,7 +32,7 @@ The official empty Leaderboard has ten model slots without ranks or scores; comp
 
 ## Three separate concepts
 
-- Evaluation categories: manipulation (14), navigation (3), training (2), construction (3).
+- Evaluation categories from the EGE abstract: Robotic manipulation (14), Navigation (3), Scene generation (1; T13), Scene and interaction reconstruction (2; T14/T15), Policy development (2; T16/T17).
 - Delivery modes: control program (17), training code/weights (2), scene/motion artifact (3).
 - Capability facets: objects/contact, dexterity, body/control, spatial reasoning, world construction.
 
@@ -42,7 +42,7 @@ These are separate axes. T12 includes a mobile base but is evaluated as manipula
 
 The research README, docs/TASKS.md, docs/AGENT_EVAL.md and task designs were reviewed on October 23, 2026. The project Notion notebook supplies task motivation and references. GitHub defines the current implementation; the user explicitly selected its crowd-navigation definition for T23 over the notebook's trajectory-collection alternative.
 
-The manuscript archive reviewed October 24, 2026 supplies the abstract, Introduction and Dataset sections. Home presents results and capability coverage; Documents separates the manuscript overview in Resources from benchmark design, source selection, six-stage construction and fair evaluation in Method. Task details have an expandable package definition. The confirmed title remains Embodied Generalist Exam. Draft task totals and naming variants do not override the user-confirmed catalog. No template PDF, placeholder authors, sample references, unsupported model claims or empirical findings are published. Wall-clock time and token usage are described as manuscript reporting goals, distinct from currently supported simulation time.
+The manuscript archive reviewed October 24, 2026 supplies the abstract, Introduction and Dataset sections. Home presents results and capability coverage; Documents separates the manuscript overview in Resources from benchmark design, source selection, six-stage construction and fair evaluation in Method. Task details have an expandable package definition. The confirmed title remains Embodied Generalist Exam. The five categories follow the EGE abstract; the older six-category Introduction is not used for grouping. Draft task totals and naming variants do not override the user-confirmed 22-task catalog. The seven editorial capability dimensions and all task-demand annotations remain independent of this taxonomy. No template PDF, placeholder authors, sample references, unsupported model claims or empirical findings are published. Wall-clock time and token usage are described as manuscript reporting goals, distinct from currently supported simulation time.
 
 The catalog states implementation limits: pre-segmented cutting, a single rotating cube layer, initial single-knot tying, standing G1 scope, frozen Go2 navigation and separately trained locomotion. Direct-policy support currently covers the ARX tools; replay checks exist for T02/T06/T19. None of these facts implies a completed 22-task model evaluation.
 
@@ -60,7 +60,7 @@ English metadata, lang=en, one H1 per document, sequential heading hierarchy, a 
 
 ## Home results and capability map
 
-Four small grouped column charts share a 0–100 scale and a five-model legend with letter keys and direct values, plus an optional values table. The selected models have complete catalog coverage and are sorted by the existing category-balanced success metric. Progress changes the displayed metric while retaining those models. Official empty positions, synthetic examples and local unreviewed reports have distinct visible labels; no real model scores are fabricated. The synthetic walkthrough has five models.
+Five small grouped column charts share a 0–100 scale and a five-model legend with letter keys and direct values, plus an optional values table. The selected models have complete catalog coverage and are sorted by category-balanced success using five separate category means. Scene generation and reconstruction are not merged. This changes the weights from the earlier four-category preview, so those overall scores are not directly comparable. Progress changes the displayed metric while retaining those models. Official empty positions, synthetic examples and local unreviewed reports have distinct visible labels; no real model scores are fabricated. The synthetic walkthrough has five models.
 
 The capability rings keep all 22 tasks in fixed clockwise positions, excluding T18. Seven editorial dimensions describe intended task requirements; they are not a taxonomy defined by the paper. Each task has explicit 0–3 ordinal annotations and rationales based on its goal, capability descriptions and checks. The common scale is Not a focus / Supporting / Important / Central. Higher radial peaks mean stronger demand; intermediate waveform strokes are decorative. These annotations never represent model performance or measured difficulty. A task selector, arrow-key marker navigation, per-task rationales and the complete table provide alternatives to reading the diagram.
 
