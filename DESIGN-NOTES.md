@@ -24,6 +24,8 @@ Home’s flowing wall links every tile to its task dossier. The title and primar
 
 Home sections fade in and move upward as they enter the viewport, once per load, without controlling page scroll. Reduced motion shows the final readable state immediately. Native dialog behavior traps focus; closing returns focus to the opening card. Play and pause use symbols with accessible labels.
 
+Home uses selective surfaces to separate content without full-width rules. The model comparison controls, legend and charts share a white rounded panel, while its heading stays on the page canvas. The T06 scoring case uses a quieter tinted panel. Capability rings, video previews, evaluation routes and category links remain open, separated by consistent whitespace. Both enclosing panels are inset from the page edges, stack naturally on phones and follow the light/dark theme transition.
+
 ## Evidence preview
 
 The official empty Leaderboard has ten model slots without ranks or scores; comparison has three model positions and a capability-chart slot. Episodes has a narrow index, a shared scrubber with event markers, video and observation positions, model input/output, the latest code snapshot and an indexed step directory. Clicking steps or dragging backward restores the trace at that time, including the latest earlier code revision. Layout events are explicitly illustrative and never enter the report or exports. Real imported records may supply input/output/code; code is escaped text and never executed. A locally attached video drives the same clock. Observation image positions remain placeholders; original footage and a public asset mapping are future work.

@@ -6,9 +6,10 @@
 @property --line{syntax:'<color>';inherits:true;initial-value:#d0d2c6}
 @property --accent{syntax:'<color>';inherits:true;initial-value:#b5442d}
 @property --green{syntax:'<color>';inherits:true;initial-value:#416257}
-:root{color-scheme:light}
-:root[data-theme=dark]{color-scheme:dark;--paper:#151b19;--surface:#202823;--ink:#edf0e8;--muted:#aeb9af;--line:#46534a;--accent:#efa88b;--green:#9ec4b1}
-:root.theme-ready{transition:--paper .65s ease,--surface .65s ease,--ink .65s ease,--muted .65s ease,--line .65s ease,--accent .65s ease,--green .65s ease}
+@property --home-panel{syntax:'<color>';inherits:true;initial-value:#fff}
+:root{color-scheme:light;--home-panel:#fff}
+:root[data-theme=dark]{color-scheme:dark;--paper:#151b19;--surface:#202823;--ink:#edf0e8;--muted:#aeb9af;--line:#46534a;--accent:#efa88b;--green:#9ec4b1;--home-panel:#26312b}
+:root.theme-ready{transition:--paper .65s ease,--surface .65s ease,--ink .65s ease,--muted .65s ease,--line .65s ease,--accent .65s ease,--green .65s ease,--home-panel .65s ease}
 .theme-snapshot,.theme-snapshot *,.theme-snapshot ::before,.theme-snapshot ::after{transition:none!important}
 .theme-snapshot::view-transition{pointer-events:none}
 .theme-snapshot::view-transition-group(root){animation-duration:.5s;animation-timing-function:cubic-bezier(.22,.7,.2,1)}
@@ -26,12 +27,18 @@
 [data-theme=dark] .theme-sun{opacity:1;transform:none}
 [data-theme=dark] .theme-moon{opacity:0;transform:rotate(50deg) scale(.65)}
 
-/* One page canvas, with space between sections instead of full-width rules. */
+/* Keep soft joins; only results and the scoring case get enclosing surfaces. */
 .section,.page-heading,.section-switch,.document-section,.research{border-top:0;border-bottom:0}
 .document-section{margin-top:36px;padding-top:36px}
 .research,.home-paths{background:transparent}
 [data-page=home] #page-content>section:not(.hero){border:0;background:transparent;padding-block:clamp(48px,6vw,88px)}
 [data-page=home] #page-content>.home-footage{padding-top:28px}
+.home-results-panel{background:var(--home-panel);border:1px solid color-mix(in srgb,var(--line) 55%,transparent);border-radius:24px;padding:clamp(20px,3vw,44px);min-width:0}
+[data-page=home] #page-content>.case-study{display:block}
+.home-case-panel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:clamp(28px,4.5vw,72px);padding:clamp(24px,3.5vw,52px);background:var(--surface);border-radius:24px}
+.home-case-panel>div{min-width:0}
+@media(max-width:900px){.home-case-panel{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.home-results-panel,.home-case-panel{border-radius:18px}.home-results-panel{padding:20px 16px}}
 .site-footer{max-width:none;background:var(--paper);color:var(--ink);border:0;padding-top:clamp(60px,8vw,110px)}
 .site-footer p,.footer-right>span{color:var(--muted)}
 .footer-right .text-link{border-color:var(--line)}

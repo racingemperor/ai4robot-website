@@ -5,8 +5,9 @@ window.HomeInsights = (() => {
  const pct=value=>value===null?'—':`${(value*100).toFixed(1)}%`;
  function render(){return `<section id="home-performance" class="section home-performance" aria-labelledby="home-performance-title">
   <div class="insight-heading"><div><h2 id="home-performance-title">Leading models. Four kinds of work.</h2><p>The top five models by overall category-balanced success, with their performance in each task category.</p></div><a class="text-link" id="home-leaderboard-link" href="${Site.href('leaderboard')}">Full leaderboard ↗</a></div>
-  <div class="insight-toolbar"><label>Results<select id="home-result-source" aria-label="Results"><option value="official">Official results</option><option value="demo">Synthetic preview</option></select></label><label>Show<select id="home-result-metric" aria-label="Show"><option value="score">Success rate</option><option value="progress">Progress / 100</option></select></label><p id="home-chart-status" role="status"></p></div>
+  <div class="home-results-panel"><div class="insight-toolbar"><label>Results<select id="home-result-source" aria-label="Results"><option value="official">Official results</option><option value="demo">Synthetic preview</option></select></label><label>Show<select id="home-result-metric" aria-label="Show"><option value="score">Success rate</option><option value="progress">Progress / 100</option></select></label><p id="home-chart-status" role="status"></p></div>
   <div id="home-category-chart"></div>
+  </div>
  </section>
  <section id="home-capabilities" class="section home-capabilities" aria-labelledby="home-capabilities-title">
   <div class="insight-heading"><div><h2 id="home-capabilities-title">Every task has its own rhythm.</h2><p>Seven capabilities. Twenty-two tasks. Switch a capability to see where the task demands rise.</p></div><a class="text-link" href="${Site.href('tasks')}">Explore all tasks ↗</a></div>
