@@ -15,7 +15,7 @@ An English static website for 22 embodied tasks (T01–T23 excluding T18). Task 
 | Contribute | Short invitations for new tasks, methods and models, with GitHub proposals and a contact link |
 | Community | WeChat and QQ group QR areas and a GitHub contact link |
 
-The fixed header opens Home, Task, Leaderboard, Report, Contribute and Community. Code links to the research GitHub repository; Dataset has no target until its URL is supplied. The logo is static. Each page contains continuous content without secondary page tabs or side indexes. Expandable task/model rows and episode selectors change data in place.
+The fixed header groups the AI for Robots identity, Code, Datasets and Community on the left. GitHub and Hugging Face icons identify the resource entries; Datasets remains inactive until its URL is supplied. Home, Task, Leaderboard, Report and Contribute form the right navigation. Community is a separate contact page. The logo is static. Each page contains continuous content without secondary tabs or side indexes. On phones the resource row stays visible and Menu opens the five page links.
 
 Eight legacy HTML URLs remain usable. Episodes opens its concrete Task recording, Compare and Matrix open Leaderboard, and Documents / Method / Run / About / Footage open Report. Old section parameters are discarded. The task, model, episode and result source remain shareable; a recording link clears task-category filters that could exclude its target.
 
@@ -42,7 +42,7 @@ Each task presents compact model rows with proportional success bars: 60% fills 
 
 No official footage or reviewed results are currently connected. The empty official task viewer provides a 90-second media layout for each planned model; these are presentation placeholders and are never exported as measured records. A model with results but no episode shows its scores and a recording empty state. Only recorded input/output/code at or before the playhead is displayed.
 
-Home retains its compact Overall board and original footer, without the subtitle or scoring footnote beneath the board. Its model rows open the matching model details in Leaderboard. Map real wall clips in HOME_VIDEOS in app.js. Task filtering and card labels use the five paper categories; custom capability filters and model-search controls have been removed.
+Home retains its compact Overall board and original footer, without the subtitle or scoring footnote beneath the board. Its model rows open the matching model details in Leaderboard. Map real wall clips in HOME_VIDEOS in app.js. Task and Leaderboard share an always-visible Evaluation scope panel for paper category, embodiment/scene and delivery mode. Task also includes text search. Filters intersect, persist in the URL and carry between the pages; recording links clear conflicting filters. The scope has its own padding and spacing above cards/charts. Custom capability filters and model-search controls have been removed.
 
 Leaderboard model checkboxes, logos and names only toggle curve visibility. Click a curve or table score to open a model’s results. Each task row in that window expands the shared synchronized player, without navigating to Task. Only one recording panel opens at a time; closing or switching pauses playback and retains the episode’s position. News appears above the chart. Ranking methodology is not rendered below the table.
 

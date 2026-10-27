@@ -1,6 +1,6 @@
 /* Research narrative, catalog and evaluation method. */
 const params=new URLSearchParams(location.search);
-const state={category:CATEGORIES.some(c=>c.id===params.get('category'))?params.get('category'):'all',search:(params.get('q')||'').slice(0,160),selected:TASKS.some(t=>t.id===params.get('task'))?params.get('task'):'T06'};
+const state={...TaskFilters.normalize(Object.fromEntries(params)),search:(params.get('q')||'').slice(0,160),selected:TASKS.some(t=>t.id===params.get('task'))?params.get('task'):'T06'};
 // Add reviewed task clips here; the same task ID supplies the wall destination.
 // Example entry: T06: {src:'media/T06.mp4', poster:'media/T06.jpg'}.
 const HOME_VIDEOS=Object.freeze({});
@@ -36,7 +36,7 @@ function taskCard(t) {
 }
 function explorer() {
  return `<section class="task-gallery" aria-label="Task explorer">
-  <div class="task-gallery-tools"><label>Find a task<input id="task-search" type="search" placeholder="Task, category or robot" autocomplete="off" value="${esc(state.search)}"></label><label>Category<select id="task-category"><option value="all">All categories</option>${CATEGORIES.map(c=>`<option value="${c.id}">${c.name} · ${c.count}</option>`).join('')}</select></label><div id="result-count" role="status" aria-live="polite">22 tasks</div></div>
+  ${TaskFilters.render({id:'task',values:state,count:TASKS.length,search:state.search})}
   <div id="task-collection" class="task-card-grid"></div>
   <dialog id="task-focus" class="task-focus" aria-labelledby="task-title"><div class="task-window-bar"><span id="task-window-label">TASK EXPLORER</span><button type="button" data-close-task aria-label="Close task" title="Close task"><span aria-hidden="true">×</span></button></div><div class="task-focus-scroll"><article id="task-detail" class="task-article" aria-labelledby="task-title"></article></div></dialog>
   <span id="task-selection-status" class="sr-only" role="status" aria-live="polite"></span>
@@ -44,12 +44,12 @@ function explorer() {
 }
 function filteredTasks() {
  const query=state.search.toLowerCase().trim();
- return TASKS.filter(t=>(state.category==='all'||t.category===state.category)&&
-  `${t.id} ${t.name} ${t.robot} ${t.goal} ${category(t.category).name}`.toLowerCase().includes(query));
+ return TASKS.filter(t=>TaskFilters.matches(t,state)&&
+  `${t.id} ${t.name} ${t.robot} ${t.goal} ${category(t.category).name} ${tracks[t.track].output}`.toLowerCase().includes(query));
 }
 function collection() {
  const ts=filteredTasks();
- $('#result-count').textContent=`${ts.length} of ${TASKS.length} tasks`;
+ $('#task-scope-count').textContent=`${ts.length} / ${TASKS.length} tasks`;
  $('#task-collection').innerHTML=ts.length?ts.map(taskCard).join(''):'<div class="task-gallery-empty"><h2>No matching tasks.</h2><p>Try a task ID, a paper category or a robot such as “Go2”.</p><button class="button" data-action="reset-search">Clear filters</button></div>';
  if(ts.length&&!ts.some(t=>t.id===state.selected))state.selected=ts[0].id;
 }
@@ -67,8 +67,8 @@ function detail() {
  <nav class="task-pagination" aria-label="Previous and next task"><button data-select="${ts[index-1]?.id||''}" ${index<=0?'disabled':''}><span>Previous task</span><strong>${ts[index-1]?`${ts[index-1].id} · ${ts[index-1].name}`:'Start of selection'}</strong></button><span>${index+1} / ${ts.length}</span><button data-select="${ts[index+1]?.id||''}" ${index===ts.length-1?'disabled':''}><span>Next task</span><strong>${ts[index+1]?`${ts[index+1].id} · ${ts[index+1].name}`:'End of selection'}</strong></button></nav>`;
  TaskReplay.mount($('#task-replay'),t);
 }
-function saveTaskView(){const p=new URLSearchParams(location.search);for(const [key,value]of Object.entries({task:state.taskOpen?state.selected:'',category:state.category,q:state.search}))if(value&&value!=='all')p.set(key,value);else p.delete(key);p.delete('view');p.delete('group');if(!state.taskOpen){p.delete('episode');p.delete('episodeModel');}history.replaceState({},'',location.pathname+(p.size?'?'+p:'')+location.hash);Site.refreshLinks();}
-function syncFilters(){if($('#task-category'))$('#task-category').value=state.category;}
+function saveTaskView(){const p=new URLSearchParams(location.search);for(const [key,value]of Object.entries({task:state.taskOpen?state.selected:'',...TaskFilters.normalize(state),q:state.search}))if(value&&value!=='all')p.set(key,value);else p.delete(key);p.delete('view');p.delete('group');if(!state.taskOpen){p.delete('episode');p.delete('episodeModel');}history.replaceState({},'',location.pathname+(p.size?'?'+p:'')+location.hash);Site.refreshLinks();}
+function syncFilters(){for(const key of ['category','robot','track'])if($('#task-'+key))$('#task-'+key).value=state[key];}
 const infoPage=document.body.dataset.page;
 let taskWindow;
 state.taskOpen=false;
@@ -78,14 +78,14 @@ if(infoPage==='tasks'){
  taskWindow=Motion.taskWindow($('#task-focus'),()=>{TaskReplay.unmount();state.taskOpen=false;saveTaskView();});
  const loadSelection=()=>{
   const p=new URLSearchParams(location.search);
-  state.category=CATEGORIES.some(c=>c.id===p.get('category'))?p.get('category'):'all';
+  Object.assign(state,TaskFilters.normalize(Object.fromEntries(p)));
   state.search=(p.get('q')||'').slice(0,160);
   let linked=TASKS.some(t=>t.id===p.get('task'))?p.get('task'):null;
   if(!linked&&p.has('episode')){
    let activeReport=Results.official;try{activeReport=p.get('data')==='imported'?Results.readSaved(sessionStorage)?.report||Results.official:Results[Results.sourceFor(p.get('data'))];}catch{}
    linked=activeReport.episodes.find(e=>e.id===p.get('episode'))?.task_id||'T06';
   }
-  if(linked){state.selected=linked;if(!filteredTasks().some(t=>t.id===linked)){state.category='all';state.search='';}}
+  if(linked){state.selected=linked;if(!filteredTasks().some(t=>t.id===linked)){Object.assign(state,TaskFilters.normalize({}));state.search='';}}
   collection();syncFilters();$('#task-search').value=state.search;
   if(linked){state.taskOpen=true;detail();taskWindow.open();}else taskWindow.close(true);
   saveTaskView();
@@ -100,7 +100,7 @@ document.addEventListener('click',e=>{
   saveTaskView();detail();$('#task-selection-status').textContent=`${state.selected}: ${task(state.selected).name}`;
   if(source)taskWindow.open(source);else{$('.task-focus-scroll').scrollTop=0;$('#task-title').focus({preventScroll:true});}
  }
- if(b.dataset.action==='reset-search'){state.search='';state.category='all';$('#task-search').value='';collection();syncFilters();saveTaskView();}
+ if(b.dataset.action==='reset-search'||b.hasAttribute('data-scope-reset')){state.search='';Object.assign(state,TaskFilters.normalize({}));$('#task-search').value='';collection();syncFilters();saveTaskView();}
 });
 document.addEventListener('input',e=>{if(e.target.id==='task-search'){state.search=e.target.value;collection();saveTaskView();}});
-document.addEventListener('change',e=>{if(e.target.id==='task-category'){state.category=e.target.value;collection();saveTaskView();}});
+document.addEventListener('change',e=>{if(e.target.dataset.scopeFilter){state[e.target.dataset.scopeFilter]=e.target.value;collection();saveTaskView();}});

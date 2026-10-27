@@ -2,7 +2,9 @@
 
 ## Public structure
 
-Six direct links open Home, Task, Leaderboard, Report, Contribute and Community. Code opens the research repository; Dataset is an inactive resource entry until its URL is supplied. Each page is continuous without secondary tabs or side navigation. Task details are continuous floating windows. Model/episode selectors and normal disclosure controls update content in place.
+The header groups identity, Code, Datasets and Community on the left, and Home, Task, Leaderboard, Report and Contribute on the right. Community remains a distinct contact page. Code opens the research repository; Datasets is inactive until its URL is supplied. GitHub/Hugging Face icons are local, attributed assets. Mobile keeps resources visible and opens the five page links through Menu. Each page is continuous without secondary tabs or side navigation. Task details are continuous floating windows. Model/episode selectors and normal disclosure controls update content in place.
+
+Task and Leaderboard use the same always-visible Evaluation scope panel. Paper category, embodiment/scene and delivery mode are intersecting filters; Task also retains search. Selections restore from the URL and carry between those pages, while task recording links recover from conflicting filters. Reset clears all filters, including Task search. Selects retain visible keyboard focus and the panel leaves a clear gap before cards/charts.
 
 Home retains the flowing task wall, benchmark identity/scale, paper metadata, News, overview-video placeholder, introduction, compact Overall bar chart and shared footer. Other former exploration sections remain removed.
 
