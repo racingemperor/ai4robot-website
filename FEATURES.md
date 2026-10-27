@@ -93,19 +93,23 @@ Defaults: seed 0 and layouts 0,1,2. Commands are generated as text, never execut
 
 ## Verification
 
-Run node --test tests/*.test.cjs and syntax-check the changed JS files. The reporting, Home-insight, Home-interaction and navigation suites contain 20 tests. Validate desktop/mobile document navigation, local section switching/history/legacy redirects, shared category filters, task details, score/progress displays, exports, import/reload/clear, Report method anchors, retained run configuration, direct-policy guards and episode video controls. Publish only the website allowlist; verify Pages files after deployment.
+Run node --test tests/*.test.cjs and syntax-check the changed JS files. The reporting, Home-insight, Home-interaction and navigation suites contain 30 tests. Validate desktop/mobile document navigation, local section switching/history/legacy redirects, shared category filters, task details, score/progress displays, exports, import/reload/clear, Report method anchors, retained run configuration, direct-policy guards and episode video controls. Publish only the website allowlist; verify Pages files after deployment.
 
 ## Manuscript integration
 
-paper.js curates the EGE research overview, four package components, six construction stages and four evaluation goals. Report → Resources provides the adapted overview; Report → Method explains design, sourcing, creation and fairness. Home uses top-five category charts and a seven-capability task-demand rings; research explanations stay in Report. Task details expose the package definition without expanding the gallery. The report schema remains unchanged; scores are computed from task aggregates using the five manuscript categories. Wall-clock elapsed time and token consumption are not inferred from simulation seconds. The site publishes no manuscript source archive, template PDF, author placeholders or empirical results.
+paper.js curates the EGE research overview, four package components, six construction stages and four evaluation goals. Report → Resources provides the adapted overview; Report → Method explains design, sourcing, creation and fairness. Home uses top-five category charts and a seven-capability task-demand rings; research explanations stay in Report. Task details expose the package definition without expanding the gallery. The report schema remains unchanged; scores are computed from task aggregates using the five manuscript categories. Wall-clock elapsed time and token consumption are not inferred from simulation seconds. The site publishes no manuscript source archive, template PDF, invented author identities or empirical results. Home reserves explicitly labeled slots for the forthcoming author list and affiliations.
 
 ## Home task wall
 
-Four flowing columns link to the 22 task dossiers. Tiles use original, labeled concept previews until reviewed footage is mapped in HOME_VIDEOS. Optional videos loop muted and inline, with visible-tile playback, page/hero suspension, automatic focus suspension and a paused reduced-motion default. Keyboard focus exposes the original tiles as a static scrollable grid; duplicate cycles are hidden from the accessibility tree.
+Six flowing columns (four on small screens) link to the 22 task dossiers. The hero, three scale figures, paper metadata, news, overview-video placeholder and centered introduction follow LIBERO-Pro 2.0’s upper Home layout. Tiles use original, labeled concept previews until reviewed footage is mapped in HOME_VIDEOS. Optional videos loop muted and inline, with visible-tile playback, page/hero suspension, automatic focus suspension and a paused reduced-motion default. Keyboard focus exposes the original tiles as a static scrollable grid; duplicate cycles are hidden from the accessibility tree.
 
 ## Appearance
 
 A shared header sun/moon control switches all five pages, task windows, evidence frames, result tables, trace/code blocks and the run configurator. Saved preference is applied before styles, with system fallback and storage-error handling. Page snapshots fade for 280 ms without remounting content or resetting a timeline, scroll position or form. Browsers without View Transitions apply the final palette immediately. Rapid repeated switches honor the latest choice; failed or interrupted transitions settle on that choice. Reduced motion disables the color/icon transition. Home fades its media wall into the page background; main sections and the footer share that canvas and use spacing in place of hard horizontal dividers.
+
+## Home Overall board
+
+Immediately after the introduction, a First Exam-style compact board places the rank, model/harness, thin horizontal success bar, percentage and task coverage on each row. It uses the shared report summarizer and planned roster. Rankings require complete 22-task coverage, ties share a rank, missing data is never drawn as zero, and synthetic/local provenance remains explicit. The Overall and category selectors stay synchronized; selecting a model opens its full Leaderboard dossier with source and model retained.
 
 ## Home insights
 

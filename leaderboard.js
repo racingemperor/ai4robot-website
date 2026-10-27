@@ -80,5 +80,5 @@ window.Leaderboard = (() => {
    <div class="table-scroll model-task-scroll" role="region" aria-label="${h(model.name)} task performance; horizontally scrollable" tabindex="0"><table class="results-table model-task-table"><caption>${h(model.name)} · ${model.scheduled?'Evaluation pending':`${provenance?provenance+' · ':''}${h(report.protocol)}`} · A dash means no result, not zero.</caption><thead><tr><th scope="col">Task / Embodiment</th><th scope="col">Success rate</th><th scope="col">Progress / 100</th><th scope="col">Success / trials</th><th scope="col">Mean sim. time</th><th scope="col">Evidence</th></tr></thead>${taskGroups||'<tbody><tr><td colspan="6">No tasks match the selected scope.</td></tr></tbody>'}</table></div>
   </section>`;
  }
- return {render};
+ return {render,roster:Object.freeze(roster.map(Object.freeze)),colorFor};
 })();
