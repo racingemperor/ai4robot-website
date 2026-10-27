@@ -6,7 +6,7 @@ window.Lab = (() => {
   const reportPages=['board','compare','matrix','episodes'];
   const storageKey=Results.storageKey;
   const query=new URLSearchParams(location.search);
-  const L={tab:currentPage==='leaderboard'?(Site.section==='comparison'?'compare':'board'):currentPage==='tasks'?'matrix':currentPage==='documents'?(Site.section==='resources'?'about':'run'):currentPage,source:query.get('data')==='demo'?'demo':'official',imported:null,importedSynthetic:false,importedSaved:false,track:'all',category:'all',group:'all',robot:'all',sort:'score',direction:-1,modelQuery:'',compare:[],episode:'',episodeTask:'all',episodeModel:'all',status:'all',time:0,speed:'1',playing:false,raf:0,last:0,videoURL:'',videoEpisode:'',message:'',runTask:'T06',runMode:'solve',runAgent:'vlm',runModel:'mock',gpu:'0',seeds:'0',layouts:'0,1,2',camera:'head'};
+  const L={tab:currentPage==='leaderboard'?(Site.section==='comparison'?'compare':'board'):currentPage==='tasks'?(Site.section==='episodes'?'episodes':'matrix'):currentPage==='report'?(Site.section==='resources'?'about':'run'):currentPage,source:query.get('data')==='demo'?'demo':'official',imported:null,importedSynthetic:false,importedSaved:false,track:'all',category:'all',group:'all',robot:'all',sort:'score',direction:-1,modelQuery:'',compare:[],episode:'',episodeTask:'all',episodeModel:'all',status:'all',time:0,speed:'1',playing:false,raf:0,last:0,videoURL:'',videoEpisode:'',message:'',runTask:'T06',runMode:'solve',runAgent:'vlm',runModel:'mock',gpu:'0',seeds:'0',layouts:'0,1,2',camera:'head'};
   for(const key of ['track','category','group','robot','sort','modelQuery','episodeTask','episodeModel','status','episode']){const value=query.get(key);if(value&&value.length<160)L[key]=value;}
   if(!['all','A','B','C'].includes(L.track))L.track='all';
   if(!['all',...CATEGORIES.map(c=>c.id)].includes(L.category))L.category='all';
@@ -45,19 +45,20 @@ window.Lab = (() => {
   function orderedRows(){return summary().filter(m=>`${m.name} ${m.agent} ${m.version}`.toLowerCase().includes(L.modelQuery.toLowerCase())).sort((a,b)=>Number(b.complete)-Number(a.complete)||((a[L.sort]??-Infinity)-(b[L.sort]??-Infinity))*L.direction||a.id.localeCompare(b.id));}
   function syncURL(){
     const p=new URLSearchParams(location.search);
-    if(currentPage==='tasks'&&Site.section!=='matrix'){
+    if(currentPage==='tasks'&&Site.section==='catalog'){
       L.source!=='official'?p.set('data',L.source):p.delete('data');
       history.replaceState({},'',location.pathname+(p.size?'?'+p:'')+location.hash);Site.refreshLinks();return;
     }
-    if(currentPage==='documents'&&Site.section==='method')return;
+    if(currentPage==='report'&&Site.section==='method')return;
     const resultKeys=['track','category','group','robot'];
-    const pageKeys={board:[...resultKeys,'sort','modelQuery'],compare:[...resultKeys,'sort','modelQuery'],matrix:resultKeys,episodes:[...resultKeys,'episodeTask','episodeModel','status','episode'],run:[],about:[]};
+    const episodeKeys=['episodeTask','episodeModel','status','episode'];
+    const pageKeys={board:[...resultKeys,'sort','modelQuery'],compare:[...resultKeys,'sort','modelQuery'],matrix:currentPage==='tasks'?[...resultKeys,...episodeKeys]:resultKeys,episodes:[...resultKeys,...episodeKeys],run:[],about:[]};
     for(const key of ['lab','variant','track','category','group','robot','sort','modelQuery','episodeTask','episodeModel','status','episode','models','order'])p.delete(key);
     L.source!=='official'?p.set('data',L.source):p.delete('data');
     for(const key of pageKeys[L.tab]){const v=L[key];if(v&&v!=='all')p.set(key,v);}
     if(currentPage==='leaderboard')p.set('order',L.direction===1?'asc':'desc');
     if(currentPage==='leaderboard'&&L.compare.length)p.set('models',L.compare.join(','));
-    if(L.tab==='run')p.set('task',L.runTask);else if(!['tasks','documents'].includes(currentPage))p.delete('task');
+    if(L.tab==='run')p.set('task',L.runTask);else if(!['tasks','report'].includes(currentPage))p.delete('task');
     history.replaceState({},'',location.pathname+(p.size?'?'+p:'')+location.hash);Site.refreshLinks();
   }
   function pageLink(page,extra){return h(Site.href(page,extra));}
@@ -166,7 +167,17 @@ window.Lab = (() => {
     document.querySelectorAll('[data-event-index]').forEach(b=>b.setAttribute('aria-current',String(Number(b.dataset.eventIndex)===snapshot.index)));
     const play=q('[data-lab-action="play"]');if(play&&play.getAttribute('aria-label')!==(L.playing?'Pause':'Play')){play.innerHTML=Evidence.playbackIcon(L.playing);play.setAttribute('aria-label',L.playing?'Pause':'Play');play.title=L.playing?'Pause':'Play';}
   }
-  function wireVideo(){const video=q('#episode-video');if(!video)return;video.addEventListener('timeupdate',()=>{L.time=video.currentTime;updateTime();});video.addEventListener('play',()=>{L.playing=true;updateTime();});video.addEventListener('ended',()=>{L.playing=false;updateTime();});video.addEventListener('pause',()=>{L.playing=false;updateTime();});video.addEventListener('error',()=>message('Video could not be decoded. Use a supported MP4 or WebM file.'));}
+  function wireVideo(){
+    const video=q('#episode-video');if(!video)return;
+    let restoring=true;
+    const active=()=>q('#episode-video')===video;
+    const restore=()=>{if(!active())return;video.playbackRate=Number(L.speed);video.currentTime=L.time;restoring=false;};
+    if(video.readyState>=1)restore();else video.addEventListener('loadedmetadata',restore,{once:true});
+    video.addEventListener('timeupdate',()=>{if(!active()||restoring)return;L.time=video.currentTime;updateTime();});
+    video.addEventListener('play',()=>{if(active()){L.playing=true;updateTime();}});
+    for(const event of ['ended','pause'])video.addEventListener(event,()=>{if(active()){L.playing=false;updateTime();}});
+    video.addEventListener('error',()=>{if(active())message('Video could not be decoded. Use a supported MP4 or WebM file.');});
+  }
   function play(){
     const e=currentEpisode();if(!e)return;
     const video=q('#episode-video');if(L.playing){stop();updateTime();return;}
@@ -249,12 +260,17 @@ window.Lab = (() => {
   }
   document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();updateTime();}});
   function render(){
-    if(currentPage==='documents'&&Site.section==='method'){q('#research')?.remove();return;}
-    const host=currentPage==='documents'?q(`#documents-${Site.section}-panel`):currentPage==='tasks'?q('#tasks-matrix-panel'):currentPage==='leaderboard'?q(`#leaderboard-${Site.section}-panel`):q('#page-content');
+    stop();
+    if(currentPage==='report'&&Site.section==='method'){q('#research')?.remove();return;}
+    if(currentPage==='tasks'&&Site.section==='catalog'){
+      q('#research')?.remove();syncURL();
+      document.dispatchEvent(new CustomEvent('lab:reportchange'));return;
+    }
+    const host=currentPage==='report'?q(`#report-${Site.section}-panel`):currentPage==='tasks'?q(`#tasks-${Site.section}-panel`):q(`#leaderboard-${Site.section}-panel`);
     q('#research')?.remove();host.innerHTML=html();mount();
   }
   document.addEventListener('site:sectionchange',()=>{
-    if(currentPage==='documents'){
+    if(currentPage==='report'){
       const p=new URLSearchParams(location.search);
       L.tab=Site.section==='resources'?'about':'run';
       if(TASKS.some(t=>t.id===p.get('task')))L.runTask=p.get('task');
@@ -262,9 +278,15 @@ window.Lab = (() => {
       render();return;
     }
     const p=new URLSearchParams(location.search);
-    if(currentPage==='tasks'&&Site.section!=='matrix'){
+    if(currentPage==='tasks'&&Site.section==='catalog'){
       const source=p.get('data');L.source=source==='demo'?'demo':source==='imported'&&L.imported?'imported':'official';
-      document.dispatchEvent(new CustomEvent('lab:reportchange'));return;
+      render();return;
+    }
+    if(currentPage==='tasks'){
+      L.tab=Site.section==='episodes'?'episodes':'matrix';
+      const previous=[L.episodeTask,L.episodeModel,L.episode].join('|');
+      for(const key of ['episodeTask','episodeModel','status','episode'])L[key]=(p.get(key)|| (key==='episode'?'':'all')).slice(0,159);
+      if(previous!==[L.episodeTask,L.episodeModel,L.episode].join('|')){stop();L.time=0;}
     }
     L.category=CATEGORIES.some(c=>c.id===p.get('category'))?p.get('category'):'all';
     L.group=GROUPS.some(g=>g.id===p.get('group'))?p.get('group'):'all';

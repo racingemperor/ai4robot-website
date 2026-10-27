@@ -1,20 +1,20 @@
 /* Interpolated semantic colors keep text, surfaces and gradients in one transition. */
-@property --paper{syntax:'<color>';inherits:true;initial-value:#f5f3ed}
-@property --surface{syntax:'<color>';inherits:true;initial-value:#eeece5}
-@property --ink{syntax:'<color>';inherits:true;initial-value:#232923}
-@property --muted{syntax:'<color>';inherits:true;initial-value:#62665e}
-@property --line{syntax:'<color>';inherits:true;initial-value:#d0d2c6}
-@property --accent{syntax:'<color>';inherits:true;initial-value:#b5442d}
-@property --green{syntax:'<color>';inherits:true;initial-value:#416257}
+@property --paper{syntax:'<color>';inherits:true;initial-value:#ffffff}
+@property --surface{syntax:'<color>';inherits:true;initial-value:#f7f9fb}
+@property --ink{syntax:'<color>';inherits:true;initial-value:#182028}
+@property --muted{syntax:'<color>';inherits:true;initial-value:#5e6975}
+@property --line{syntax:'<color>';inherits:true;initial-value:#e2e6ea}
+@property --accent{syntax:'<color>';inherits:true;initial-value:#2457c5}
+@property --green{syntax:'<color>';inherits:true;initial-value:#337653}
 @property --home-panel{syntax:'<color>';inherits:true;initial-value:#fff}
-:root{color-scheme:light;--home-panel:#fff}
-:root[data-theme=dark]{color-scheme:dark;--paper:#151b19;--surface:#202823;--ink:#edf0e8;--muted:#aeb9af;--line:#46534a;--accent:#efa88b;--green:#9ec4b1;--home-panel:#26312b}
-:root.theme-ready{transition:--paper .65s ease,--surface .65s ease,--ink .65s ease,--muted .65s ease,--line .65s ease,--accent .65s ease,--green .65s ease,--home-panel .65s ease}
+:root{color-scheme:light;--home-panel:#f7f9fb}
+:root[data-theme=dark]{color-scheme:dark;--paper:#121619;--surface:#1c2227;--ink:#edf1f4;--muted:#abb6c0;--line:#333e47;--accent:#89b5ff;--green:#8fceb0;--home-panel:#1c2227}
+:root.theme-ready{transition:none}
 .theme-snapshot,.theme-snapshot *,.theme-snapshot ::before,.theme-snapshot ::after{transition:none!important}
 .theme-snapshot::view-transition{pointer-events:none}
-.theme-snapshot::view-transition-group(root){animation-duration:.5s;animation-timing-function:cubic-bezier(.22,.7,.2,1)}
+.theme-snapshot::view-transition-group(root){animation-duration:.28s;animation-timing-function:cubic-bezier(.22,.7,.2,1)}
 .theme-snapshot::view-transition-old(root){animation:none;mix-blend-mode:normal}
-.theme-snapshot::view-transition-new(root){animation:theme-fade-in .5s cubic-bezier(.22,.7,.2,1) both;mix-blend-mode:normal}
+.theme-snapshot::view-transition-new(root){animation:theme-fade-in .28s cubic-bezier(.22,.7,.2,1) both;mix-blend-mode:normal}
 @keyframes theme-fade-in{from{opacity:0}to{opacity:1}}
 
 .site-header{max-width:none;border-bottom-color:transparent;gap:20px}
@@ -63,3 +63,37 @@
 @media(max-width:1100px){.nav-toggle{margin-left:auto}.site-header nav{margin-left:0}.site-header{gap:14px}}
 @media(max-width:600px){.site-header{gap:10px}.site-header .brand{font-size:18px;gap:9px}.theme-toggle{width:44px}.nav-toggle{gap:8px;font-size:12px}}
 @media(prefers-reduced-motion:reduce){:root.theme-ready{transition:none}.theme-toggle svg{transition:none}}
+
+/* Restrained, floating navigation and neutral reading surfaces. */
+:root{--nav-height:96px;--max:1440px;--gutter:clamp(22px,4.5vw,64px)}
+.site-header{inset:18px 0 auto;width:min(1072px,calc(100% - 48px));max-width:1072px;height:64px;margin:0 auto;padding:0 26px;border:1px solid var(--line);border-radius:36px;box-shadow:0 3px 12px #18202809;background:var(--paper);gap:24px}
+.site-header .brand{font-size:22px;gap:10px;cursor:default}
+.site-header nav{display:flex;align-items:center;align-self:stretch;gap:28px;margin-left:auto}
+.site-header #primary-nav>a:nth-child(n){position:relative;display:inline-flex;align-items:center;min-height:44px;height:100%;padding:0;border:0;font-size:14px;font-weight:600;line-height:24px}
+.site-header nav>a[aria-current=page]::after{content:'';position:absolute;left:0;right:0;bottom:11px;height:2px;background:var(--accent)}
+.site-header .brand-sub{display:none}.brand-mark{width:31px;height:31px}
+.theme-toggle{border:0;border-radius:50%;background:transparent;padding:0;width:44px;height:44px}
+.theme-toggle:hover{background:var(--surface);border:0}
+.site-header .nav-toggle{display:none}
+.page-heading{padding-top:56px;padding-bottom:28px}.page-heading-meta{margin-bottom:18px}
+.page-heading h1{font-size:clamp(34px,4vw,46px)}.page-heading>p{margin-top:14px}
+.section-switch{gap:24px;padding-block:12px 24px}
+.section-switch button{position:relative;min-height:44px;padding:8px 0;border:0;border-radius:0;background:transparent;color:var(--muted)}
+.section-switch button[aria-pressed=true]{background:transparent;color:var(--accent);border:0}
+.section-switch button[aria-pressed=true]::after{content:'';height:2px;position:absolute;left:0;right:0;bottom:0;background:var(--accent)}
+.task-replay-link{display:inline-flex;align-items:center;min-height:44px;font-size:14px;margin-bottom:15px}
+.home-results-panel{border-color:var(--line);border-radius:22px}.home-case-panel{border-radius:22px}
+.home-category-explorer{border:0}.home-category-explorer-heading .eyebrow{display:none}
+.site-footer{border-top:1px solid var(--line);padding-top:48px;padding-bottom:40px}
+:root[data-theme=dark] .site-header{box-shadow:0 3px 16px #0003}
+@media(max-width:760px){
+ :root{--nav-height:84px}
+ .site-header{top:10px;width:calc(100% - 28px);height:58px;padding:0 16px;gap:10px;border-radius:30px}
+ .site-header .brand{font-size:20px}.site-header .nav-toggle{display:inline-flex;margin-left:auto;min-height:44px;font-size:13px;align-items:center;gap:8px}
+ .site-header nav{display:none;position:absolute;top:66px;left:0;right:0;max-height:calc(100dvh - 100px);margin:0;padding:12px 18px;background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:0 4px 15px #18202810;grid-template-columns:1fr 1fr;gap:2px 20px;overflow:auto}
+ .site-header nav.is-open{display:grid}.site-header #primary-nav>a:nth-child(n){height:44px;min-height:44px;padding:0 6px}
+ .site-header nav>a[aria-current=page]::after{bottom:2px;left:6px;right:auto;width:25px}
+ .page-heading{padding-top:28px}.section-switch{gap:20px}.section-switch button{flex:none;font-size:13px}
+ .home-results-panel,.home-case-panel{border-radius:18px}
+}
+@media(prefers-reduced-motion:reduce){.theme-toggle svg{transition:none!important}}

@@ -2,13 +2,13 @@
 
 ## Available tools
 
-- Five main pages with four fixed header categories: Tasks, Leaderboard, Episodes and Documents. Home opens through the logo; small screens use a menu. Model comparison is a local Leaderboard view; the results matrix is a local Tasks view; Method, Run and Resources are local Documents views. Switching preserves the parent document and header highlight, with shareable section links and browser history. Six old document URLs redirect to the current structure.
+- Four main pages with four fixed header destinations: Home, Task, Leaderboard and Report. The logo is a static brand mark; small screens use a menu. Model comparison is a local Leaderboard view; the results matrix and episode replay are local Task views; Method, Run and Resources are local Report views. Switching preserves the parent document and header highlight, with shareable section links and browser history. Eight legacy URLs redirect to the current structure.
 - Twenty-two detailed task briefs with goals, three capability explanations, completion checks, embodiment, deliverable, input, execution stages and current scope. A searchable illustrated card gallery replaces the directory. Each card has three capability cells and a hover lift. Clicking moves and enlarges the card into a centered floating window with Overview, Capabilities, Model results and Evidence views. The window supports Escape, backdrop/close dismissal, focus return and reduced motion; it remains smaller than the screen.
 - Home route switch, interactive T06 judge examples and once-per-section scroll reveals. Reduced motion presents content immediately.
 - Leaderboard ranking view with sorting, model search, category/delivery/capability/embodiment filters, coverage and exports. No cross-page comparison action is embedded in its table.
 - Up to three-model comparison on common capability-task coverage.
 - Numeric task/model matrix within Tasks, linked to matching episode records. Catalog and matrix share category/capability scope; switching preserves catalog search/selection. Importing or clearing a report leaves the catalog intact.
-- Grid placeholders for Home video/evidence, per-task video/detail frames/deliverables and Documents figures/output/publication material.
+- Grid placeholders for Home video/evidence, per-task video/detail frames/deliverables and Report figures/output/publication material.
 - Ten layout-only model rows in the empty official Leaderboard, and reserved comparison positions. No placeholder models, scores or ranks enter reports/exports.
 - Episode filters, shared video/event timeline, symbol-only play/pause with accessible labels, keyboard seeking, playback speed, model input/output, time-stamped code revisions, local video and JSON export. The empty official archive provides a clearly separate layout preview; preview episodes cannot be exported as results.
 - Existing check/solve/play and bounded direct-policy eval command configuration.
@@ -93,11 +93,11 @@ Defaults: seed 0 and layouts 0,1,2. Commands are generated as text, never execut
 
 ## Verification
 
-Run node --test tests/*.test.cjs and syntax-check the changed JS files. The reporting, Home-insight and Home-interaction suites contain 17 tests. Validate desktop/mobile document navigation, local section switching/history/legacy redirects, shared category filters, task details, score/progress displays, exports, import/reload/clear, Documents method anchors, retained run configuration, direct-policy guards and episode video controls. Publish only the website allowlist; verify Pages files after deployment.
+Run node --test tests/*.test.cjs and syntax-check the changed JS files. The reporting, Home-insight, Home-interaction and navigation suites contain 20 tests. Validate desktop/mobile document navigation, local section switching/history/legacy redirects, shared category filters, task details, score/progress displays, exports, import/reload/clear, Report method anchors, retained run configuration, direct-policy guards and episode video controls. Publish only the website allowlist; verify Pages files after deployment.
 
 ## Manuscript integration
 
-paper.js curates the EGE research overview, four package components, six construction stages and four evaluation goals. Documents → Resources provides the adapted overview; Documents → Method explains design, sourcing, creation and fairness. Home uses top-five category charts and a seven-capability task-demand rings; research explanations stay in Documents. Task details expose the package definition without expanding the gallery. The report schema remains unchanged; scores are computed from task aggregates using the five manuscript categories. Wall-clock elapsed time and token consumption are not inferred from simulation seconds. The site publishes no manuscript source archive, template PDF, author placeholders or empirical results.
+paper.js curates the EGE research overview, four package components, six construction stages and four evaluation goals. Report → Resources provides the adapted overview; Report → Method explains design, sourcing, creation and fairness. Home uses top-five category charts and a seven-capability task-demand rings; research explanations stay in Report. Task details expose the package definition without expanding the gallery. The report schema remains unchanged; scores are computed from task aggregates using the five manuscript categories. Wall-clock elapsed time and token consumption are not inferred from simulation seconds. The site publishes no manuscript source archive, template PDF, author placeholders or empirical results.
 
 ## Home task wall
 
@@ -105,7 +105,7 @@ Four flowing columns link to the 22 task dossiers. Tiles use original, labeled c
 
 ## Appearance
 
-A shared header sun/moon control switches all five pages, task windows, evidence frames, result tables, trace/code blocks and the run configurator. Saved preference is applied before styles, with system fallback and storage-error handling. Page snapshots fade for 500 ms, with registered semantic color properties interpolating for 650 ms as a fallback without remounting content or resetting a timeline, scroll position or form. Reduced motion disables the color/icon transition. Home fades its media wall into the page background; main sections and the footer share that canvas and use spacing in place of hard horizontal dividers.
+A shared header sun/moon control switches all four pages, task windows, evidence frames, result tables, trace/code blocks and the run configurator. Saved preference is applied before styles, with system fallback and storage-error handling. Page snapshots fade for 280 ms without remounting content or resetting a timeline, scroll position or form. Browsers without View Transitions apply the final palette immediately. Rapid repeated switches honor the latest choice; failed or interrupted transitions settle on that choice. Reduced motion disables the color/icon transition. Home fades its media wall into the page background; main sections and the footer share that canvas and use spacing in place of hard horizontal dividers.
 
 ## Home insights
 

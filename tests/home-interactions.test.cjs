@@ -6,6 +6,7 @@ const vm=require('node:vm');
 
 function href(page,overrides={}){
  const params=new URLSearchParams();
+ if(page==='episodes'){page='tasks';params.set('section','episodes');}
  for(const [key,value]of Object.entries(overrides))if(value!==null&&value!==undefined&&value!=='')params.set(key,String(value));
  return `${page}.html${params.size?`?${params}`:''}`;
 }
@@ -42,7 +43,7 @@ test('every evaluation route exposes four selectable stages with detail and all 
   assert.match(html,/class="route-stage-detail"[^>]*aria-live="polite"/);
   assert.match(html,/href="tasks\.html\?task=T06/);
   assert.match(html,/href="leaderboard\.html\?category=manipulation/);
-  assert.match(html,/href="episodes\.html\?episodeTask=T06&category=manipulation/);
+  assert.match(html,/href="tasks\.html\?section=episodes&episodeTask=T06&category=manipulation/);
  }
 });
 
@@ -106,6 +107,6 @@ test('choosing a category and model updates the in-place result and scoped deep 
  assert.match(detail,new RegExp(model.name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')));
  assert.match(detail,/modelQuery=/);
  assert.match(detail,/episodeModel=/);
- assert.doesNotMatch(detail,/episodes\.html[^"\s]*episodeTask=/,'a category episode link should not hide available runs by forcing its first task');
+ assert.doesNotMatch(detail,/tasks\.html[^"\s]*section=episodes[^"\s]*episodeTask=/,'a category episode link should not hide available runs by forcing its first task');
  assert.match(detail,/Synthetic preview · not measured/);
 });

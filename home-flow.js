@@ -35,7 +35,7 @@ window.HomeFlow=(()=>{
    <section id="route-stage-detail" class="route-stage-detail" aria-live="polite" aria-atomic="true" aria-label="${esc(stage.name)} stage details">
     <div class="route-stage-heading"><span>STAGE ${String(index+1).padStart(2,'0')} / 04</span><h4>${esc(stage.name)} · ${esc(stage.label)}</h4></div>
     <dl class="route-stage-facts"><div><dt>Input</dt><dd>${esc(stage.input)}</dd></div><div><dt>Model / system step</dt><dd>${esc(stage.action)}</dd></div><div><dt>Evidence to capture</dt><dd>${esc(stage.evidence)}</dd></div></dl>
-    <div class="route-stage-links"><a class="text-link" href="${Site.href('tasks',{task:taskId})}">Tasks · inspect ${taskId} ↗</a><a class="text-link" href="${Site.href('leaderboard',{category:categoryId})}">Leaderboard · compare this category ↗</a><a class="text-link" href="${Site.href('episodes',{episodeTask:taskId,category:categoryId})}">Episodes · follow a run ↗</a></div>
+    <div class="route-stage-links"><a class="text-link" href="${Site.href('tasks',{task:taskId})}">Task · inspect ${taskId} ↗</a><a class="text-link" href="${Site.href('leaderboard',{category:categoryId})}">Leaderboard · compare this category ↗</a><a class="text-link" href="${Site.href('episodes',{episodeTask:taskId,category:categoryId})}">Task · replay a run ↗</a></div>
    </section><div class="route-note"><strong>Evaluation boundary</strong><p>${esc(route.note)}</p></div>`;
  }
  return {render};
