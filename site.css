@@ -341,7 +341,7 @@ h1,h2,h3,h4{text-wrap:wrap}
 .task-gallery-tools input,.task-gallery-tools select{width:100%;min-width:0;min-height:46px;padding:10px 13px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px}
 .task-gallery-tools #result-count{font:11px var(--sans);padding-block:15px;white-space:nowrap}
 .task-gallery-note{font-size:11px;color:var(--muted);line-height:1.8;margin:20px 0 30px}
-.task-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
+.task-card-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
 .task-card{position:relative;display:flex;flex-direction:column;text-align:left;width:100%;min-width:0;background:var(--paper);border:1px solid var(--line);padding:0;cursor:pointer;transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s,border-color .3s;isolation:isolate}
 .task-card-image{display:block;position:relative;aspect-ratio:16/10;overflow:hidden;background:color-mix(in srgb,var(--task-color) 7%,var(--paper));color:var(--task-color);border-bottom:1px solid var(--line)}
 .task-thumbnail{display:block;width:100%;height:100%;transition:transform .5s cubic-bezier(.2,.7,.2,1)}

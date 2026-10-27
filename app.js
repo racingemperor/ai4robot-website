@@ -53,7 +53,7 @@ function collection() {
  const page=TaskPagination.select(ts,state.page);state.page=page.page;
  $('#task-scope-count').textContent=`${ts.length} / ${TASKS.length} tasks`;
  $('#task-collection').innerHTML=ts.length?page.items.map(taskCard).join(''):'<div class="task-gallery-empty"><h2>No matching tasks.</h2><p>Try a task ID, a paper category or a robot such as “Go2”.</p><button class="button" data-action="reset-search">Clear filters</button></div>';
- $('#task-pages').innerHTML=page.pages>1?`<nav class="task-page-controls" aria-label="Task pages"><p role="status" aria-live="polite">${page.start}–${page.end} of ${page.total} tasks</p><div><button type="button" data-task-page="${page.page-1}"${page.page===1?' disabled':''} aria-label="Previous page">←</button>${Array.from({length:page.pages},(_,i)=>`<button type="button" data-task-page="${i+1}" aria-label="Page ${i+1}"${page.page===i+1?' aria-current="page"':''}>${i+1}</button>`).join('')}<button type="button" data-task-page="${page.page+1}"${page.page===page.pages?' disabled':''} aria-label="Next page">→</button></div></nav>`:'';
+ $('#task-pages').innerHTML=page.pages>1?`<nav class="task-page-controls" aria-label="Task pages"><div><button type="button" data-task-page="${page.page-1}"${page.page===1?' disabled':''} aria-label="Previous page">←</button>${Array.from({length:page.pages},(_,i)=>`<button type="button" data-task-page="${i+1}" aria-label="Page ${i+1}"${page.page===i+1?' aria-current="page"':''}>${i+1}</button>`).join('')}<button type="button" data-task-page="${page.page+1}"${page.page===page.pages?' disabled':''} aria-label="Next page">→</button></div></nav>`:'';
  if(ts.length&&!ts.some(t=>t.id===state.selected))state.selected=ts[0].id;
 }
 function detail() {
