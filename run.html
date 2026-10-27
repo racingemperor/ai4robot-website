@@ -7,11 +7,11 @@
  <link rel="icon" href="data:,">
  <script>
   const target=new URL('report.html',location.href);
-  target.search=location.search;target.searchParams.set('section','run');target.hash=location.hash;
+  target.search='';target.hash='';
   location.replace(target.href);
  </script>
 </head>
-<body><p>Run configuration has a new location. <a id="destination" href="report.html?section=run">Continue to run configuration</a>.</p>
+<body><p>Run configuration has a new location. <a id="destination" href="report.html">Continue to run configuration</a>.</p>
 <script>document.getElementById('destination').href=target.href;</script>
 </body>
 </html>

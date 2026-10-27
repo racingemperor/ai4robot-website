@@ -7,11 +7,11 @@
  <link rel="icon" href="data:,">
  <script>
   const target=new URL('tasks.html',location.href);
-  target.search=location.search;target.searchParams.set('section','episodes');target.hash=location.hash;
+  target.search=location.search;target.searchParams.delete('section');target.hash=location.hash;if(/^T\d{2}$/.test(target.searchParams.get('episodeTask')||''))target.searchParams.set('task',target.searchParams.get('episodeTask'));if(!target.searchParams.has('task')&&!target.searchParams.has('episode'))target.searchParams.set('task','T06');target.searchParams.delete('episodeTask');target.searchParams.delete('status');
   location.replace(target.href);
  </script>
 </head>
-<body><p>Task episode replay has a new location. <a id="destination" href="tasks.html?section=episodes">Continue to task episode replay</a>.</p>
+<body><p>Task episode replay has a new location. <a id="destination" href="tasks.html?task=T06">Continue to task episode replay</a>.</p>
 <script>document.getElementById('destination').href=target.href;</script>
 </body>
 </html>

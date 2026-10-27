@@ -7,11 +7,11 @@
  <link rel="icon" href="data:,">
  <script>
   const target=new URL('report.html',location.href);
-  target.search=location.search;target.searchParams.set('section','method');target.hash=location.hash;
+  target.search='';target.hash='';
   location.replace(target.href);
  </script>
 </head>
-<body><p>Evaluation method has a new location. <a id="destination" href="report.html?section=method">Continue to evaluation method</a>.</p>
+<body><p>Evaluation method has a new location. <a id="destination" href="report.html">Continue to evaluation method</a>.</p>
 <script>document.getElementById('destination').href=target.href;</script>
 </body>
 </html>

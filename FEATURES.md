@@ -1,112 +1,47 @@
-# Tools and report format
+# Website features and report contract
 
-## Available tools
+## Public structure
 
-- Five main pages with fixed header destinations: Home, Task, Leaderboard, Report and Contribute. The logo is a static brand mark; small screens use a menu. Model comparison is a local Leaderboard view; the results matrix and episode replay are local Task views; Method, Run and Resources are local Report views. Switching preserves the parent document and header highlight, with shareable section links and browser history. Eight legacy URLs redirect to the current structure.
-- Twenty-two detailed task briefs with goals, three capability explanations, completion checks, embodiment, deliverable, input, execution stages and current scope. A searchable illustrated card gallery replaces the directory. Each card has three capability cells and a hover lift. Clicking moves and enlarges the card into a centered floating window with Overview, Capabilities, Model results and Evidence views. The window supports Escape, backdrop/close dismissal, focus return and reduced motion; it remains smaller than the screen.
-- Home presents the task wall, title and benchmark scale, paper metadata, News, an overview-video placeholder and the research introduction. The introduction is followed by the compact Overall bar leaderboard and the shared footer. Remaining sections retain once-per-section scroll reveals; reduced motion presents content immediately.
-- LIBERO-Pro-style chart of the five manuscript categories plus Overall. Model-colored curves, direct labels, visibility checkboxes and a raw category table support inspection. Click a curve, model name or task score to open a centered floating result window. The task comparison matrix uses 22 task columns plus Overall; headings sort the table while preserving global Overall ranks. Model selection and the detail category filter are shareable. Search, scope filters, imports, exports and replay links preserve provenance and the parent navigation.
-- Up to three-model comparison on common capability-task coverage.
-- Numeric task/model matrix within Tasks, linked to matching episode records. Catalog and matrix share category/capability scope; switching preserves catalog search/selection. Importing or clearing a report leaves the catalog intact.
-- Grid placeholders for the Home overview video, per-task video/detail frames/deliverables and Report figures/output/publication material.
-- Eight planned model/harness pairs in the empty official Overall view: gpt6-astra/codex, opus5.5/claude code, gemini 4/argon, Grok 4.7/Grok Build, deepseek v4.1 flash/dsh, glm 5.3 flash/zcode, kimi k3.1 pro/kimi code, and MiniMax-M3.1-Flash/MiniMax Code. They have no scores or ranks, and never enter reports or exports. Synthetic reports retain generic model names. Comparison retains reserved positions until results exist.
-- Episode filters, shared video/event timeline, symbol-only play/pause with accessible labels, keyboard seeking, playback speed, model input/output, time-stamped code revisions, local video and JSON export. The empty official archive provides a clearly separate layout preview; preview episodes cannot be exported as results.
-- Existing check/solve/play and bounded direct-policy eval command configuration.
-- Local report validation, session-tab persistence, clear control and storage fallback.
-- CSV/JSON downloads, shareable view links, research sources, FAQ and website citation.
-- Each task includes success rate, progress, trial count, mean simulation time and matching episode links from the active report. Official, synthetic and local sources remain distinct. The standalone media plan has been retired.
+Five main links open Home, Task, Leaderboard, Report and Contribute. Each is a single continuous page without secondary tabs, side navigation or nested page views. Task details are continuous floating windows. Model/source/episode selectors and normal disclosure controls change the current content, rather than navigating to another section page.
 
-These cover the main research-site capabilities observed in earlier public-page reviews of RoboDojo and Embodied First Exam. They are not an exhaustive claim about those websites.
+Home retains the flowing task wall, benchmark identity/scale, paper metadata, News, overview-video placeholder, introduction, compact Overall bar chart and shared footer. Other former exploration sections remain removed.
 
-## Research scope
+Task presents 22 illustrated task cards. Each task shows its goal, embodiment, deliverable, completion checks, capability explanations, execution stages, scope and evidence placeholders. Its model table and recording player replace the former separate matrix/episode views. Model and episode controls select the matching recording without leaving the task. Videos, input/output, code and observations share one timeline, with symbol-only playback, speed, range seeking and timestamped step buttons. Local attachments and positions are kept separately for each source/model/episode until leaving or reloading the page. Closing the window, hiding the document and changing recordings pause playback. Closing or replacing a task cancels its pending import; late file reads and interrupted playback requests cannot overwrite another recording or reopen a closed task.
 
-Five categories from the EGE abstract: Robotic manipulation 14, Navigation 3, Scene generation 1 (T13), Scene and interaction reconstruction 2 (T14/T15), and Policy development 2 (T16/T17). T18 is excluded. Task scope follows the research repository snapshot reviewed October 23, 2026; T23 is navigation among people. Current implementation and future targets are identified per task.
+Leaderboard presents category/Overall model-colored curves, visibility controls, an accessible source table and a sortable table with all 22 tasks. Every model curve/name/task score opens its result window. Incomplete models are unranked; ties share ranks. Data & exports contains validated import, template, CSV/JSON export and share controls; no separate comparison page is mounted. Scope filters do not navigate away.
 
-## Result provenance
+Report contains publication entries, project announcements and external coverage only. Research method, CLI configurator, package-design narrative and FAQ are not mounted there. Public paper/press details are explicitly forthcoming. Contribute retains criteria, proposal preparation, checklists and downloads.
 
-The default official report contains no models or scores. The synthetic walkthrough contains five generic example models, 110 aggregates and 110 episodes. It is not evidence about actual models.
+Legacy Episodes links open a concrete task recording. Compare/Matrix redirect to Leaderboard. Documents/Method/Run/About/Footage redirect to the single Report page, without secondary query state.
 
-Only one report is active at a time. Imports replace the report and remain local and unreviewed. Known synthetic provenance persists through navigation and report export. Reports are revalidated on sessionStorage reload. No video URLs are accepted from imported reports; local attached video is held only in page memory. Files and provider credentials are not uploaded.
+## Normalized JSON report
 
-Limits: 5 MB per import, 30 models, 660 aggregates, 500 episodes and 200 events per episode. Only allowlisted fields survive validation. Text is escaped before display, CSV strings guard spreadsheet formula execution, and reports do not execute code.
+A report has schema_version: 1, benchmark_version, protocol, environment: simulation, models, results and optional episodes. Keep evaluation routes, model versions, environments and protocol budgets separate. Website validation checks structure and consistency, not experimental authenticity. Raw research summary.json needs explicit conversion.
 
-## Website report schema v1
+Each model has unique id (letters, numbers, underscore or hyphen), name, version and agent. Import 1–30 models, at most 660 unique task/model aggregates and at most 500 episodes. T18 is excluded. Reports are limited to 5 MB. Unknown fields are removed.
 
-This format is separate from the research CLI's summary.json. Convert research aggregates explicitly; the website does not automatically certify experiment authenticity or protocol comparability.
+Each aggregate has model_id, task_id, trials (positive integer), successes (0 to trials), progress_sum (successes to trials) and duration_sum_s (nonnegative simulation seconds). Normalize task progress to 0–1 before summing; successful trials contribute 1. Merge seeds/layouts into one aggregate per task/model. Include all valid outcomes and rerun infrastructure-invalid trials.
 
-```json
-{
-  "schema_version": 1,
-  "benchmark_version": "your-frozen-release",
-  "protocol": "your-frozen-route-interface-budget-and-judge-version",
-  "environment": "simulation",
-  "models": [
-    {"id": "your-model", "name": "Model name", "version": "Exact version", "agent": "Exact agent and harness version"}
-  ],
-  "results": [],
-  "episodes": []
-}
-```
+Each episode has a unique id, model_id, task_id, status (success/failure/incomplete), positive duration_s, nonnegative integer seed/layout and 1–200 ordered events. The task/model aggregate must exist; selected episode counts and outcomes cannot contradict it. Displayed recordings may be a subset of trials, so their success fraction is not the model’s benchmark score.
 
-Each result: model_id, task_id, trials (positive integer), successes (0 to trials), progress_sum (successes to trials), duration_sum_s (nonnegative simulation seconds). Normalize each task's 0–100 progress to 0–1 before summing. A successful trial has progress 1. Merge multiple seeds/layouts outside the website into one aggregate per model/task. Include all valid outcomes; rerun infrastructure-invalid trials rather than silently counting them as robot failures.
+Optional episode video is an object with src and optional poster. URLs must use HTTP(S) or be relative media paths; script/data/protocol-relative URLs are rejected. For example:
 
-Each episode: unique id, model_id, task_id, status (success/failure/incomplete), positive duration_s, nonnegative integer seed/layout and events. Each event has time_s, type and text. Times are ordered and within the duration. Optional input and output fields preserve multiline text (up to 16,000 characters each). Optional code is an object containing filename (up to 160 characters) and content (multiline, up to 64,000 characters). Newlines and tabs are allowed in these multiline fields; other control characters are rejected. The viewer retains the latest supplied input, output and code at or before the current time. Before the first event, all remain absent. Missing fields show placeholders; code is never executed. Episode outcomes must be consistent with the corresponding aggregate. Displayed episodes may be a subset; do not infer population success from selected videos.
+    "video": {"src": "media/T06/model-a/episode-01.mp4", "poster": "media/T06/model-a/poster.jpg"}
 
-Use one frozen benchmark/protocol/environment for all models in a report. Do not combine program submission, direct-policy and privileged solver runs under one protocol. Current imports support simulation only.
+Each event has time_s within episode duration, type and text. Optional input/output preserve multiline text up to 16,000 characters. Optional code contains filename (up to 160 characters) and content (up to 64,000 characters). Code is displayed only. Optional images contains up to four observation objects with src and descriptive alt text. For example:
 
-For example, an event can include:
+    "images": [{"src": "media/T06/model-a/frame-008.jpg", "alt": "Head camera supplied to the model"}]
 
-```json
-{
-  "time_s": 22,
-  "type": "Code revision",
-  "text": "First submitted revision",
-  "input": "Instruction and permitted observation description",
-  "output": "Recorded response at this time",
-  "code": {"filename": "policy.py", "content": "# Exact submitted file snapshot\n# Additional lines"}
-}
-```
+The playhead retains the latest supplied input, output, code and images at or before the current time. Before their first event these remain absent. Video starts on the same original clock as event timestamps. A local recording attachment overrides the hosted video for only that episode. Each local attachment must be reselected after reload/navigation; videos are never uploaded. A duration mismatch is explicitly shown.
 
-Attach local footage with the same time origin as the event log. The video position drives the shared timeline and timeline seeking updates the video. Video attachments are page-memory only. Camera-frame slots remain reserved; imported reports do not load images or remote media. The 90-second layout preview is illustrative, separate from official/synthetic/local reports, and has no measured outcome.
+Imports remain local and unreviewed in sessionStorage for the current tab. Storage failure uses page memory. Synthetic imports retain their label through navigation and export. Shared links contain view state, not uploaded files. The official empty report and layout placeholders never enter exports as model results.
 
-## Metrics
+## Scoring
 
-1. Per task: successes / trials; normalized progress_sum / trials.
-2. Per category: average the available task values equally.
-3. Balanced score and progress: average represented selected categories equally. The full catalog uses five separate category means from the EGE abstract; generation and reconstruction each receive their own weight. Earlier four-category balanced scores are not directly comparable. Progress is displayed in points out of 100.
-4. A selected category with no data makes the balanced summary unavailable. Partial task coverage is labeled and receives no rank. Missing tasks are never zero-filled.
-5. Pooled success is separately total successes / total trials. Its Wilson 95% interval is not an interval for the balanced score and does not model task/seed correlations.
-6. Mean simulation time is total simulation seconds / valid trials, including unsuccessful outcomes. Wall time and model latency are different measures.
-7. Only complete coverage earns an Overall rank, with ties sharing rank. Task table headers sort by task success or Overall, with missing values last; task sorting does not change Overall ranks. Legacy comparison/export metrics remain available.
-8. Capability bars use only tasks covered by every selected model; summary cards show individual coverage. Do not treat different coverage as directly comparable.
+The manuscript defines five distinct categories: manipulation (14 tasks), navigation (3), scene generation (1), scene and interaction reconstruction (2), policy development (2). Overall first averages task success rates within each selected category, then averages those category means equally. Progress follows the same aggregation on 0–100 points. Complete selected-task coverage is required for a rank. Missing data stays missing and genuine zero remains zero.
 
-CSV success fields are fractions, progress_0_100 is points, and duration_s is simulation seconds. Leaderboard exports include pooled_success_rate and pooled_wilson_95_low/high separately from balanced_success_rate. Exports retain source and protocol.
+Pooled success divides all successes by all trials; its Wilson 95% interval is distinct from the category-balanced score and does not account for task/seed correlations. Mean simulation time divides total simulation seconds by valid trials, including unsuccessful outcomes. Wall-clock elapsed time and tokens remain future reporting goals.
 
-## CLI configuration
+## Verification and publication
 
-- check: first seed, all selected layouts.
-- solve: all seeds × layouts, optional --video head.
-- play: first seed and layout.
-- eval: all seeds × layouts, explicit GPU, vlm/null/replay agent; this UI enables T02/T06/T19. mock exercises the pipeline offline. null/replay are controls, not model performance.
-
-Defaults: seed 0 and layouts 0,1,2. Commands are generated as text, never executed by the website. Model identifiers are restricted and shell-quoted. Agent/model controls are disabled when irrelevant. Downloaded configurations contain the effective mode parameters.
-
-## Verification
-
-Run node --test tests/*.test.cjs and syntax-check the changed JS files. The reporting, Home-insight, Home-interaction and navigation suites contain 29 tests. Validate desktop/mobile document navigation, local section switching/history/legacy redirects, shared category filters, task details, score/progress displays, exports, import/reload/clear, Report method anchors, retained run configuration, direct-policy guards and episode video controls. Publish only the website allowlist; verify Pages files after deployment.
-
-## Manuscript integration
-
-paper.js curates the EGE research overview, four package components, six construction stages and four evaluation goals. Report → Resources provides the adapted overview; Report → Method explains design, sourcing, creation and fairness. Home follows the research introduction with the compact Overall board and shared footer; research explanations stay in Report. Task details expose the package definition without expanding the gallery. The report schema remains unchanged; scores are computed from task aggregates using the five manuscript categories. Wall-clock elapsed time and token consumption are not inferred from simulation seconds. The site publishes no manuscript source archive, template PDF, invented author identities or empirical results. Home reserves explicitly labeled slots for the forthcoming author list and affiliations.
-
-## Home task wall
-
-Six flowing columns (four on small screens) link to the 22 task dossiers. The hero, three scale figures, paper metadata, news, overview-video placeholder and centered introduction follow LIBERO-Pro 2.0’s upper Home layout. Tiles use original, labeled concept previews until reviewed footage is mapped in HOME_VIDEOS. Optional videos loop muted and inline, with visible-tile playback, page/hero suspension, automatic focus suspension and a paused reduced-motion default. Keyboard focus exposes the original tiles as a static scrollable grid; duplicate cycles are hidden from the accessibility tree.
-
-## Appearance
-
-A shared header sun/moon control switches all five pages, task windows, evidence frames, result tables, trace/code blocks and the run configurator. Saved preference is applied before styles, with system fallback and storage-error handling. Page snapshots fade for 280 ms without remounting content or resetting a timeline, scroll position or form. Browsers without View Transitions apply the final palette immediately. Rapid repeated switches honor the latest choice; failed or interrupted transitions settle on that choice. Reduced motion disables the color/icon transition. Home fades its media wall into the page background; main sections and the footer share that canvas and use spacing in place of hard horizontal dividers.
-
-## Retained exploration source
-
-The earlier category-chart, task-demand ring and evaluation-route modules remain in the repository, but Home no longer loads or initializes them. Their isolated module tests remain available. The compact Home Overall board and its dedicated tests are retained, with independent result-source selection. Rankings and model details remain in Leaderboard; task results and synchronized replay remain in Task.
+Run node --test tests/*.test.cjs, syntax-check JavaScript, verify hashes and git diff --check. Browser checks cover direct and legacy navigation, model/episode isolation, replay retention, video/range/trace synchronization, imports/exports, keyboard and reduced motion, mobile layout, theme persistence and Home regression. Publish only website assets and verify the Pages deployment and files.

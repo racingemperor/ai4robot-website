@@ -12,13 +12,18 @@ window.Results = (() => {
     demo.results.push({model_id:m.id,task_id:t.id,trials:10,successes,progress_sum:Number(progress.toFixed(3)),duration_sum_s:duration*10});
     const success=successes>=5;
     const texts=[`Initial state and goal: ${t.goal}`,`Allowed observation: cameras and measured body state.`,`Key action: ${t.beats[1]}.`,`${success?'Success':'Failure'} synthetic outcome; actual criterion: ${t.proof}`];
-    demo.episodes.push({id:`example-${mi+1}-${t.id.toLowerCase()}`,model_id:m.id,task_id:t.id,status:success?'success':'failure',duration_s:duration,seed:0,layout:0,events:texts.map((text,i)=>({time_s:Math.round(duration*i/3),type:['Goal','Observation','Action','Judgment'][i],text}))});
+    demo.episodes.push({id:`example-${mi+1}-${t.id.toLowerCase()}`,model_id:m.id,task_id:t.id,status:success?'success':'failure',duration_s:duration,seed:0,layout:0,events:texts.map((text,i)=>({time_s:Math.round(duration*i/3),type:['Goal','Observation','Action','Judgment'][i],text,input:`[SYNTHETIC INPUT] ${i===0?t.goal:'Example camera observation and permitted measured state.'}`,output:`[SYNTHETIC OUTPUT] ${text}`,...(i===2?{code:{filename:'policy.py',content:'# SYNTHETIC CODE SNAPSHOT\n# Interface example only; no robot program is executed.'}}:{})}))});
   }));
   function validate(raw){
     const fail=m=>{throw new Error(m);};
     if(!raw||typeof raw!=='object'||Array.isArray(raw))fail('The report must be a JSON object.');
     if(raw.schema_version!==1)fail('schema_version must be 1.');
     const str=(v,label,max=160)=>{if(typeof v!=='string'||!v.trim()||v.length>max||/[\u0000-\u001f]/.test(v))fail(`${label} must contain 1–${max} text characters.`);return v;};
+    const mediaURL=(value,label)=>{
+      str(value,label,2048);
+      if(!/^https?:\/\/[^\s<>"\\]+$/i.test(value)&&!(/^[a-zA-Z0-9_./%~-][^\s:<>"\\]*$/.test(value)&&!value.startsWith('//')))fail(`${label} must be an HTTP(S) or relative media URL.`);
+      return value;
+    };
     const num=(v,label,min=0,max=1e12)=>{if(typeof v!=='number'||!Number.isFinite(v)||v<min||v>max)fail(`${label} is outside its valid range.`);return v;};
     const integer=(v,label,min=0,max=1000000)=>{num(v,label,min,max);if(!Number.isInteger(v))fail(`${label} must be an integer.`);return v;};
     if(raw.environment!=='simulation')fail('Only simulation reports are supported; physical and simulated results cannot be mixed.');
@@ -62,9 +67,19 @@ window.Results = (() => {
           if(!event.code||typeof event.code!=='object'||Array.isArray(event.code))fail('event.code must contain a filename and content.');
           cleanEvent.code={filename:str(event.code.filename,'code.filename',160),content:multiline(event.code.content,'code.content',64000)};
         }
+        if(event.images!==undefined){
+          if(!Array.isArray(event.images)||event.images.length>4)fail('event.images must contain at most 4 observation frames.');
+          cleanEvent.images=event.images.map(image=>({src:mediaURL(image?.src,'image.src'),alt:str(image?.alt,'image.alt',300)}));
+        }
         return cleanEvent;
       });
-      clean.episodes.push({id,model_id:e.model_id,task_id:e.task_id,status:e.status,duration_s:duration,seed:integer(e.seed,'seed'),layout:integer(e.layout,'layout'),events});
+      let video;
+      if(e.video!==undefined){
+        if(!e.video||typeof e.video!=='object'||Array.isArray(e.video))fail('episode.video requires a media URL.');
+        video={src:mediaURL(e.video.src,'video.src')};
+        if(e.video.poster!==undefined)video.poster=mediaURL(e.video.poster,'video.poster');
+      }
+      clean.episodes.push({id,model_id:e.model_id,task_id:e.task_id,status:e.status,duration_s:duration,seed:integer(e.seed,'seed'),layout:integer(e.layout,'layout'),events,...(video?{video}:{})});
     }
     return clean;
   }

@@ -10,7 +10,7 @@ window.Evidence = (() => {
  function atTime(episode,time) {
   const index=episode.events.findLastIndex(event=>event.time_s<=time);
   const past=episode.events.slice(0,index+1);
-  return {index,event:index<0?null:episode.events[index],input:past.findLast(event=>event.input),output:past.findLast(event=>event.output),code:past.findLast(event=>event.code)};
+  return {index,event:index<0?null:episode.events[index],input:past.findLast(event=>event.input),output:past.findLast(event=>event.output),code:past.findLast(event=>event.code),images:past.findLast(event=>event.images?.length)};
  }
  function preview(task) {
   const steps=[

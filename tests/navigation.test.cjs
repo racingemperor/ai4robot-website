@@ -10,10 +10,14 @@ function site(page='home',search=''){
   if(!elements.has(selector))elements.set(selector,{innerHTML:'',open:false,addEventListener(){},setAttribute(){},classList:{remove(){},toggle(){}}});
   return elements.get(selector);
  };
- const context={window:{Theme:{mount(){}},addEventListener(){}},document:{body:{dataset:{page}},querySelector:element,querySelectorAll(){return[];},addEventListener(){}},location:new URL('https://example.test/'+(page==='home'?'index':page)+'.html'+search),URL,URLSearchParams};
+ const location=new URL('https://example.test/'+(page==='home'?'index':page)+'.html'+search);
+ let redirected;
+ location.replace=url=>{redirected=new URL(url,location.href);};
+ const context={window:{Theme:{mount(){}},addEventListener(){}},document:{body:{dataset:{page}},querySelector:element,querySelectorAll(){return[];},addEventListener(){}},location,URL,URLSearchParams};
+ context.history={replaceState(_a,_b,url){context.location=new URL(url,context.location.href);}};
  vm.createContext(context);
  vm.runInContext(fs.readFileSync(path.join(__dirname,'../site.js'),'utf8'),context);
- return {Site:context.window.Site,shell:element('#app').innerHTML,sections:element('#page-content').innerHTML};
+ return {Site:context.window.Site,shell:element('#app').innerHTML,location:context.location,redirected};
 }
 
 test('all five parent pages expose Home, Task, Leaderboard, Report and Contribute with one current item and a static logo',()=>{
@@ -24,31 +28,40 @@ test('all five parent pages expose Home, Task, Leaderboard, Report and Contribut
   assert.equal([...nav.matchAll(/aria-current="page"/g)].length,1);
   assert.match(shell,/<header[^>]*><span class="brand"/);
   assert.doesNotMatch(shell,/<a class="brand"/);
+  assert.doesNotMatch(shell,/section-switch|data-section=|board-page-index/);
  }
 });
 
-test('episode links resolve inside Task with model, category and synthetic source intact',()=>{
- const {Site,sections}=site('tasks','?data=demo&category=manipulation');
+test('episode links open the matching task and model directly without a secondary view',()=>{
+ const {Site}=site('tasks','?data=demo&category=manipulation');
  const url=new URL(Site.href('episodes',{episodeTask:'T06',episodeModel:'model-a'}),'https://example.test/');
- assert.equal(url.pathname,'/tasks.html');
- assert.equal(url.searchParams.get('section'),'episodes');
- assert.equal(url.searchParams.get('data'),'demo');
- assert.equal(url.searchParams.get('category'),'manipulation');
- assert.equal(url.searchParams.get('episodeTask'),'T06');
- assert.equal(url.searchParams.get('episodeModel'),'model-a');
- assert.match(sections,/data-section="episodes"/);
- assert.equal(Site.section,'catalog');
- assert.equal(site('tasks','?section=episodes').Site.section,'episodes');
+ assert.equal(url.pathname,'/tasks.html');assert.equal(url.searchParams.get('task'),'T06');
+ assert.equal(url.searchParams.get('section'),null);assert.equal(url.searchParams.get('episodeTask'),null);
+ assert.equal(url.searchParams.get('data'),'demo');assert.equal(url.searchParams.get('episodeModel'),'model-a');
+ assert.equal(url.searchParams.get('category'),null,'a recording link must not exclude its target task');
 });
 
-test('research aliases resolve to Report and retain the configured task across its views',()=>{
+test('retired research and comparison aliases open their single parent page without subviews',()=>{
  const {Site}=site('report','?section=run&task=T19');
- for(const [alias,section]of [['method','method'],['run','run'],['about','resources']]){
-  const url=new URL(Site.href(alias),'https://example.test/');
-  assert.equal(url.pathname,'/report.html');
-  assert.equal(url.searchParams.get('section'),section);
-  assert.equal(url.searchParams.get('task'),'T19');
- }
- assert.equal(Site.href('home'),'index.html');
- assert.equal(Site.href('documents'),'report.html?task=T19');
+ for(const alias of ['documents','method','run','about'])assert.equal(Site.href(alias),'report.html');
+ assert.equal(Site.href('home'),'index.html');assert.equal(Site.href('compare'),'leaderboard.html');assert.equal(Site.href('matrix'),'leaderboard.html');
+});
+
+test('legacy task matrix URLs redirect to the leaderboard with their data source and scope',()=>{
+ const {redirected}=site('tasks','?section=matrix&data=demo&category=navigation');
+ assert.equal(redirected.pathname,'/leaderboard.html');
+ assert.equal(redirected.searchParams.get('section'),null);
+ assert.equal(redirected.searchParams.get('data'),'demo');
+ assert.equal(redirected.searchParams.get('category'),'navigation');
+});
+
+test('legacy replay URLs preserve the episode identity so its task can be resolved before fallback',()=>{
+ const {location}=site('tasks','?section=episodes&data=demo&episode=example-1-t21');
+ assert.equal(location.searchParams.get('episode'),'example-1-t21');
+ assert.equal(location.searchParams.get('task'),null);
+ assert.equal(location.searchParams.get('section'),null);
+ const explicit=site('tasks','?section=episodes&episodeTask=T23').location;
+ assert.equal(explicit.searchParams.get('task'),'T23');
+ assert.equal(explicit.searchParams.get('episodeTask'),null);
+ assert.equal(site('tasks','?section=episodes').location.searchParams.get('task'),'T06');
 });

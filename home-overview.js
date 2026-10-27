@@ -7,7 +7,7 @@ window.HomeOverview = (() => {
    <div><dt>Authors</dt><dd class="home-metadata-pending">Author list to be announced</dd></div>
    <div><dt>Affiliations</dt><dd class="home-affiliations-pending">Institution logos and affiliations to be announced</dd></div>
    <div><dt>Published</dt><dd>Research preview · Paper forthcoming</dd></div>
-   <div><dt>Report</dt><dd><a href="${Site.href('report')}">Read the research overview ↗</a></dd></div>
+   <div><dt>Report</dt><dd><a href="${Site.href('report')}">Publications &amp; updates ↗</a></dd></div>
    <div><dt>Repository</dt><dd><a href="${RESEARCH_REPO}" target="_blank" rel="noopener">ALEXander22568 / AI4Robot ↗</a></dd></div>
    <div><dt>Leaderboard</dt><dd><a href="${Site.href('leaderboard')}">View the full leaderboard ↗</a></dd></div>
    <div class="home-paper-contact"><dt>Contact</dt><dd class="home-metadata-pending">Contact information forthcoming</dd></div>

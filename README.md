@@ -2,73 +2,57 @@
 
 Live: https://racingemperor.github.io/ai4robot-website/
 
-An English static research website with five main pages and eight compatibility redirects, a fixed header and 22 task dossiers. T18 is excluded. The current EGE manuscript supplies the research motivation, benchmark design, task-creation process and evaluation goals. Implementation sources: https://github.com/ALEXander22568/AI4Robot and the project Notion notebook linked from Report → Resources. Current task definitions follow GitHub; the user confirmed T23 is navigation among people.
+An English static website for 22 embodied tasks (T01–T23 excluding T18). Task definitions follow https://github.com/ALEXander22568/AI4Robot. T23 is dynamic crowd navigation. No framework, package installation or build step is required.
 
 ## Pages
 
-| Page | Purpose |
+| Main page | Content |
 |---|---|
-| index.html | Flowing task wall, title and benchmark scale, paper information, News, overview-video placeholder and research introduction, compact Overall bar leaderboard and shared footer |
-| tasks.html | Searchable visual task gallery, card-to-center floating task details, capabilities, evidence and model results, plus a task/model results matrix and synchronized episode replay |
-| leaderboard.html | Category + Overall line chart, selectable model curves, a sortable 22-task score matrix and centered model result windows, plus report tools |
-| contribute.html | Four contribution routes, quality criteria, review workflow and an interactive material checklist with downloadable/GitHub proposal drafts |
-| compare.html | Compatibility redirect to leaderboard.html?section=comparison |
-| matrix.html | Compatibility redirect to tasks.html?section=matrix |
-| episodes.html | Compatibility redirect to tasks.html?section=episodes |
-| report.html | Manuscript overview, benchmark design, task sourcing, six-stage construction, fair evaluation and metrics, research CLI, resources and FAQ |
-| documents.html | Compatibility redirect to report.html, preserving its selected section |
-| method.html / run.html / about.html | Compatibility redirects to the corresponding Report section |
-| footage.html | Retired media-plan URL; redirects to Report |
+| Home | Flowing task wall, title and benchmark scale, paper metadata, News, overview-video placeholder, introduction, compact Overall bar leaderboard and shared footer |
+| Task | Illustrated searchable task gallery; each floating task window contains its objective, model results, synchronized model recordings, capabilities, completion checks and evidence |
+| Leaderboard | Five manuscript categories plus Overall in a model-colored line chart, sortable 22-task table, model result windows and report data tools |
+| Report | Publications, project announcements and external coverage; no methods, CLI configurator or nested documentation views |
+| Contribute | Contribution guidelines, material checklists and downloadable or GitHub proposal drafts |
 
-The fixed header has five destinations: Home, Task, Leaderboard, Report and Contribute. The logo is a static brand mark. Leaderboard contains Ranking / Model comparison; Task contains Task catalog / Results matrix / Episode replay; Report contains Method / Run / Resources. These are local button-controlled views: the document and highlighted header stay the same. The section query parameter supports sharing, reload and browser back/forward. Gallery search and report source are retained; category/capability filters are shared between catalog and matrix. Report keeps the current run configuration when switching sections; links between its sections stay in the same document. Media plan is no longer part of the public site. No framework, build or package installation is required.
+The fixed header has five links: Home, Task, Leaderboard, Report and Contribute. The logo is static. Each link opens one page with continuous content; there are no secondary page tabs, side indexes or hidden subpages. Model/source/episode selectors change data in place. Task windows have no internal content tabs.
+
+Eight legacy HTML URLs remain usable. Episodes opens its concrete Task recording, Compare and Matrix open Leaderboard, and Documents / Method / Run / About / Footage open Report. Old section parameters are discarded. The task, model, episode and result source remain shareable; a recording link clears task-category filters that could exclude its target.
 
 ## Serve and verify
-
-From this directory:
 
     python -m http.server 4174 --bind 127.0.0.1
     node --test tests/*.test.cjs
 
-Open http://127.0.0.1:4174/. When serving the workspace root instead, use /website-prototype/.
+Open http://127.0.0.1:4174/. Syntax-check changed JavaScript files and verify desktop/mobile navigation, model recordings, timestamp seeking, playback, imports and exports before publication.
 
-## Appearance
+## Appearance and interaction
 
-The header’s sun/moon button switches every page between light and dark themes. Light mode uses a pure-white background with neutral reading surfaces. The choice persists across navigation and reload; without a saved choice it follows the system. Unavailable browser storage falls back to an in-memory choice. Complete page snapshots fade over 280 ms where supported; reduced motion and browsers without View Transitions apply the final palette immediately. Switching themes preserves live content, playback and scroll position. The hero fades into the same page canvas as the following sections; tables and controls retain their boundaries.
+The site follows LIBERO-Pro 2.0's white canvas, local Lato typography and restrained reading layout. The header sun/moon button switches all pages and floating windows; the preference persists across navigation/reload. Page snapshots fade for 280 ms where supported, while reduced motion applies the final palette immediately. Switching does not remount recordings or reset their playhead.
 
-Typography follows [LIBERO-Pro 2.0](https://racingemperor.github.io/LIBERO-Pro2.0/): locally hosted Lato, 16 px body text, 18 px research introduction, 15 px / 700 navigation and a shared heading hierarchy. Buttons, cards, captions, tables and form fields use the same family; literal commands and trace/code snapshots retain the reference's system monospace stack. `typography.css` owns these roles and responsive adjustments. Lato font files are distributed unmodified under the [SIL Open Font License](fonts/OFL-Lato.txt); the files and license originate from the reference site's `assets/fonts/` directory.
+The Lato files originate from the reference site's assets/fonts/ directory and are distributed unmodified under fonts/OFL-Lato.txt. Body text is 16 px, the introduction 18 px, and navigation 15 px / 700. Commands and recorded code use monospace. Cards animate from their clicked position into a centered window. Escape/backdrop/close dismisses the window and pauses playback; keyboard focus returns to its card. Home scroll reveals and the video wall respect reduced motion and page visibility.
 
-## Data contract
+## Results and recordings
 
-Home places the compact Overall bar leaderboard immediately after the introduction and ends with the shared footer. The board independently selects official, synthetic or locally saved unreviewed results; a model row opens its corresponding Leaderboard details. Complete task coverage is required for a rank. The other former Home exploration sections remain removed.
+The five manuscript categories are Robotic manipulation (14), Navigation (3), Scene generation (1), Scene and interaction reconstruction (2), and Policy development (2). Overall averages task success rates within each category and then category means equally. Complete selected-task coverage is required for a rank; missing values are never zero-filled. Ties share a rank. Pooled trial success and its Wilson interval are separate from category-balanced success.
 
-The EGE abstract defines five categories: Robotic manipulation (14), Navigation (3), Scene generation (1; T13), Scene and interaction reconstruction (2; T14/T15), and Policy development (2; T16/T17). Scene generation and reconstruction are never merged. Full-scope scores give each of these five category means equal weight; previous four-category aggregate scores are not directly comparable.
+Official results remain empty until reviewed reports are connected. The eight planned model/harness pairs reserve space without invented scores. The synthetic source contains five generic example models. Imports are validated, unreviewed, stored only in the current tab and never uploaded. Storage failure keeps the report in page memory. Shared URLs carry selection parameters, never local file contents.
 
-Official results are empty until reviewed reports are connected. Synthetic examples use generic names and never assign scores to real models. Imports are validated, local, unreviewed and stored in this tab's sessionStorage; a storage failure falls back to page memory. Video is page-memory only. Shared URLs contain view parameters, not file contents.
+Each task combines a model-performance table with its recording viewer. Select a model and episode to inspect video, exact model input/output, observation frames, code revisions and feedback on one timeline. Each model/episode keeps its own local video attachment and playback position across model and task changes while the page remains open. Closing the task window pauses playback. Reload/navigation requires reattaching local files. A report can supply an HTTP(S) or relative video URL and poster for each episode, plus timestamped observation images; these are retained by validation. Recording duration mismatches and unavailable files are shown explicitly. See FEATURES.md for the schema.
 
-Grid placeholders reserve media and output positions across Home, Tasks and Report. The empty official Leaderboard displays the eight planned model/harness pairs with no scores or ranks. Selecting a model opens its category summary and task-by-task results in a centered floating window. The roster is presentation only and never enters result reports or exports. Episodes offers a separate, explicitly labeled 90-second layout preview until official records exist. These slots are never report models or exported results. Optional event input, output and code snapshots follow the same clock as local video; real recordings need matching timestamps. No public footage or observation frames are connected yet. Home shows explicitly labeled concept previews in its flowing wall. Add reviewed clips to HOME_VIDEOS in app.js as task-ID entries with src and optional poster; use the same task footage for Home and Tasks. Wall clips play silently in a loop when visible; focus, offscreen/tab suspension and reduced-motion preferences pause them automatically. Every tile opens its task dossier.
+No official footage or reviewed results are currently connected. The official task viewer provides a clearly labeled 90-second layout preview for each planned model; these are presentation placeholders and are never exported as measured records. A model with results but no episode shows its scores and a recording empty state. Only recorded input/output/code at or before the playhead is displayed.
 
-Scoring follows the current research plan: average task rates within each category, then average categories. Pooled success and its Wilson interval are separate. See FEATURES.md for the normalized report format and limitations.
+Home retains its compact Overall board and original footer. Its independent source selector opens the matching model details in Leaderboard. Concept previews in the flowing wall remain labeled until reviewed clips are mapped in HOME_VIDEOS in app.js.
 
-The site does not execute robot commands or request provider credentials. Its run configurator covers check/solve/play and direct-policy eval for T02/T06/T19. Other tasks have varying readiness. Program submission and direct-policy evaluation must retain distinct protocol labels.
+## Publications and contributions
+
+Report follows a simple publication-entry layout inspired by LIBERO-Pro 2.0. It lists the forthcoming EGE paper, the available website announcement and an honest empty state for external coverage. Public paper links, authors, venue and press links are added when supplied. No reference-site papers, invented publication claims or raw manuscript archives are published.
+
+Contribute explains evaluation, harness, task and research-tool contributions. Its selector updates the material checklist; downloading a proposal or opening a prefilled GitHub issue does not submit anything automatically.
 
 ## Modules and publication
 
-theme.js applies the saved/system appearance before styles load and mounts the header switch; theme.css supplies neutral light/dark palettes, the rounded floating header and a compositor fade that keeps the live content intact. home-overview.js/css own the Home paper-information layout, news, overview-video placeholder, introduction and compact Overall board. leaderboard.js shares the planned roster and renders the category/Overall chart, sortable task matrix and model dossier; leaderboard.css owns their responsive presentation. contribute.js/css provide contribution routes, material checklists and proposal drafts. site.js owns navigation and shared dialogs; app.js owns narrative pages; lab.js owns result/configuration tools; tasks.js owns the reviewed task catalog; results.js owns validation, aggregation and the shared saved-report contract; illustrations.js supplies task visuals; evidence.js owns grid placeholders, playback symbols, separate preview events and time-based trace selection; motion.js owns scroll reveals, video-wall playback and the card-to-window transition; paper.js owns curated manuscript text and its presentation in Report. The earlier exploration modules (insights.js, home-insights.js, home-flow.js and insights.css) are retained as source but are not loaded by Home. Task images are original conceptual illustrations reserved for future experiment frames. Task detail windows use native modal focus handling, Escape/backdrop dismissal and reduced-motion alternatives.
+site.js owns direct navigation and compatibility routing. app.js renders Home and the task gallery/details. task-replay.js/css own model performance and per-episode playback/media state. leaderboard.js/css render the chart, task table and model dossier; lab.js controls that single Leaderboard view and imports/exports. report.js/css own publication entries. results.js validates and summarizes reports; evidence.js selects timestamped snapshots. motion.js controls the task-window transition, wall and reveals. theme.js/css and typography.css provide shared appearance. contribute.js/css own proposals. tasks.js defines the reviewed catalog; illustrations.js provides original task concepts.
 
-Publish only this website directory to the website repository. GitHub Pages serves the root of codex/website-publication. Research source code, operational setup, credentials and progress records are outside publication scope. See DESIGN-NOTES.md. The internal VIDEO-BRIEF.md is excluded from publication.
+Earlier exploration modules (paper.js, insights.js, home-insights.js, home-flow.js and insights.css) remain source references and are not loaded by current public pages. The website never executes robot programs or requests provider credentials. Simulation mean time is supported; end-to-end wall-clock time and token consumption are not yet stored.
 
-## Manuscript content
-
-The site uses the confirmed title Embodied Generalist Exam (EGE). The abstract, Introduction and Dataset sections inform the public overview. Draft name variants are normalized to EGE; the confirmed 22-task/five-category catalog and six concrete robot platforms are preserved. Raw manuscript sources, template PDFs, example authors, template references and unfinished results are excluded from publication. The manuscript describes a six-stage construction process with cross-checks by at least three authors per stage; this does not imply that every listed task has completed that process.
-
-Manuscript reporting goals include success, intermediate progress, total elapsed wall-clock time and token consumption. The existing report schema supports simulation duration; it does not yet store end-to-end wall-clock time or tokens. The site explains this distinction rather than inferring efficiency results. Foundation-model weights remain unchanged during evaluation; a policy-development task may train a separate robot policy.
-
-## Leaderboard interaction
-
-The opening chart follows LIBERO-Pro 2.0: distinct model colors, visibility controls, direct line labels and success-rate axes for the five manuscript categories plus category-balanced Overall. Click or press Enter on a curve or label to open the same centered floating result window used by task cards. Official empty reports show the planned eight models and no invented lines; the opt-in synthetic report uses generic model names.
-
-The table below puts models in rows and all 22 concrete tasks in columns, with Overall and fixed model identities. Column headings sort success rates, missing values stay last and Overall ranks retain complete-coverage eligibility. A score opens model details and locates that task. The horizontal scroll position is retained when sorting. The model window includes category summaries, success/progress/trials/time and replay links; its model and category selectors update in place. Model, detail and table-sort parameters are shareable. Data & exports contains imports, downloads, view sharing and the legacy comparison view; evaluation scope is collapsed by default.
-
-## Contributing
-
-Contribute is a separate page inspired by First Exam's contribution flow: evaluate a model, integrate a harness, propose a task, or contribute tools/evidence/analysis. It explains six quality criteria and a five-step review workflow. Selecting a contribution type updates its material checklist. Visitors can download a Markdown proposal or open a prefilled issue in the website repository; no issue is sent automatically. Research-repository access remains separate. These are proposed contribution guidelines, not a claim that every current task meets every criterion.
+Publish only this website directory to its repository. GitHub Pages serves the root of codex/website-publication. Research sources, operational setup, credentials and progress records stay outside publication scope.

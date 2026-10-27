@@ -6,12 +6,12 @@
  <title>Task results matrix — Embodied Generalist Exam</title>
  <link rel="icon" href="data:,">
  <script>
-  const target=new URL('tasks.html',location.href);
-  target.search=location.search;target.searchParams.set('section','matrix');target.hash=location.hash;
+  const target=new URL('leaderboard.html',location.href);
+  target.search=location.search;target.searchParams.delete('section');target.hash=location.hash;
   location.replace(target.href);
  </script>
 </head>
-<body><p>Task results matrix has a new location. <a id="destination" href="tasks.html?section=matrix">Continue to task results matrix</a>.</p>
+<body><p>Task results matrix has a new location. <a id="destination" href="leaderboard.html">Continue to task results matrix</a>.</p>
 <script>document.getElementById('destination').href=target.href;</script>
 </body>
 </html>

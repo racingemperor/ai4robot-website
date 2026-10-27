@@ -95,3 +95,11 @@ test('saved report loading rejects corrupt, invalid, oversized or unavailable st
  assert.throws(()=>R.readSaved({getItem:()=>' '.repeat(5*1024*1024+1)}),/exceeds 5 MB/);
  assert.throws(()=>R.readSaved({getItem:()=>{throw new Error('Storage unavailable');}}),/Storage unavailable/);
 });
+
+test('episode media and timestamped observations survive validation while unsafe URLs are rejected',()=>{
+ const raw=clone(R.demo);raw.episodes[0].video={src:'media/T01/model-a.mp4',poster:'https://example.test/frame.jpg'};
+ raw.episodes[0].events[1].images=[{src:'media/observation.png',alt:'Head camera input'}];
+ const clean=R.validate(raw).episodes[0];assert.equal(clean.video.src,'media/T01/model-a.mp4');assert.equal(clean.events[1].images[0].alt,'Head camera input');
+ const E=context.window.Evidence;assert.equal(E.atTime(clean,0).images,undefined);assert.equal(E.atTime(clean,clean.events[1].time_s).images.images[0].src,'media/observation.png');
+ for(const src of ['javascript:alert(1)','data:text/html,hello','//unknown.test/file.mp4']){const bad=clone(raw);bad.episodes[0].video.src=src;assert.throws(()=>R.validate(bad),/media URL/);}
+});
