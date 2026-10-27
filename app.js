@@ -25,7 +25,7 @@ function homeHero(){return `<section class="hero hero-cinema" aria-labelledby="h
  <div class="hero-shade" aria-hidden="true"></div>
  <div class="hero-copy"><h1 id="hero-title">Embodied Generalist Exam</h1><p class="hero-question">Evaluating General-Purpose Models in the Physical World</p><dl class="home-hero-statistics" aria-label="Benchmark scale"><div><dt>Tasks</dt><dd>22</dd></div><div><dt>Task categories</dt><dd>5</dd></div><div><dt>Robot platforms</dt><dd>6</dd></div></dl></div>
  </section>`;}
-function home(){return homeHero()+HomeOverview.introduction();}
+function home(){return homeHero()+HomeOverview.introduction()+HomeOverview.shell();}
 function taskCard(t) {
  const traits=t.capabilities.map(([name])=>name);
  return `<button class="task-card" data-select="${t.id}" aria-haspopup="dialog" aria-controls="task-focus" aria-label="Open ${t.id}: ${t.name}" style="--task-color:${group(t.group).color}">
@@ -106,7 +106,7 @@ function syncFilters(){if($('#task-category'))$('#task-category').value=state.ca
 const infoPage=document.body.dataset.page;
 let taskWindow;
 state.taskView='overview';state.taskOpen=false;
-if(infoPage==='home'){$('#page-content').innerHTML=home();Motion.revealHome($('#page-content'));Motion.videoWall($('.hero-cinema'));}
+if(infoPage==='home'){$('#page-content').innerHTML=home();Motion.revealHome($('#page-content'));Motion.videoWall($('.hero-cinema'));HomeOverview.mount();}
 if(infoPage==='tasks'){
  $('#tasks-catalog-panel').innerHTML=explorer();collection();syncFilters();
  taskWindow=Motion.taskWindow($('#task-focus'),()=>{state.taskOpen=false;if(Site.section==='catalog')saveTaskView();});

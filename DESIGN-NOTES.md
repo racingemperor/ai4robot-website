@@ -2,7 +2,7 @@
 
 ## Research story
 
-The site asks whether a general-purpose language model or coding agent can turn an instruction into a physical outcome. Home opens with the LIBERO-Pro 2.0 sequence: task wall and title, three scale figures, paper metadata, News, an overview-video placeholder and a centered introduction. Home ends after the introduction with a comfortable bottom inset and no footer. Rankings, replay and method details remain in their respective pages. Research motivation and benchmark explanations stay in Report.
+The site asks whether a general-purpose language model or coding agent can turn an instruction into a physical outcome. Home opens with the LIBERO-Pro 2.0 sequence: task wall and title, three scale figures, paper metadata, News, an overview-video placeholder and a centered introduction. The compact Overall bar leaderboard follows the introduction, then the shared project footer. All other former sections below the introduction remain removed. Rankings, replay and method details remain in their respective pages. Research motivation and benchmark explanations stay in Report.
 
 The visual language follows LIBERO-Pro 2.0: a pure-white canvas, neutral gray reading surfaces, dark ink, restrained blue interaction states and local Lato typography. The fixed floating header is a rounded capsule with a subtle border; colored model and capability annotations remain distinct. Dashed grid placeholders reserve video, observation, figure, document and output positions. Home has a theme-aware, full-width hero with six tilted, continuously flowing columns (four on mobile) of rounded task tiles, plus an overview-video placeholder; each task has one demonstration video, three detail frames and a deliverable. Report reserves method figures, execution output and publication material. No experimental media is published. Controls use a shared 10 px corner radius; video, image, output and task presentation frames use 14 px corners, with their contents following the frame. Task characteristic cells use 6 px corners.
 
@@ -24,7 +24,7 @@ Home’s flowing wall links every tile to its task dossier. The title and primar
 
 Home sections fade in and move upward as they enter the viewport, once per load, without controlling page scroll. Reduced motion shows the final readable state immediately. Native dialog behavior traps focus; closing returns focus to the opening card. Play and pause use symbols with accessible labels.
 
-Home keeps its introductory sections open on the page canvas, separated by whitespace. The News list retains a bordered surface. The removed results and exploration sections are not mounted or loaded.
+Home keeps its introductory sections open on the page canvas, separated by whitespace. The News list retains a bordered surface. The compact Overall board retains its rounded panel; the other removed exploration sections are not mounted or loaded.
 
 ## Evidence preview
 
@@ -59,4 +59,4 @@ English metadata, lang=en, one H1 per document, sequential heading hierarchy, a 
 
 ## Retained exploration source
 
-The earlier category charts, seven-dimension task-demand annotations, capability rings and route-step modules remain in the repository for reference. Home does not load or initialize them, and its final section is the research introduction. The dedicated Leaderboard continues to use the five manuscript categories and all 22 tasks.
+The earlier category charts, seven-dimension task-demand annotations, capability rings and route-step modules remain in the repository for reference. Home does not load or initialize them, and its final content section is the compact Overall leaderboard before the shared footer. The dedicated Leaderboard continues to use the five manuscript categories and all 22 tasks.
