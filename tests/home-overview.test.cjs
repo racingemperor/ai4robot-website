@@ -38,15 +38,15 @@ test('Home ranks by category-balanced success, preserves ties and links to the e
  assert.doesNotMatch(html,/Synthetic|Not measured|Unreviewed/i);
 });
 
-test('a genuine zero is drawn, incomplete results stay unranked and local reports keep their exact links without status copy',()=>{
+test('a genuine zero is drawn, incomplete results stay unranked and report model links remain exact',()=>{
  const report={models:['zero','partial','<unsafe>'].map(model),results:[...TASKS.map(t=>result('zero',t,0)),...TASKS.slice(1).map(t=>result('partial',t,10))]};
- const html=HomeOverview.board(report,'imported',true);
+ const html=HomeOverview.board(report,'official');
  assert.match(html,/style="width:0%"/);
  assert.match(html,/0\.0%/);
  assert.equal((html.match(/home-rank-number">—/g)||[]).length,2);
  assert.match(html,/21 \/ 22/);
  assert.doesNotMatch(html,/Synthetic|Not measured|Unreviewed/i);
  assert.match(html,/&lt;unsafe&gt;/);assert.doesNotMatch(html,/<unsafe>/);
- assert.match(html,/data=imported/);
+ assert.match(html,/data=official/);
  assert.equal((html.match(/class="home-rank-logo"/g)||[]).length,3);
 });

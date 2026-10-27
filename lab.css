@@ -116,8 +116,6 @@ main,section[id],#task-detail{scroll-margin-top: 20px;}
 .event-list strong{font-weight: 500;}
 .event-list [aria-current="true"]{background: var(--paper);}
 .episode-meta{display: flex; justify-content: space-between; gap: 15px; font: 9px var(--sans); color: var(--muted); margin: 19px 0px; overflow-wrap: anywhere;}
-.video-upload{position: relative;}
-.video-upload input{position: absolute; inset: 0px; opacity: 0; cursor: pointer; width: 100%;}
 .run-layout{display: grid; grid-template-columns: 1fr 1.25fr; gap: 35px;}
 .run-form{display: grid; grid-template-columns: 1fr 1fr; gap: 19px;}
 .command-box{background: var(--ink); color: var(--paper); padding: 25px; min-width: 0px;}

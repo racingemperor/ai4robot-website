@@ -39,7 +39,7 @@ test('partial results distinguish zero success from missing data and never recei
  const tasks=context.TASKS.filter(t=>['T01','T21'].includes(t.id));
  const report={models:[{id:'partial',name:'Partial model',agent:'Harness',version:'v1'}],results:[{model_id:'partial',task_id:'T01',trials:4,successes:0,progress_sum:1,duration_sum_s:40}],episodes:[]};
  const rows=Results.summarize(report,tasks.map(t=>t.id));
- const view=render({report,rows,tasks,source:'imported'});
+ const view=render({report,rows,tasks,source:'official'});
  assert.match(view.html,/<td class="rank-column">—/);assert.equal(rows[0].complete,false);assert.match(view.html,/curve-unbranded/);
  const measured=view.detailHTML.match(/data-model-task="T01"[\s\S]*?<\/tr>/)[0];
  const missing=view.detailHTML.match(/data-model-task="T21"[\s\S]*?<\/tr>/)[0];
@@ -49,7 +49,7 @@ test('partial results distinguish zero success from missing data and never recei
 
 test('model selection preserves global ranks and each task has an inline recording disclosure',()=>{
  const tasks=[context.TASKS[0]],report={models:[{id:'first',name:'First model',agent:'Harness',version:'v1'},{id:'second',name:'Second model',agent:'Harness',version:'v1'}],results:[{model_id:'first',task_id:'T01',trials:2,successes:2,progress_sum:2,duration_sum_s:10},{model_id:'second',task_id:'T01',trials:2,successes:1,progress_sum:1.5,duration_sum_s:20}],episodes:[{model_id:'second',task_id:'T01'}]};
- const view=render({report,rows:Results.summarize(report,['T01']),tasks,source:'imported',selectedModel:'second'});
+ const view=render({report,rows:Results.summarize(report,['T01']),tasks,source:'official',selectedModel:'second'});
  assert.equal(view.selectedModel,'second');assert.match(view.html,/<td class="rank-column">2/);
  assert.match(view.detailHTML,/data-model-task-toggle="T01" aria-expanded="false" aria-controls="model-task-panel-T01"/);
  assert.match(view.detailHTML,/id="model-task-panel-T01" hidden/);
@@ -59,7 +59,7 @@ test('model selection preserves global ranks and each task has an inline recordi
 });
 
 test('model dossiers and tables omit data-status notices',()=>{
- const view=render({report:Results.demo,rows:Results.summarize(Results.demo,context.TASKS.map(t=>t.id)),source:'imported',synthetic:true});
+ const view=render({report:Results.demo,rows:Results.summarize(Results.demo,context.TASKS.map(t=>t.id)),source:'official',synthetic:true});
  assert.doesNotMatch(view.html+view.detailHTML,/Synthetic|unreviewed|forthcoming|model-search|board-search/i);
  assert.match(view.detailHTML,/model-breakdown-title/);
 });
@@ -71,7 +71,7 @@ test('chart category rates and Overall preserve equal category weighting and the
  {model_id:'one',task_id:'T01',trials:10,successes:0,progress_sum:0,duration_sum_s:10},
  {model_id:'one',task_id:'T02',trials:10,successes:10,progress_sum:10,duration_sum_s:10},
  {model_id:'one',task_id:'T21',trials:10,successes:10,progress_sum:10,duration_sum_s:10}],episodes:[]};
- const options={report,rows:Results.summarize(report,tasks.map(t=>t.id)),tasks,source:'imported'};
+ const options={report,rows:Results.summarize(report,tasks.map(t=>t.id)),tasks,source:'official'};
  const view=render(options);
  assert.match(view.html,/Robotic manipulation: 50.0%/);assert.match(view.html,/Navigation: 100.0%/);assert.match(view.html,/Overall: 75.0%/);
  for(const id of ['T01','T02','T21'])assert(view.html.includes('data-table-sort="'+id+'"'));
@@ -81,7 +81,7 @@ test('chart category rates and Overall preserve equal category weighting and the
 
 test('task sorting puts missing results last in both directions without changing Overall ranks',()=>{
  const tasks=[context.TASKS[0]],report={models:[{id:'missing',name:'Missing',agent:'H',version:'v1'},{id:'zero',name:'Zero',agent:'H',version:'v1'},{id:'full',name:'Full',agent:'H',version:'v1'}],results:[{model_id:'zero',task_id:'T01',trials:2,successes:0,progress_sum:0,duration_sum_s:2},{model_id:'full',task_id:'T01',trials:2,successes:2,progress_sum:2,duration_sum_s:2}],episodes:[]};
- const options={report,rows:Results.summarize(report,['T01']),tasks,source:'imported',tableSort:'T01'};
+ const options={report,rows:Results.summarize(report,['T01']),tasks,source:'official',tableSort:'T01'};
  const modelOrder=direction=>[...render({...options,tableDirection:direction}).html.match(/<table class="task-comparison-table">[\s\S]*?<\/table>/)[0].matchAll(/class="table-model" data-board-model="([^"]+)"/g)].map(m=>m[1]);
  assert.deepEqual(modelOrder(-1),['full','zero','missing']);
  assert.deepEqual(modelOrder(1),['zero','full','missing']);

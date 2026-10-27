@@ -82,7 +82,7 @@ if(infoPage==='tasks'){
   state.search=(p.get('q')||'').slice(0,160);
   let linked=TASKS.some(t=>t.id===p.get('task'))?p.get('task'):null;
   if(!linked&&p.has('episode')){
-   let activeReport=Results.official;try{activeReport=p.get('data')==='imported'?Results.readSaved(sessionStorage)?.report||Results.official:Results[Results.sourceFor(p.get('data'))];}catch{}
+   const activeReport=Results[Results.sourceFor(p.get('data'))];
    linked=activeReport.episodes.find(e=>e.id===p.get('episode'))?.task_id||'T06';
   }
   if(linked){state.selected=linked;if(!filteredTasks().some(t=>t.id===linked)){Object.assign(state,TaskFilters.normalize({}));state.search='';}}

@@ -2,9 +2,9 @@
 window.TaskReplay=(()=>{
  const h=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const pct=v=>v==null?'—':`${(v*100).toFixed(1)}%`;
- const localVideos=new Map(),positions=new Map(),selections=new Map();
- let host=null,activeTask=null,recordingContext=null,mountVersion=0,playVersion=0,activeModel='',activeEpisode='',modelOpen=false,source='official',saved=null,memoryImport=false,ignoreStored=false,playing=false,raf=0,last=0,speed=1,time=0,notice='';
- const report=()=>recordingContext?.report||(source==='demo'?Results.demo:source==='imported'&&saved?saved.report:Results.official);
+ const positions=new Map(),selections=new Map();
+ let host=null,activeTask=null,recordingContext=null,mountVersion=0,playVersion=0,activeModel='',activeEpisode='',modelOpen=false,source='official',playing=false,raf=0,last=0,speed=1,time=0;
+ const report=()=>recordingContext?.report||Results[source];
  const models=()=>source==='official'&&!report().models.length?Leaderboard.roster:report().models;
  const key=e=>`${source}:${e.model_id}:${e.id}`;
  const taskKey=()=>`${source}:${activeTask.id}`;
@@ -22,12 +22,6 @@ window.TaskReplay=(()=>{
   const button=host.querySelector('[data-replay-action="play"]');if(button){button.innerHTML=Evidence.playbackIcon(false);button.setAttribute('aria-label','Play');}
  }
  function unmount(){suspend();mountVersion++;host=null;activeTask=null;recordingContext=null;}
- function clearImportedRecordings(){
-  if(source==='imported')suspend();
-  for(const [k,v]of localVideos)if(k.startsWith('imported:')){URL.revokeObjectURL(v.url);localVideos.delete(k);}
-  for(const k of positions.keys())if(k.startsWith('imported:'))positions.delete(k);
-  for(const k of selections.keys())if(k.startsWith('imported:'))selections.delete(k);
- }
  function syncURL(){
   if(recordingContext)return;
   const url=new URL(location.href);url.searchParams.set('task',activeTask.id);url.searchParams.delete('section');
@@ -60,17 +54,17 @@ window.TaskReplay=(()=>{
   }).join('')||'<p class="task-recording-empty">No models in this report.</p>'}</div></section>`;
  }
  function viewer(e){
-  const recording=localVideos.get(key(e)),src=recording?.url||e.video?.src,poster=e.video?.poster;
+  const src=e.video?.src,poster=e.video?.poster;
   return `<div class="replay-recording-heading"><label>Episode<select id="task-episode-select">${episodes().map(r=>`<option value="${h(r.id)}"${r.id===e.id?' selected':''}>${r.preview?r.id:`${r.id} · ${r.status}`}</option>`).join('')}</select></label><p>${e.preview?'':`${h(e.status)} · seed ${e.seed} · layout ${e.layout}`}</p></div>
    <div class="episode-timeline"><div class="playback"><button type="button" class="lab-button playback-toggle" data-replay-action="play" aria-label="Play" title="Play">${Evidence.playbackIcon(false)}</button><input id="task-episode-seek" type="range" min="0" max="${e.duration_s}" step="0.1" value="${time}" aria-label="Episode time"><output id="task-episode-clock"></output><label>Speed<select id="task-episode-speed">${[0.5,1,2,4].map(v=>`<option value="${v}"${v===speed?' selected':''}>${v}×</option>`).join('')}</select></label></div><div class="episode-time-markers">${e.events.map((ev,i)=>`<button type="button" data-replay-event="${i}" style="--event-position:${ev.time_s/e.duration_s*100}%" aria-label="Seek to ${ev.time_s} seconds: ${h(ev.type)}"><i aria-hidden="true"></i><span>${ev.time_s.toFixed(0)}s</span></button>`).join('')}</div></div>
-   <div class="episode-synchronized task-recording-layout"><section class="episode-visuals"><div class="evidence-panel-heading"><h4>Episode video</h4><output id="task-frame-time"></output></div><div class="episode-stage">${src?`<video id="task-episode-video" src="${h(src)}"${poster?` poster="${h(poster)}"`:''} preload="metadata" playsinline controls></video>`:Evidence.slot('VIDEO','Model episode recording','This model’s continuous recording follows the shared timeline','episode-video-slot')}</div><div class="episode-attachments"><label class="lab-button video-upload">${recording?'Replace local video':'Attach local video'}<input type="file" id="task-video-upload" accept="video/*"></label>${recording?'<button type="button" class="lab-button" data-replay-action="remove-video">Remove local video</button>':''}</div><p class="replay-media-note">${recording?`${h(recording.name)} · `:''}Local attachments stay in this tab; reattach after reload.</p><p id="task-video-status" role="status"></p><div id="task-observations" class="task-replay-observations"></div></section>
+   <div class="episode-synchronized task-recording-layout"><section class="episode-visuals"><div class="evidence-panel-heading"><h4>Episode video</h4><output id="task-frame-time"></output></div><div class="episode-stage">${src?`<video id="task-episode-video" src="${h(src)}"${poster?` poster="${h(poster)}"`:''} preload="metadata" playsinline controls></video>`:Evidence.slot('VIDEO','Model episode recording','This model’s continuous recording follows the shared timeline','episode-video-slot')}</div><p id="task-video-status" role="status"></p><div id="task-observations" class="task-replay-observations"></div></section>
    <section class="episode-trace" aria-label="Synchronized model input, output and code"><div class="evidence-panel-heading"><h4>Model trace</h4><span id="task-step-label"></span></div><div id="task-event" class="current-event"></div><div id="task-sync-content"></div></section></div>
    <details class="episode-step-directory"><summary>All steps and code revisions · ${e.events.length}</summary><div class="event-list">${e.events.map((ev,i)=>`<button type="button" data-replay-event="${i}"><time>${ev.time_s.toFixed(1)}s</time><strong>${h(ev.type)}</strong><span>${h(ev.code?.filename||ev.text)}</span></button>`).join('')}</div></details>`;
  }
  function draw(){
   const e=episode();
   if(recordingContext){host.innerHTML=e?viewer(e):'<p class="task-recording-empty">No recordings for this model on this task.</p>';if(e){updateTime();wireVideo();}return;}
-  host.innerHTML=`<div class="task-replay-toolbar"><button type="button" class="lab-button" data-replay-action="import">Import JSON</button>${saved?'<button type="button" class="text-link" data-replay-action="clear-import">Clear local report</button>':''}<input type="file" id="task-report-upload" accept=".json,application/json" hidden></div><p id="task-replay-notice" role="status">${h(notice)}</p>${modelList()}`;
+  host.innerHTML=modelList();
   if(modelOpen&&e){updateTime();wireVideo();}
  }
  function updateTime(){
@@ -106,7 +100,7 @@ window.TaskReplay=(()=>{
   video.addEventListener('timeupdate',()=>{if(active()&&!restoring){time=video.currentTime;if(time>=e.duration_s){video.pause();playing=false;}updateTime();}});
   video.addEventListener('play',()=>{if(active()){playing=true;updateTime();}});
   for(const name of ['pause','ended'])video.addEventListener(name,()=>{if(active()){playing=false;updateTime();}});
-  video.addEventListener('error',()=>{if(active())host.querySelector('#task-video-status').textContent='Video could not be loaded. Attach an MP4 or WebM recording for this episode.';});
+  video.addEventListener('error',()=>{if(active())host.querySelector('#task-video-status').textContent='Video could not be loaded.';});
  }
  function play(){
   if(playing){suspend();updateTime();return;}const e=episode();if(!e)return;
@@ -116,9 +110,8 @@ window.TaskReplay=(()=>{
   last=performance.now();const tick=now=>{if(!playing||!host?.isConnected)return;time+=(now-last)/1000*speed;last=now;if(time>=e.duration_s){time=e.duration_s;playing=false;}updateTime();if(playing)raf=requestAnimationFrame(tick);};raf=requestAnimationFrame(tick);updateTime();
  }
  function mountView(element,task,context=null){
-  suspend();mountVersion++;host=element;activeTask=task;recordingContext=context;notice='';
-  if(!context&&!memoryImport&&!ignoreStored)try{saved=Results.readSaved(sessionStorage);}catch{saved=null;notice='Saved results are unavailable. You can import a report below.';}
-  const p=new URLSearchParams(context?'':location.search);source=context?.source||(p.get('data')==='imported'&&saved?'imported':Results.sourceFor(p.get('data')));
+  suspend();mountVersion++;host=element;activeTask=task;recordingContext=context;
+  const p=new URLSearchParams(context?'':location.search);source=context?.source||Results.sourceFor(p.get('data'));
   const selection=selections.get(taskKey());activeModel=context?.modelId||p.get('episodeModel')||selection?.model||models()[0]?.id||'';
   if(!models().some(m=>m.id===activeModel))activeModel=models()[0]?.id||'';
   const linkedEpisode=report().episodes.find(e=>e.task_id===activeTask.id&&e.id===p.get('episode'));
@@ -132,35 +125,12 @@ window.TaskReplay=(()=>{
    if(b.dataset.replayEvent!==undefined){seek(episode().events[Number(b.dataset.replayEvent)].time_s);return;}
    const action=b.dataset.replayAction;
    if(action==='play')play();
-   if(action==='import')host.querySelector('#task-report-upload').click();
-   if(action==='remove-video'){suspend();const record=localVideos.get(key(episode()));if(record)URL.revokeObjectURL(record.url);localVideos.delete(key(episode()));draw();}
-   if(action==='clear-import'){
-    clearImportedRecordings();let removed=true;try{sessionStorage.removeItem(Results.storageKey);}catch{removed=false;}saved=null;memoryImport=false;ignoreStored=true;source=Results.defaultSource();activeEpisode='';notice=removed?'Local report cleared.':'Report cleared from this page. Storage removal failed; close this tab to end the stored session.';chooseModel('');
-   }
   };
   host.oninput=event=>{if(event.target.id==='task-episode-seek')seek(event.target.value);};
-  host.onchange=async event=>{
+  host.onchange=event=>{
    const el=event.target;
    if(el.id==='task-episode-select')chooseEpisode(el.value);
    if(el.id==='task-episode-speed'){speed=Number(el.value);const v=host.querySelector('video');if(v)v.playbackRate=speed;}
-   if(el.id==='task-video-upload'&&el.files[0]){
-    const e=episode(),file=el.files[0];if(!file.type.startsWith('video/'))return;
-    suspend();const old=localVideos.get(key(e));if(old)URL.revokeObjectURL(old.url);
-    localVideos.set(key(e),{url:URL.createObjectURL(file),name:file.name});draw();
-   }
-   if(el.id==='task-report-upload'&&el.files[0]){
-    const versionAtRead=mountVersion,file=el.files[0];
-    try{
-     if(file.size>5*1024*1024)throw new Error('The report exceeds 5 MB.');
-     const raw=JSON.parse(await file.text()),checked=Results.validate(raw);
-     if(mountVersion!==versionAtRead||!host?.isConnected)return;
-     suspend();clearImportedRecordings();
-     saved={report:checked,synthetic:raw.website_data_source==='demo'};source='imported';activeEpisode='';
-     notice=`Validated ${checked.models.length} models and ${checked.episodes.length} recordings.`;
-     ignoreStored=false;memoryImport=false;try{sessionStorage.setItem(Results.storageKey,JSON.stringify(saved));}catch{memoryImport=true;try{sessionStorage.removeItem(Results.storageKey);}catch{}notice+=' Storage unavailable; results remain on this page only.';}
-     chooseModel('');
-    }catch(error){if(mountVersion!==versionAtRead||!host?.isConnected)return;notice=`Import failed: ${error.message}`;host.querySelector('#task-replay-notice').textContent=notice;}
-   }
    if(el.id==='task-episode-select')host.querySelector('#'+el.id)?.focus({preventScroll:true});
   };
   draw();syncURL();
@@ -168,6 +138,6 @@ window.TaskReplay=(()=>{
  const mount=(element,task)=>mountView(element,task);
  const mountRecording=(element,task,context)=>mountView(element,task,context);
  document.addEventListener('visibilitychange',()=>{if(document.hidden)suspend();});
- window.addEventListener('pagehide',()=>{suspend();for(const v of localVideos.values())URL.revokeObjectURL(v.url);localVideos.clear();});
- return {mount,mountRecording,suspend,unmount,clearImportedRecordings};
+ window.addEventListener('pagehide',suspend);
+ return {mount,mountRecording,suspend,unmount};
 })();

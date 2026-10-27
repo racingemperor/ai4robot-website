@@ -81,21 +81,6 @@ test('timeline selection never exposes future output or code and retains the lat
   assert.equal(R.official.episodes.length,0);
 });
 
-test('saved reports share validation, storage key and synthetic provenance across pages',()=>{
- const read=raw=>R.readSaved({getItem:key=>{assert.equal(key,R.storageKey);return raw;}});
- assert.equal(read(null),null);
- for(const raw of [{report:R.demo,synthetic:true},{...R.demo,website_data_source:'demo'}]){
-  const saved=read(JSON.stringify(raw));assert.equal(saved.synthetic,true);assert.equal(saved.report.models.length,8);assert.equal(saved.report.results.length,176);
- }
- assert.equal(read(JSON.stringify({report:R.demo,synthetic:false})).synthetic,false);
-});
-test('saved report loading rejects corrupt, invalid, oversized or unavailable storage',()=>{
- assert.throws(()=>R.readSaved({getItem:()=>'not json'}),/JSON/);
- assert.throws(()=>R.readSaved({getItem:()=>JSON.stringify({report:{}})}),/schema_version/);
- assert.throws(()=>R.readSaved({getItem:()=>' '.repeat(5*1024*1024+1)}),/exceeds 5 MB/);
- assert.throws(()=>R.readSaved({getItem:()=>{throw new Error('Storage unavailable');}}),/Storage unavailable/);
-});
-
 test('episode media and timestamped observations survive validation while unsafe URLs are rejected',()=>{
  const raw=clone(R.demo);raw.episodes[0].video={src:'media/T01/model-a.mp4',poster:'https://example.test/frame.jpg'};
  raw.episodes[0].events[1].images=[{src:'media/observation.png',alt:'Head camera input'}];
@@ -104,11 +89,11 @@ test('episode media and timestamped observations survive validation while unsafe
  for(const src of ['javascript:alert(1)','data:text/html,hello','//unknown.test/file.mp4']){const bad=clone(raw);bad.episodes[0].video.src=src;assert.throws(()=>R.validate(bad),/media URL/);}
 });
 
-test('all eight roster models resolve to local official logos while unrelated imports stay unbranded',()=>{
+test('all eight roster models resolve to local official logos while unrelated models stay unbranded',()=>{
  for(const m of R.roster){
   const src=R.logoPath(m);assert.ok(fs.existsSync(path.join(__dirname,'..',src)));
   assert.match(R.logo(m),/aria-hidden="true"/);assert.match(R.logo(m),/alt=""/);
-  assert.equal(R.logoPath({id:'imported-id',name:m.name,agent:'Other harness'}),src);
+  assert.equal(R.logoPath({id:'other-model-id',name:m.name,agent:'Other harness'}),src);
  }
  const unknown={id:'unknown',name:'Unrelated model',agent:'Custom harness',logo:'javascript:alert(1)'};
  assert.equal(R.logoPath(unknown),'');assert.equal(R.logo(unknown),'');
@@ -118,8 +103,8 @@ test('all eight roster models resolve to local official logos while unrelated im
 
 test('explicit report sources survive replacing the layout default with real models',()=>{
  assert.equal(R.sourceFor('official'),'official');assert.equal(R.sourceFor('demo'),'demo');
- assert.equal(R.sourceFor(null),'demo');
+ assert.equal(R.sourceFor(null),'demo');assert.equal(R.sourceFor('imported'),'demo');
  R.official.models.push({id:'measured'});
- try{assert.equal(R.sourceFor(null),'official');assert.equal(R.sourceFor('demo'),'demo');assert.equal(R.sourceFor('official'),'official');}
+ try{assert.equal(R.sourceFor('imported'),'official');assert.equal(R.sourceFor(null),'official');assert.equal(R.sourceFor('demo'),'demo');assert.equal(R.sourceFor('official'),'official');}
  finally{R.official.models.pop();}
 });

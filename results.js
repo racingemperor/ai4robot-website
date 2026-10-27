@@ -1,7 +1,6 @@
 /* Public reporting contract. Demo values are synthetic and never model claims. */
 window.Results = (() => {
   const version = 'preview-v1';
-  const storageKey='ai4robot-imported-report-v1';
   const official = {schema_version:1,benchmark_version:version,protocol:'preview-v1 / simulation / fixed-interface',environment:'simulation',models:[],results:[],episodes:[]};
   const roster = Object.freeze([
     ['gpt6-astra','gpt6-astra','codex','openai','svg'],
@@ -66,7 +65,7 @@ window.Results = (() => {
       clean.results.push({model_id:r.model_id,task_id:r.task_id,trials,successes,progress_sum:num(r.progress_sum,'progress_sum',successes,trials),duration_sum_s:num(r.duration_sum_s,'duration_sum_s')});
     }
     if(raw.episodes!==undefined&&!Array.isArray(raw.episodes))fail('episodes must be an array.');
-    if((raw.episodes||[]).length>500)fail('Import at most 500 episodes.');
+    if((raw.episodes||[]).length>500)fail('A report supports at most 500 episodes.');
     const seenCounts=new Map();
     for(const e of raw.episodes||[]){
       if(!e||!modelIds.has(e.model_id)||!TASKS.some(t=>t.id===e.task_id))fail('An episode references an unknown model or task.');
@@ -106,13 +105,6 @@ window.Results = (() => {
     }
     return clean;
   }
-  function readSaved(storage){
-    const saved=storage.getItem(storageKey);
-    if(!saved)return null;
-    if(saved.length>5*1024*1024)throw new Error('The saved report exceeds 5 MB.');
-    const parsed=JSON.parse(saved);
-    return {report:validate(parsed.report||parsed),synthetic:parsed.synthetic===true||parsed.website_data_source==='demo'};
-  }
   function summarize(data,ids){
     const taskIds=[...new Set(ids)].filter(id=>TASKS.some(t=>t.id===id));
     const categories=[...new Set(taskIds.map(id=>TASKS.find(t=>t.id===id).category))];
@@ -132,5 +124,5 @@ window.Results = (() => {
     });
   }
   function csv(rows){return '\uFEFF'+rows.map(row=>row.map(v=>{let value=String(v??'');if(typeof v==='string'&&/^[=+\-@\t\r]/.test(value))value="'"+value;return '"'+value.replaceAll('"','""')+'"';}).join(',')).join('\r\n');}
-  return {version,official,demo,validate,summarize,csv,storageKey,readSaved,roster,logo,logoPath,defaultSource,sourceFor};
+  return {version,official,demo,validate,summarize,csv,roster,logo,logoPath,defaultSource,sourceFor};
 })();

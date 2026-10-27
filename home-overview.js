@@ -40,15 +40,14 @@ window.HomeOverview = (() => {
     <span class="home-rank-number">${value===null?'—':rank}</span><span class="home-rank-logo">${Results.logo(model)}</span><span class="home-rank-name"><strong>${h(model.name)}</strong><span>${h(model.agent)}</span></span>
     <span class="home-rank-track" aria-hidden="true">${value===null?'':`<span style="width:${value*100}%"></span>`}</span><span class="home-rank-value"><strong>${score}</strong><small>${coverage}</small></span>
    </a>`;
-  }).join('')||'<p class="home-rank-empty">No models in this report. Import a report from the full leaderboard.</p>'}</div>`;
+  }).join('')||'<p class="home-rank-empty">No models in this report.</p>'}</div>`;
  }
  function mount(){
   const host=document.querySelector('#home-overall-chart');
   if(!host)return;
-  let saved=null;try{saved=Results.readSaved(sessionStorage);}catch{/* Storage is optional. */}
   const initial=new URLSearchParams(location.search).get('data');
-  const source=initial==='imported'&&saved?'imported':Results.sourceFor(initial);
-  const report=source==='demo'?Results.demo:source==='imported'?saved.report:Results.official;
+  const source=Results.sourceFor(initial);
+  const report=Results[source];
   host.innerHTML=board(report,source);
   const url=new URL(location.href);
   url.searchParams.set('data',source);

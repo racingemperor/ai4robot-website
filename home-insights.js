@@ -26,14 +26,8 @@ window.HomeInsights = (() => {
   const source=document.querySelector('#home-result-source');
   if(!source)return;
   const metric=document.querySelector('#home-result-metric');
-  let imported=null,synthetic=false;
-  try{
-   const saved=Results.readSaved(sessionStorage);
-   if(saved){imported=saved.report;synthetic=saved.synthetic;}
-  }catch{/* An unavailable or invalid local report never becomes public results. */}
-  if(imported)source.insertAdjacentHTML('beforeend','<option value="imported">Local report · unreviewed</option>');
   const initial=new URLSearchParams(location.search).get('data');
-  source.value=initial==='demo'?'demo':initial==='imported'&&imported?'imported':'official';
+  source.value=initial==='demo'?'demo':'official';
   let activeCategory=categories[0].id,selectedModelId=null;
   const categoryDetail=document.querySelector('#home-category-detail');
   function categoryLinks(category,categoryTasks,sourceId,selected){
@@ -46,20 +40,20 @@ window.HomeInsights = (() => {
    const categoryTasks=TASKS.filter(t=>t.category===category.id);
    const selected=rows.find(model=>model.id===selectedModelId);
    const categoryResult=selected?.categories.find(item=>item.id===category.id);
-   const provenance=sourceId==='demo'?'Synthetic preview · not measured':sourceId==='imported'?`Local report · ${synthetic?'Synthetic · ':''}Unreviewed`:'Official results';
+   const provenance=sourceId==='demo'?'Synthetic preview · not measured':'Official results';
    const modelPanel=selected&&categoryResult?.value!==null&&categoryResult?.value!==undefined
     ? `<div class="home-category-result"><span class="home-category-result-label">SELECTED MODEL · ${h(provenance)}</span><strong>${h(selected.name)}</strong><b>${metricId==='progress'?(categoryResult.value*100).toFixed(1):pct(categoryResult.value)}</b><span>${metricId==='progress'?'Progress / 100':'Success rate'} · ${h(category.name)}</span></div>`
     : rows.length?`<div class="home-category-result home-category-result-empty"><span class="home-category-result-label">MODEL RESULT</span><strong>Choose a model above</strong><span>Its score for ${h(category.name)} will appear here.</span></div>`
-    : `<div class="home-category-result home-category-result-empty"><span class="home-category-result-label">MODEL RESULT</span><strong>${sourceId==='official'?'Reviewed results are forthcoming':'No complete model cohort'}</strong><span>${sourceId==='official'?'No model scores are published in the official view yet.':sourceId==='demo'?'Synthetic examples are available for layout preview; no complete 22-task cohort is present.':'This local report does not contain a complete 22-task cohort for ranking.'}</span></div>`;
+    : `<div class="home-category-result home-category-result-empty"><span class="home-category-result-label">MODEL RESULT</span><strong>${sourceId==='official'?'Reviewed results are forthcoming':'No complete model cohort'}</strong><span>${sourceId==='official'?'No model scores are published in the official view yet.':sourceId==='demo'?'Synthetic examples are available for layout preview; no complete 22-task cohort is present.':'No complete 22-task cohort is present.'}</span></div>`;
    categoryDetail.innerHTML=`<div class="home-category-detail-main"><div class="home-category-summary"><span class="home-category-overline">${category.count} TASK${category.count===1?'':'S'} · TASK CATEGORY</span><h4>${h(category.name)}</h4><p>Primary deliverable: <strong>${h(category.output)}</strong></p><p>${h(category.hidden)}</p>${modelPanel}</div><div class="home-category-task-browser"><div class="home-category-task-heading"><h4>Tasks in this category</h4><span>${categoryTasks.length} tasks</span></div>${categoryLinks(category,categoryTasks,sourceId,selected)}</div></div>`;
    document.querySelectorAll('[data-home-category]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.homeCategory===activeCategory)));
    document.querySelector('#home-category-selection-status').textContent=`${category.name}: ${categoryTasks.length} tasks. ${selected?`${selected.name} ${metricId==='progress'?'progress':'success rate'} ${categoryResult?.value===null||categoryResult?.value===undefined?'not available':metricId==='progress'?(categoryResult.value*100).toFixed(1)+' out of 100':pct(categoryResult.value)}.`:'Category details updated.'}`;
   }
   function drawChart(){
-   const report=source.value==='demo'?Results.demo:source.value==='imported'?imported:Results.official;
+   const report=Results[Results.sourceFor(source.value)];
    const rows=Insights.topModels(report,metric.value),empty=!rows.length;
    if(!rows.some(model=>model.id===selectedModelId))selectedModelId=null;
-   const label=source.value==='demo'?'Synthetic preview · Not measured':source.value==='imported'?`Local report · ${synthetic?'Synthetic · ':''}Unreviewed`:'Official results';
+   const label=source.value==='demo'?'Synthetic preview · Not measured':'Official results';
    const models=empty?Array.from({length:5},(_,i)=>({name:`Model slot ${String(i+1).padStart(2,'0')}`,categories:[]})):rows;
    const progress=metric.value==='progress';
    document.querySelector('#home-chart-status').textContent=`${label}${empty?' · Awaiting complete 22-task results':` · ${rows.length} models · 22 / 22 tasks`}`;
@@ -70,7 +64,7 @@ window.HomeInsights = (() => {
     return `<figure class="${c.id===activeCategory?'is-active-category':''}"><figcaption><button type="button" class="home-category-chart-select" data-home-category="${c.id}" aria-pressed="${c.id===activeCategory}" aria-controls="home-category-detail">${h(c.name)}</button><span>${c.count} task${c.count===1?'':'s'} · ${progress?'Progress / 100':'Success rate'}</span></figcaption><svg class="category-bar-chart" viewBox="0 0 270 260" role="img" aria-label="${h(c.name)}: ${empty?'five model positions awaiting results':`${label}; ${progress?'progress':'success rate'} for the top ${rows.length} models`}">
      ${[0,50,100].map(t=>`<line x1="35" x2="265" y1="${baseline-t*scale}" y2="${baseline-t*scale}" class="chart-grid"/><text x="29" y="${baseline-t*scale+4}" text-anchor="end" class="chart-axis">${t}</text>`).join('')}
      ${models.map((m,i)=>{const value=m.categories[ci]?.value??null,x=start+i*(barWidth+gap),height=value===null?0:value*100*scale,dimmed=selectedModelId&&selectedModelId!==m.id;return `<g class="${dimmed?'is-muted-series':''}"><title>${h(m.name)}: ${value===null?'Awaiting results':progress?(value*100).toFixed(1)+' / 100':pct(value)}</title>${value===null?`<rect x="${x}" y="43" width="${barWidth}" height="180" rx="5" class="chart-empty-bar"/><text x="${x+barWidth/2}" y="130" text-anchor="middle" class="chart-value">—</text>`:`<rect x="${x}" y="${baseline-height}" width="${barWidth}" height="${height}" rx="4" fill="var(--model-${i})"/><text x="${x+barWidth/2}" y="${baseline-height-9}" text-anchor="middle" class="chart-value">${(value*100).toFixed(1)}</text>`}<text x="${x+barWidth/2}" y="246" text-anchor="middle" class="chart-model-key">${String.fromCharCode(65+i)}</text></g>`;}).join('')}</svg></figure>`;
-   }).join('')}</div><p class="insight-note">${empty?'Five model series are reserved. No rankings or scores have been published. Choose Synthetic preview to inspect the chart layout.':`Models are selected by overall balanced success; the same five appear in every category. Each category averages its task ${progress?'progress':'success rates'} equally. ${source.value==='demo'?'All values are synthetic examples and make no claim about real models.':source.value==='imported'?'Local imports have not been reviewed.':''}`}</p>
+   }).join('')}</div><p class="insight-note">${empty?'Five model series are reserved. No rankings or scores have been published. Choose Synthetic preview to inspect the chart layout.':`Models are selected by overall balanced success; the same five appear in every category. Each category averages its task ${progress?'progress':'success rates'} equally. ${source.value==='demo'?'All values are synthetic examples and make no claim about real models.':''}`}</p>
     ${empty?'':`<details class="home-chart-table"><summary>View chart values</summary><p class="insight-note">${h(report.benchmark_version)} · ${h(report.protocol)} · ${label}</p><div class="table-scroll" role="region" tabindex="0" aria-label="Model category results; horizontally scrollable"><table class="atlas-annotation-table"><caption>${label} · ${progress?'Progress / 100':'Success rate'} · Complete catalog coverage</caption><thead><tr><th scope="col">Model / agent</th><th scope="col">Overall success</th>${CATEGORIES.map(c=>`<th scope="col">${c.name}</th>`).join('')}</tr></thead><tbody>${rows.map(m=>`<tr><th scope="row">${h(m.name)}<small>${h(m.version)} · ${h(m.agent)}</small></th><td>${pct(m.score)}</td>${m.categories.map(c=>`<td>${progress?(c.value*100).toFixed(1):pct(c.value)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></details>`}`;
    drawCategoryDetail(rows,source.value,metric.value);
   }

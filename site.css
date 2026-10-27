@@ -450,7 +450,6 @@ html.task-modal-open{overflow:hidden}
 .episode-observations{margin-top:25px}
 .episode-camera-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .episode-camera-grid .evidence-slot{min-height:175px;padding:11px}.episode-camera-grid .evidence-slot-center{padding:10px 0}.episode-camera-grid .evidence-slot-center strong{font-size:13px}.episode-camera-grid .evidence-slot-center p{font-size:10px}
-.episode-attachments{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
 .episode-trace .current-event{margin:0 0 15px;padding:10px 0;border-block:1px solid var(--line);min-height:0}
 .episode-trace .current-event span{font:11px var(--sans);color:var(--accent)}
 .trace-text-block,.trace-code-block{border:1px solid var(--line);margin-bottom:17px;min-width:0}
