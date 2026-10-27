@@ -3,7 +3,7 @@ window.TaskReplay=(()=>{
  const h=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const pct=v=>v==null?'—':`${(v*100).toFixed(1)}%`;
  const localVideos=new Map(),positions=new Map(),selections=new Map();
- let host=null,activeTask=null,mountVersion=0,playVersion=0,activeModel='',activeEpisode='',source='official',saved=null,memoryImport=false,ignoreStored=false,playing=false,raf=0,last=0,speed=1,time=0,notice='';
+ let host=null,activeTask=null,mountVersion=0,playVersion=0,activeModel='',activeEpisode='',modelOpen=false,source='official',saved=null,memoryImport=false,ignoreStored=false,playing=false,raf=0,last=0,speed=1,time=0,notice='';
  const report=()=>source==='demo'?Results.demo:source==='imported'&&saved?saved.report:Results.official;
  const provenance=()=>source==='demo'?'Synthetic preview · Not measured':source==='imported'?`Local report · ${saved?.synthetic?'Synthetic · ':''}Unreviewed`:'Official results · Awaiting evaluation';
  const models=()=>source==='official'&&!report().models.length?Leaderboard.roster:report().models;
@@ -16,43 +16,56 @@ window.TaskReplay=(()=>{
  }
  const episode=()=>episodes().find(e=>e.id===activeEpisode)||null;
  function suspend(){
-  playVersion++;if(!host)return;const e=episode();if(e)positions.set(key(e),time);
-  playing=false;cancelAnimationFrame(raf);const video=host.querySelector('video');video?.pause();
+  playVersion++;if(!host)return;const e=episode(),video=host.querySelector('video');
+  if(e&&video?.readyState>=2)time=Math.min(video.currentTime,e.duration_s);
+  if(e)positions.set(key(e),time);
+  playing=false;cancelAnimationFrame(raf);video?.pause();
   const button=host.querySelector('[data-replay-action="play"]');if(button){button.innerHTML=Evidence.playbackIcon(false);button.setAttribute('aria-label','Play');}
  }
  function unmount(){suspend();mountVersion++;host=null;activeTask=null;}
  function syncURL(){
   const url=new URL(location.href);url.searchParams.set('task',activeTask.id);url.searchParams.delete('section');
   source==='official'?url.searchParams.delete('data'):url.searchParams.set('data',source);
-  activeModel?url.searchParams.set('episodeModel',activeModel):url.searchParams.delete('episodeModel');
-  const e=episode();e&&!e.preview?url.searchParams.set('episode',e.id):url.searchParams.delete('episode');
+  modelOpen&&activeModel?url.searchParams.set('episodeModel',activeModel):url.searchParams.delete('episodeModel');
+  const e=episode();modelOpen&&e&&!e.preview?url.searchParams.set('episode',e.id):url.searchParams.delete('episode');
   history.replaceState({},'',url);Site.refreshLinks();
  }
  function chooseEpisode(id){
   suspend();const rows=episodes();activeEpisode=rows.some(e=>e.id===id)?id:rows[0]?.id||'';
   time=episode()?positions.get(key(episode()))||0:0;
-  selections.set(taskKey(),{model:activeModel});selections.set(modelKey(),{episode:activeEpisode});draw();syncURL();
+  selections.set(taskKey(),{model:activeModel,open:modelOpen});selections.set(modelKey(),{episode:activeEpisode});draw();syncURL();
  }
  function chooseModel(id){
   suspend();activeModel=models().some(m=>m.id===id)?id:models()[0]?.id||'';activeEpisode='';chooseEpisode(selections.get(modelKey())?.episode||'');
  }
- function resultTable(){
+ function toggleModel(id){
+  if(modelOpen&&id===activeModel){suspend();modelOpen=false;selections.set(taskKey(),{model:activeModel,open:false});draw();syncURL();}
+  else{modelOpen=true;chooseModel(id);}
+  const button=[...host.querySelectorAll('[data-replay-model]')].find(b=>b.dataset.replayModel===id);
+  button?.focus({preventScroll:true});button?.scrollIntoView({block:'nearest',behavior:'instant'});
+ }
+ function modelList(){
   const stats=Results.summarize(report(),[activeTask.id]);
-  return `<div class="task-model-results"><h3>Model performance</h3><p>Task-level results across all valid trials. Choose a model to inspect its recordings below.</p><div class="table-scroll" role="region" tabindex="0" aria-label="Model performance on ${activeTask.id}"><table class="results-table"><caption>${h(provenance())} · ${activeTask.id}</caption><thead><tr><th scope="col">Model / harness</th><th scope="col">Success</th><th scope="col">Progress / 100</th><th scope="col">Trials</th><th scope="col">Recordings</th></tr></thead><tbody>${models().map(m=>{const s=stats.find(x=>x.id===m.id),count=report().episodes.filter(e=>e.task_id===activeTask.id&&e.model_id===m.id).length;return `<tr class="${m.id===activeModel?'is-selected-model':''}"><th scope="row"><button type="button" data-replay-model="${h(m.id)}" aria-pressed="${m.id===activeModel}">${h(m.name)}</button><small>${h(m.agent)}</small></th><td>${pct(s?.score)}</td><td>${s?.progress==null?'—':(s.progress*100).toFixed(1)}</td><td>${s?.trials||'—'}</td><td>${count?`<button type="button" data-replay-model="${h(m.id)}">${count} recording${count===1?'':'s'} ↗</button>`:'Awaiting recording'}</td></tr>`;}).join('')||'<tr><td colspan="5">No models in this report.</td></tr>'}</tbody></table></div></div>`;
+  return `<section class="task-model-results" aria-labelledby="task-model-results-title"><div class="task-model-results-heading"><h3 id="task-model-results-title">Model performance</h3><p>Select a model to expand its video and trace.</p></div><div class="task-model-columns" aria-hidden="true"><span>Model / harness</span><span>Success rate</span><span>Progress / 100</span><span>Trials</span><span>Recordings</span><span></span></div><div class="task-model-list">${models().map((m,index)=>{
+   const s=stats.find(x=>x.id===m.id),count=report().episodes.filter(e=>e.task_id===activeTask.id&&e.model_id===m.id).length,open=modelOpen&&m.id===activeModel;
+   const pending=s?.score==null,fill=pending?'':`<i style="width:${Math.max(0,Math.min(100,s.score*100))}%"></i>`,panel=`task-model-panel-${index}`,button=`task-model-toggle-${index}`;
+   const e=open?episode():null;
+   return `<article class="task-model-item${open?' is-expanded':''}"><h4 class="task-model-heading"><button type="button" class="task-model-summary" id="${button}" data-replay-model="${h(m.id)}" aria-expanded="${open}" aria-controls="${panel}"><span class="task-model-identity"><strong>${h(m.name)}</strong><small>${h(m.agent)}</small></span><span class="task-model-success"><span class="sr-only">Success rate: </span><span class="task-success-track${pending?' is-pending':''}" aria-hidden="true">${fill}</span><strong>${pending?'Pending':pct(s.score)}</strong></span><span class="task-model-stat task-model-progress"><span class="sr-only">Progress out of 100: </span>${s?.progress==null?'—':(s.progress*100).toFixed(1)}</span><span class="task-model-stat task-model-trials"><span class="sr-only">Trials: </span>${s?.trials||'—'}</span><span class="task-model-recordings">${count?`${count} recording${count===1?'':'s'}`:source==='official'&&!report().episodes.length?'Layout preview':'No recordings'}</span><svg class="task-model-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7 5 5 5-5"/></svg></button></h4><div class="task-model-panel" id="${panel}" role="region" aria-labelledby="${button}"${open?'':' hidden'}><div class="task-model-panel-content">${open?(e?viewer(e):'<p class="task-recording-empty">No recordings for this model on this task yet.</p>'):''}</div></div></article>`;
+  }).join('')||'<p class="task-recording-empty">No models in this report.</p>'}</div></section>`;
  }
  function viewer(e){
   const recording=localVideos.get(key(e)),src=recording?.url||e.video?.src,poster=e.video?.poster;
-  return `<div class="replay-recording-heading"><div><h3 id="task-recording-title" tabindex="-1">${h(models().find(m=>m.id===activeModel)?.name||'Model')} · Task recording</h3><p>${e.preview?'Layout preview · No recorded run':`${h(e.id)} · ${h(e.status)} · seed ${e.seed} · layout ${e.layout}`}</p></div><label>Episode<select id="task-episode-select">${episodes().map(r=>`<option value="${h(r.id)}"${r.id===e.id?' selected':''}>${r.preview?'Layout preview':`${r.id} · ${r.status}`}</option>`).join('')}</select></label></div>
-   ${e.preview?'<p class="layout-preview-note">The video position, model messages and code below are placeholders. The preview is separate from model results.</p>':''}
+  return `<div class="replay-recording-heading"><label>Episode<select id="task-episode-select">${episodes().map(r=>`<option value="${h(r.id)}"${r.id===e.id?' selected':''}>${r.preview?'Layout preview':`${r.id} · ${r.status}`}</option>`).join('')}</select></label><p>${e.preview?'Layout preview · No recorded run':`${h(e.status)} · seed ${e.seed} · layout ${e.layout}`}</p></div>
+   ${e.preview?'<p class="layout-preview-note">Video and trace placeholders · No recorded model output.</p>':''}
    <div class="episode-timeline"><div class="playback"><button type="button" class="lab-button playback-toggle" data-replay-action="play" aria-label="Play" title="Play">${Evidence.playbackIcon(false)}</button><input id="task-episode-seek" type="range" min="0" max="${e.duration_s}" step="0.1" value="${time}" aria-label="Episode time"><output id="task-episode-clock"></output><label>Speed<select id="task-episode-speed">${[0.5,1,2,4].map(v=>`<option value="${v}"${v===speed?' selected':''}>${v}×</option>`).join('')}</select></label></div><div class="episode-time-markers">${e.events.map((ev,i)=>`<button type="button" data-replay-event="${i}" style="--event-position:${ev.time_s/e.duration_s*100}%" aria-label="Seek to ${ev.time_s} seconds: ${h(ev.type)}"><i aria-hidden="true"></i><span>${ev.time_s.toFixed(0)}s</span></button>`).join('')}</div></div>
-   <div class="episode-synchronized task-recording-layout"><section class="episode-visuals"><div class="evidence-panel-heading"><h4>Episode video</h4><output id="task-frame-time"></output></div><div class="episode-stage">${src?`<video id="task-episode-video" src="${h(src)}"${poster?` poster="${h(poster)}"`:''} preload="metadata" playsinline controls></video>`:Evidence.slot('VIDEO','Model episode recording','This model’s continuous recording follows the shared timeline','episode-video-slot')}</div><div class="episode-attachments"><label class="lab-button video-upload">${recording?'Replace local video':'Attach local video'}<input type="file" id="task-video-upload" accept="video/*"></label>${recording?'<button type="button" class="lab-button" data-replay-action="remove-video">Remove local video</button>':''}</div><p class="replay-media-note">${recording?`Attached: ${h(recording.name)}. `:''}Local videos remain assigned to their model and episode while this page stays open. They are never uploaded and must be reattached after reload.</p><p id="task-video-status" role="status"></p><div id="task-observations" class="task-replay-observations"></div></section>
+   <div class="episode-synchronized task-recording-layout"><section class="episode-visuals"><div class="evidence-panel-heading"><h4>Episode video</h4><output id="task-frame-time"></output></div><div class="episode-stage">${src?`<video id="task-episode-video" src="${h(src)}"${poster?` poster="${h(poster)}"`:''} preload="metadata" playsinline controls></video>`:Evidence.slot('VIDEO','Model episode recording','This model’s continuous recording follows the shared timeline','episode-video-slot')}</div><div class="episode-attachments"><label class="lab-button video-upload">${recording?'Replace local video':'Attach local video'}<input type="file" id="task-video-upload" accept="video/*"></label>${recording?'<button type="button" class="lab-button" data-replay-action="remove-video">Remove local video</button>':''}</div><p class="replay-media-note">${recording?`${h(recording.name)} · `:''}Local attachments stay in this tab; reattach after reload.</p><p id="task-video-status" role="status"></p><div id="task-observations" class="task-replay-observations"></div></section>
    <section class="episode-trace" aria-label="Synchronized model input, output and code"><div class="evidence-panel-heading"><h4>Model trace</h4><span id="task-step-label"></span></div><div id="task-event" class="current-event"></div><div id="task-sync-content"></div></section></div>
-   <section class="episode-step-directory"><h4>Steps and code revisions</h4><div class="event-list">${e.events.map((ev,i)=>`<button type="button" data-replay-event="${i}"><time>${ev.time_s.toFixed(1)}s</time><strong>${h(ev.type)}</strong><span>${h(ev.code?.filename||ev.text)}</span></button>`).join('')}</div></section>`;
+   <details class="episode-step-directory"><summary>All steps and code revisions · ${e.events.length}</summary><div class="event-list">${e.events.map((ev,i)=>`<button type="button" data-replay-event="${i}"><time>${ev.time_s.toFixed(1)}s</time><strong>${h(ev.type)}</strong><span>${h(ev.code?.filename||ev.text)}</span></button>`).join('')}</div></details>`;
  }
  function draw(){
   const e=episode();
-  host.innerHTML=`<div class="task-replay-toolbar"><label>Results<select id="task-result-source"><option value="official"${source==='official'?' selected':''}>Official results</option><option value="demo"${source==='demo'?' selected':''}>Synthetic preview</option>${saved?`<option value="imported"${source==='imported'?' selected':''}>Local report · unreviewed</option>`:''}</select></label><button type="button" class="lab-button" data-replay-action="import">Import results JSON</button>${saved?'<button type="button" class="text-link" data-replay-action="clear-import">Clear local report</button>':''}<input type="file" id="task-report-upload" accept=".json,application/json" hidden><span>${h(provenance())}</span></div><p id="task-replay-notice" role="status">${h(notice)}</p>${resultTable()}<div class="task-model-picker"><label>Model recording<select id="task-model-select">${models().map(m=>`<option value="${h(m.id)}"${m.id===activeModel?' selected':''}>${h(m.name)} · ${h(m.agent)}</option>`).join('')}</select></label><p>Every model has its own episodes, video attachments and playback position.</p></div>${e?viewer(e):'<div class="task-recording-empty"><h3>No recordings for this model on this task yet.</h3><p>Its performance results remain above. Episode video and timestamped messages will appear here when supplied.</p></div>'}`;
-  if(e){updateTime();wireVideo();}
+  host.innerHTML=`<div class="task-replay-toolbar"><label>Results<select id="task-result-source"><option value="official"${source==='official'?' selected':''}>Official results</option><option value="demo"${source==='demo'?' selected':''}>Synthetic preview</option>${saved?`<option value="imported"${source==='imported'?' selected':''}>Local report · unreviewed</option>`:''}</select></label><button type="button" class="lab-button" data-replay-action="import">Import JSON</button>${saved?'<button type="button" class="text-link" data-replay-action="clear-import">Clear local report</button>':''}<input type="file" id="task-report-upload" accept=".json,application/json" hidden><span>${h(provenance())}</span></div><p id="task-replay-notice" role="status">${h(notice)}</p>${modelList()}`;
+  if(modelOpen&&e){updateTime();wireVideo();}
  }
  function updateTime(){
   const e=episode();if(!e||!host?.querySelector('#task-episode-seek'))return;
@@ -104,10 +117,11 @@ window.TaskReplay=(()=>{
   if(!models().some(m=>m.id===activeModel))activeModel=models()[0]?.id||'';
   const linkedEpisode=report().episodes.find(e=>e.task_id===activeTask.id&&e.id===p.get('episode'));
   if(linkedEpisode)activeModel=linkedEpisode.model_id;
+  modelOpen=!!activeModel&&(p.has('episodeModel')||!!linkedEpisode||selection?.open===true);
   const id=p.get('episode')||selections.get(modelKey())?.episode;activeEpisode=episodes().some(e=>e.id===id)?id:episodes()[0]?.id||'';
   time=episode()?positions.get(key(episode()))||0:0;
   host.onclick=event=>{
-   const m=event.target.closest('[data-replay-model]');if(m){chooseModel(m.dataset.replayModel);const title=host.querySelector('#task-recording-title');title?.focus({preventScroll:true});title?.scrollIntoView({block:'start',behavior:'instant'});return;}
+   const m=event.target.closest('[data-replay-model]');if(m){toggleModel(m.dataset.replayModel);return;}
    const b=event.target.closest('button');if(!b)return;
    if(b.dataset.replayEvent!==undefined){seek(episode().events[Number(b.dataset.replayEvent)].time_s);return;}
    const action=b.dataset.replayAction;
@@ -121,7 +135,6 @@ window.TaskReplay=(()=>{
   host.oninput=event=>{if(event.target.id==='task-episode-seek')seek(event.target.value);};
   host.onchange=async event=>{
    const el=event.target;
-   if(el.id==='task-model-select')chooseModel(el.value);
    if(el.id==='task-episode-select')chooseEpisode(el.value);
    if(el.id==='task-episode-speed'){speed=Number(el.value);const v=host.querySelector('video');if(v)v.playbackRate=speed;}
    if(el.id==='task-result-source'){suspend();source=el.value;activeEpisode='';notice='';chooseModel('');}
@@ -145,7 +158,7 @@ window.TaskReplay=(()=>{
      chooseModel('');
     }catch(error){if(mountVersion!==versionAtRead||!host?.isConnected)return;notice=`Import failed: ${error.message}`;host.querySelector('#task-replay-notice').textContent=notice;}
    }
-   if(['task-model-select','task-episode-select','task-result-source'].includes(el.id))host.querySelector('#'+el.id)?.focus({preventScroll:true});
+   if(['task-episode-select','task-result-source'].includes(el.id))host.querySelector('#'+el.id)?.focus({preventScroll:true});
   };
   draw();syncURL();
  }

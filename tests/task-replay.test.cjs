@@ -4,19 +4,19 @@ const fs=require('node:fs');
 const path=require('node:path');
 const vm=require('node:vm');
 
-function replay({withVideo=false}={}){
+function replay({withVideo=false,withResults=false,search}={}){
  const empty={models:[],results:[],episodes:[]},writes=[],notices={textContent:''},elements=new Map(),playFailures=[];
- const recorded={models:[{id:'model-a',name:'Test model',agent:'Test harness'}],results:[],episodes:[{id:'recording-1',model_id:'model-a',task_id:'T06',duration_s:4,events:[],video:{src:'https://example.test/recording.mp4'}}]};
- const video={currentTime:0,playbackRate:1,pause(){},addEventListener(){},play(){return {catch(callback){playFailures.push(callback);}};}};
+ const recorded={models:[{id:'model-a',name:'Test model',agent:'Test harness'},{id:'model-b',name:'Zero model',agent:'Test harness'},{id:'model-c',name:'Pending model',agent:'Test harness'}],results:[],episodes:[{id:'recording-1',model_id:'model-a',task_id:'T06',duration_s:4,events:[],video:{src:'https://example.test/recording.mp4'}}]};
+ const video={currentTime:0,playbackRate:1,pauseCount:0,pause(){this.pauseCount++;},addEventListener(){},play(){return {catch(callback){playFailures.push(callback);}};}};
  function element(selector){
-  if(!elements.has(selector))elements.set(selector,{dataset:{},attributes:{},setAttribute(k,v){this.attributes[k]=v;}});
+  if(!elements.has(selector))elements.set(selector,{dataset:{},attributes:{},setAttribute(k,v){this.attributes[k]=v;},focus(){this.focused=true;},scrollIntoView(){}});
   return elements.get(selector);
  }
  const context={
   window:{addEventListener(){}},document:{addEventListener(){}},URL,URLSearchParams,
-  location:new URL('https://example.test/tasks.html?data=demo'),
+  location:new URL('https://example.test/tasks.html'+(search??`?data=demo${withVideo?'&episodeModel=model-a':''}`)),
   Site:{refreshLinks(){}},Leaderboard:{roster:[]},cancelAnimationFrame(){},
-  Results:{official:empty,demo:withVideo?recorded:empty,readSaved:()=>null,validate:v=>v,summarize:()=>[],storageKey:'test-report'},
+  Results:{official:empty,demo:withVideo||withResults?recorded:empty,readSaved:()=>null,validate:v=>v,summarize:()=>[{id:'model-a',score:.6,progress:.8,trials:10},{id:'model-b',score:0,progress:0,trials:10}],storageKey:'test-report'},
   sessionStorage:{setItem(key,value){writes.push({key,value});},removeItem(){}}
  };
  context.history={replaceState(_a,_b,url){context.location=new URL(url,context.location);}};
@@ -24,7 +24,7 @@ function replay({withVideo=false}={}){
  vm.runInContext(fs.readFileSync(path.join(__dirname,'../evidence.js'),'utf8'),context);
  context.Evidence=context.window.Evidence;
  vm.runInContext(fs.readFileSync(path.join(__dirname,'../task-replay.js'),'utf8'),context);
- const host={isConnected:true,innerHTML:'',querySelector:s=>s==='video'?(withVideo?video:null):s==='#task-replay-notice'?notices:element(s),querySelectorAll:()=>[]};
+ const host={isConnected:true,innerHTML:'',querySelector:s=>s==='video'?(withVideo?video:null):s==='#task-replay-notice'?notices:element(s),querySelectorAll:s=>s==='[data-replay-model]'?[...host.innerHTML.matchAll(/data-replay-model="([^"]+)"/g)].map(m=>Object.assign(element('model:'+m[1]),{dataset:{replayModel:m[1]}})):[]};
  const controller=context.window.TaskReplay;
  controller.mount(host,{id:'T06'});
  function importLater(){
@@ -34,7 +34,8 @@ function replay({withVideo=false}={}){
   return {done,resolve,reject};
  }
  const clickPlay=()=>host.onclick({target:{closest:s=>s==='button'?{dataset:{replayAction:'play'}}:null}});
- return {context,controller,host,writes,notices,importLater,playFailures,clickPlay,element};
+ const clickModel=id=>host.onclick({target:{closest:s=>s==='[data-replay-model]'?{dataset:{replayModel:id}}:null}});
+ return {context,controller,host,writes,notices,importLater,playFailures,clickPlay,clickModel,element,video};
 }
 const report={models:[{id:'model-a',name:'Test model',agent:'Test harness'}],results:[],episodes:[]};
 
@@ -69,6 +70,8 @@ test('an import that finishes in the active task still stores and selects its re
  pending.resolve(JSON.stringify(report));await pending.done;
  assert.equal(r.writes.length,1);
  assert.equal(r.context.location.searchParams.get('data'),'imported');
+ assert.equal(r.context.location.searchParams.get('episodeModel'),null,'importing does not force a recording open');
+ r.clickModel('model-a');
  assert.equal(r.context.location.searchParams.get('episodeModel'),'model-a');
 });
 
@@ -94,4 +97,48 @@ test('failure of the active playback request remains visible',()=>{
  const r=replay({withVideo:true});r.clickPlay();r.playFailures[0](new Error('Video unavailable'));
  assert.equal(r.element('[data-replay-action="play"]').attributes['aria-label'],'Play');
  assert.match(r.element('#task-video-status').textContent,/Playback failed/);
+});
+
+test('task model rows distinguish a 60% fill, measured zero and missing results',()=>{
+ const r=replay({withResults:true});
+ assert.match(r.host.innerHTML,/width:60%/);
+ assert.match(r.host.innerHTML,/60\.0%/);
+ assert.match(r.host.innerHTML,/width:0%/);
+ assert.match(r.host.innerHTML,/0\.0%/);
+ assert.match(r.host.innerHTML,/task-success-track is-pending/);
+ assert.equal([...r.host.innerHTML.matchAll(/aria-expanded="false"/g)].length,3);
+ assert.doesNotMatch(r.host.innerHTML,/id="task-episode-seek"/,'ordinary task visits start compact');
+});
+
+test('a model expands its recording in the same row and switching keeps only one panel open',()=>{
+ const r=replay({withResults:true});r.clickModel('model-a');
+ assert.equal([...r.host.innerHTML.matchAll(/aria-expanded="true"/g)].length,1);
+ assert.match(r.host.innerHTML,/id="task-model-panel-0"[^>]*><div class="task-model-panel-content"><div class="replay-recording-heading"/);
+ assert.match(r.host.innerHTML,/id="task-episode-seek"/);
+ assert.equal(r.element('model:model-a').focused,true);
+ r.clickModel('model-b');
+ assert.equal([...r.host.innerHTML.matchAll(/aria-expanded="true"/g)].length,1);
+ assert.match(r.host.innerHTML,/id="task-model-panel-0"[^>]* hidden/);
+ assert.match(r.host.innerHTML,/No recordings for this model/);
+ assert.equal(r.context.location.searchParams.get('episodeModel'),'model-b');
+});
+
+test('collapsing a playing model pauses it, clears its deep link and restores its playhead on reopening',()=>{
+ const r=replay({withVideo:true});
+ r.host.oninput({target:{id:'task-episode-seek',value:'2.4'}});r.clickPlay();
+ r.video.readyState=4;r.video.currentTime=2.8;
+ const pauses=r.video.pauseCount;r.clickModel('model-a');
+ assert.equal(r.video.pauseCount,pauses+1);
+ assert.doesNotMatch(r.host.innerHTML,/id="task-episode-seek"/);
+ assert.equal(r.context.location.searchParams.get('episodeModel'),null);
+ assert.equal(r.context.location.searchParams.get('episode'),null);
+ r.clickModel('model-a');
+ assert.equal(r.element('#task-episode-seek').value,2.8,'capture the video clock even between timeupdate events');
+ assert.equal(r.context.location.searchParams.get('episode'),'recording-1');
+});
+
+test('a direct model recording link expands the requested row on arrival',()=>{
+ const r=replay({withResults:true,search:'?data=demo&episode=recording-1'});
+ assert.match(r.host.innerHTML,/data-replay-model="model-a" aria-expanded="true"/);
+ assert.match(r.host.innerHTML,/id="task-episode-seek"/);
 });
