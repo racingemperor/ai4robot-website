@@ -6,7 +6,7 @@ window.Lab = (() => {
   const reportPages=['board','compare','matrix','episodes'];
   const storageKey=Results.storageKey;
   const query=new URLSearchParams(location.search);
-  const L={tab:currentPage==='leaderboard'?(Site.section==='comparison'?'compare':'board'):currentPage==='tasks'?(Site.section==='episodes'?'episodes':'matrix'):currentPage==='report'?(Site.section==='resources'?'about':'run'):currentPage,source:query.get('data')==='demo'?'demo':'official',imported:null,importedSynthetic:false,importedSaved:false,track:'all',category:'all',group:'all',robot:'all',sort:'score',direction:-1,modelQuery:'',compare:[],episode:'',episodeTask:'all',episodeModel:'all',status:'all',time:0,speed:'1',playing:false,raf:0,last:0,videoURL:'',videoEpisode:'',message:'',runTask:'T06',runMode:'solve',runAgent:'vlm',runModel:'mock',gpu:'0',seeds:'0',layouts:'0,1,2',camera:'head'};
+  const L={tab:currentPage==='leaderboard'?(Site.section==='comparison'?'compare':'board'):currentPage==='tasks'?(Site.section==='episodes'?'episodes':'matrix'):currentPage==='report'?(Site.section==='resources'?'about':'run'):currentPage,source:query.get('data')==='demo'?'demo':'official',imported:null,importedSynthetic:false,importedSaved:false,track:'all',category:'all',group:'all',robot:'all',sort:'score',direction:-1,modelQuery:'',selectedModel:'',taskCategory:'all',scopeOpen:false,compare:[],episode:'',episodeTask:'all',episodeModel:'all',status:'all',time:0,speed:'1',playing:false,raf:0,last:0,videoURL:'',videoEpisode:'',message:'',runTask:'T06',runMode:'solve',runAgent:'vlm',runModel:'mock',gpu:'0',seeds:'0',layouts:'0,1,2',camera:'head'};
   for(const key of ['track','category','group','robot','sort','modelQuery','episodeTask','episodeModel','status','episode']){const value=query.get(key);if(value&&value.length<160)L[key]=value;}
   if(!['all','A','B','C'].includes(L.track))L.track='all';
   if(!['all',...CATEGORIES.map(c=>c.id)].includes(L.category))L.category='all';
@@ -14,6 +14,7 @@ window.Lab = (() => {
   if(!['all',...TASKS.map(t=>t.robot)].includes(L.robot))L.robot='all';
   if(!['score','pooled','progress','duration','trials','coverage'].includes(L.sort))L.sort='score';
   if(query.get('order')==='asc')L.direction=1;
+  L.selectedModel=(query.get('model')||'').slice(0,160);L.taskCategory=(query.get('taskCategory')||'all').slice(0,160);
   L.compare=(query.get('models')||'').split(',').filter(Boolean).slice(0,3);
   if(TASKS.some(t=>t.id===query.get('task')))L.runTask=query.get('task');
   try{
@@ -42,7 +43,7 @@ window.Lab = (() => {
   }
   function selectedTasks(){return TASKS.filter(t=>(L.category==='all'||t.category===L.category)&&(L.track==='all'||t.track===L.track)&&(L.group==='all'||t.group===L.group)&&(L.robot==='all'||t.robot===L.robot));}
   function summary(ids=selectedTasks().map(t=>t.id)){return Results.summarize(data(),ids);}
-  function orderedRows(){return summary().filter(m=>`${m.name} ${m.agent} ${m.version}`.toLowerCase().includes(L.modelQuery.toLowerCase())).sort((a,b)=>Number(b.complete)-Number(a.complete)||((a[L.sort]??-Infinity)-(b[L.sort]??-Infinity))*L.direction||a.id.localeCompare(b.id));}
+  function orderedRows(ignoreSearch=false){return summary().filter(m=>ignoreSearch||`${m.name} ${m.agent} ${m.version}`.toLowerCase().includes(L.modelQuery.toLowerCase())).sort((a,b)=>Number(b.complete)-Number(a.complete)||((a[L.sort]??-Infinity)-(b[L.sort]??-Infinity))*L.direction||a.id.localeCompare(b.id));}
   function syncURL(){
     const p=new URLSearchParams(location.search);
     if(currentPage==='tasks'&&Site.section==='catalog'){
@@ -53,32 +54,31 @@ window.Lab = (() => {
     const resultKeys=['track','category','group','robot'];
     const episodeKeys=['episodeTask','episodeModel','status','episode'];
     const pageKeys={board:[...resultKeys,'sort','modelQuery'],compare:[...resultKeys,'sort','modelQuery'],matrix:currentPage==='tasks'?[...resultKeys,...episodeKeys]:resultKeys,episodes:[...resultKeys,...episodeKeys],run:[],about:[]};
-    for(const key of ['lab','variant','track','category','group','robot','sort','modelQuery','episodeTask','episodeModel','status','episode','models','order'])p.delete(key);
+    for(const key of ['lab','variant','track','category','group','robot','sort','modelQuery','episodeTask','episodeModel','status','episode','models','order','model','taskCategory'])p.delete(key);
     L.source!=='official'?p.set('data',L.source):p.delete('data');
     for(const key of pageKeys[L.tab]){const v=L[key];if(v&&v!=='all')p.set(key,v);}
     if(currentPage==='leaderboard')p.set('order',L.direction===1?'asc':'desc');
     if(currentPage==='leaderboard'&&L.compare.length)p.set('models',L.compare.join(','));
+    if(currentPage==='leaderboard'&&L.selectedModel)p.set('model',L.selectedModel);
+    if(currentPage==='leaderboard'&&L.taskCategory!=='all')p.set('taskCategory',L.taskCategory);
     if(L.tab==='run')p.set('task',L.runTask);else if(!['tasks','report'].includes(currentPage))p.delete('task');
     history.replaceState({},'',location.pathname+(p.size?'?'+p:'')+location.hash);Site.refreshLinks();
   }
   function pageLink(page,extra){return h(Site.href(page,extra));}
   const option=(value,text,active)=>`<option value="${h(value)}"${value===active?' selected':''}>${h(text)}</option>`;
-  function html(){return `<section class="research page-workspace" id="research">${reportPages.includes(L.tab)?`<div class="lab-source"><div><strong id="source-label">${sourceLabel()}</strong><span id="source-description"></span></div><div class="lab-actions"><button class="lab-button" data-lab-action="demo">${L.source==='demo'?'View official results':'Load synthetic example'}</button><button class="lab-button" data-lab-action="import">Import JSON</button>${L.imported?'<button class="lab-button" data-lab-action="stored">View imported report</button><button class="lab-button" data-lab-action="clear-import">Clear import</button>':''}<button class="lab-button" data-lab-action="share">Copy view link</button></div></div>`:''}<input id="result-upload" type="file" accept=".json,application/json" hidden><p id="lab-message" class="lab-message" role="status" aria-live="polite">${h(L.message)}</p><div id="lab-filters"></div><div id="lab-panel"></div></section>`;}
+  function html(){
+    const tools=`<div class="lab-actions"><button class="lab-button" data-lab-action="demo">${L.source==='demo'?'View official results':'Load synthetic example'}</button><button class="lab-button" data-lab-action="import">Import JSON</button>${L.imported?'<button class="lab-button" data-lab-action="stored">View imported report</button><button class="lab-button" data-lab-action="clear-import">Clear import</button>':''}<button class="lab-button" data-lab-action="share">Copy view link</button>${L.tab==='board'?'<button class="lab-button" data-lab-action="csv">Export CSV</button><button class="lab-button" data-lab-action="json">Download report</button>':''}</div>`;
+    return `<section class="research page-workspace" id="research">${reportPages.includes(L.tab)?`<div class="lab-source"><div><strong id="source-label">${sourceLabel()}</strong><span id="source-description"></span></div>${L.tab==='board'?`<details class="leaderboard-data-tools"><summary>Data &amp; exports <span aria-hidden="true">⌄</span></summary>${tools}</details>`:tools}</div>`:''}<input id="result-upload" type="file" accept=".json,application/json" hidden><p id="lab-message" class="lab-message" role="status" aria-live="polite">${h(L.message)}</p><div id="lab-filters"></div><div id="lab-panel"></div></section>`;
+  }
   function filters(){return `<div class="lab-filters"><label>Evaluation category<select data-lab-filter="category">${option('all','All categories',L.category)}${CATEGORIES.map(c=>option(c.id,c.name,L.category)).join('')}</select></label><label>Delivery mode<select data-lab-filter="track">${option('all','All delivery modes',L.track)}${[['A','A · Control program'],['B','B · Training'],['C','C · Artifact construction']].map(([v,t])=>option(v,t,L.track)).join('')}</select></label><label>Capability facet<select data-lab-filter="group">${option('all','All capabilities',L.group)}${GROUPS.map(g=>option(g.id,g.name,L.group)).join('')}</select></label><label>Embodiment / scene<select data-lab-filter="robot">${option('all','All embodiments & scenes',L.robot)}${[...new Set(TASKS.map(t=>t.robot))].map(r=>option(r,r,L.robot)).join('')}</select></label><button class="lab-button" data-lab-action="reset">Reset filters</button><p>${selectedTasks().length} / 22 tasks · <span>Simulation · Single report protocol</span></p></div>`;}
   function empty(text='Reviewed evaluation reports are forthcoming.',kind=L.tab){
     const descriptions={board:'This table will show category-balanced success, progress, pooled trial intervals and task coverage.',compare:'Compare up to three models across five capability facets using common task coverage.',matrix:'Inspect per-task success rates and follow each result into its episode evidence.',episodes:'Explore task/model filters, event seeking and attached video after a report is loaded.'};
     return `<div class="lab-empty empty-${kind}"><h3>${text}</h3><p>${descriptions[kind]||''}</p><p>Load synthetic data to explore this page, or import a report. Examples do not represent real model performance.</p><button class="lab-button solid" data-lab-action="load-demo">Explore synthetic example</button><button class="lab-button" data-lab-action="template">Download report template</button>${kind==='compare'?'<div class="empty-comparison"><span>Model A · Awaiting a report</span><span>Model B · Awaiting a report</span><span>Common tasks · Awaiting results</span></div>':''}</div>`;
   }
-  function boardPlaceholders(){
-    const slots=Array.from({length:10},(_,i)=>`Model slot ${String(i+1).padStart(2,'0')}`).filter(name=>name.toLowerCase().includes(L.modelQuery.toLowerCase()));
-    return `<div class="layout-preview-note"><strong>10 model positions</strong><span>Layout placeholders · Models and measured results have not been added.</span></div><div class="table-scroll" role="region" aria-label="Leaderboard layout with ten model positions; horizontally scrollable" tabindex="0"><table class="results-table placeholder-table"><caption>Reserved positions, not a ranking or evaluation report</caption><thead><tr>${['Rank','Model / agent','Balanced success','Pooled success','Progress / 100','Mean sim. time','Trials','Task coverage'].map(label=>`<th scope="col">${label}</th>`).join('')}</tr></thead><tbody>${slots.map(name=>`<tr data-placeholder="model"><td>—</td><th scope="row"><strong>${name}</strong><small>Model name · version · agent</small></th>${Array.from({length:6},()=>'<td><span class="metric-placeholder">—</span></td>').join('')}</tr>`).join('')||'<tr><td colspan="8">No matching model positions.</td></tr>'}</tbody></table></div>`;
-  }
   function board(){
-    const rows=orderedRows();
-    const ids=selectedTasks().map(t=>t.id);
-    let rank=0,previous=null,position=0;
-    const sortButton=(key,text)=>`<button data-sort="${key}">${text} <span aria-hidden="true">${L.sort===key?(L.direction===-1?'↓':'↑'):'↕'}</span></button>`;
-    return `<div class="panel-heading"><div><h2>Leaderboard</h2><p>Compare one protocol and task scope. Incomplete coverage receives no rank.</p></div><div class="lab-actions"><button class="lab-button" data-lab-action="csv">Export table CSV</button><button class="lab-button" data-lab-action="json">Download active report</button></div></div><label class="model-search">Search model or agent<input id="model-search" type="search" placeholder="Name / version / agent" value="${h(L.modelQuery)}"></label>${data().models.length?`<div class="table-scroll" tabindex="0" role="region" aria-label="Leaderboard; horizontally scrollable"><table class="results-table"><caption>${sourceLabel()} · ${h(data().benchmark_version)} · ${h(data().protocol)}</caption><thead><tr><th scope="col">Rank</th><th scope="col">Model / agent</th>${[['score','Balanced success'],['pooled','Pooled success'],['progress','Progress / 100'],['duration','Mean sim. time'],['trials','Trials'],['coverage','Task coverage']].map(([k,n])=>`<th scope="col" aria-sort="${L.sort===k?(L.direction===-1?'descending':'ascending'):'none'}">${sortButton(k,n)}</th>`).join('')}</tr></thead><tbody>${rows.length?rows.map(m=>{if(m.complete){position++;if(previous!==m[L.sort])rank=position;previous=m[L.sort];}return `<tr><td class="rank">${m.complete?String(rank).padStart(2,'0'):'—'}</td><th scope="row"><strong>${h(m.name)}</strong><small>${h(m.version)} · ${h(m.agent)}</small></th><td><strong>${pct(m.score)}</strong></td><td><strong>${pct(m.pooled)}</strong><small>${m.ci?`95% CI ${pct(m.ci[0])}–${pct(m.ci[1])}`:'No trials'}</small></td><td>${points(m.progress)}</td><td>${fmt(m.duration)}</td><td>${m.trials}</td><td>${m.coverage} / ${ids.length}<small>${m.complete?'Complete':'Incomplete · unranked'}</small></td></tr>`;}).join(''):'<tr><td colspan="8">No matching models.</td></tr>'}</tbody></table></div>`:boardPlaceholders()}<details class="metric-notes"><summary>Ranking and aggregation</summary><p>The full catalog uses the five categories defined in the EGE abstract. Balanced success = mean of task success rates within each selected category, then mean of those category values. Progress uses the same aggregation, displayed in 0–100 points. Pooled success = total successes / total valid trials, shown separately with a Wilson 95% interval; that interval is not uncertainty for the balanced score. Mean simulation time = total simulation seconds / trials. Full selected-task coverage is required for ranking; missing results are not zero-filled. Partial balanced summaries are unavailable if a selected category has no data. Ties share a rank. Time sorts ascending by default. Only one report and protocol are active; final release settings must be frozen and recorded.</p><p>The EGE manuscript also specifies total elapsed wall-clock time and token consumption. These are separate from simulation time and are not included in this report format yet. <a class="text-link" href="${Site.href('method')}#fair-evaluation">Read the evaluation metrics ↗</a></p></details>`;
+    const view=Leaderboard.render({report:data(),rows:orderedRows(true),tasks:selectedTasks(),source:L.source,synthetic:L.source==='demo'||(L.source==='imported'&&L.importedSynthetic),modelQuery:L.modelQuery,selectedModel:L.selectedModel,taskCategory:L.taskCategory,sort:L.sort,direction:L.direction,href:Site.href});
+    L.selectedModel=view.selectedModel;L.taskCategory=view.taskCategory;
+    return view.html+`<details class="metric-notes"><summary>How the ranking is calculated</summary><p>Overall success averages task success rates within each selected category, then averages those category means equally. The full catalog uses five distinct categories from the manuscript. Progress follows the same aggregation on a 0–100 scale. Missing tasks are never zero-filled; complete selected-task coverage is required for a rank. Ties share a rank. Sort controls change the order; overall bars always show category-balanced success.</p><p>Pooled success is total successes divided by valid trials. Its Wilson 95% interval is included in the CSV export; it does not describe uncertainty in the category-balanced score. Mean simulation time includes all valid trials. The manuscript also specifies wall-clock time and token consumption, which are not connected to this report format yet. <a class="text-link" href="${Site.href('method')}#fair-evaluation">Evaluation method ↗</a></p></details>`;
   }
   function compare(){
     const models=data().models;
@@ -138,7 +138,7 @@ window.Lab = (() => {
       q('[data-lab-action="demo"]',q('.lab-source')).textContent=L.source==='demo'?'View official results':'Load synthetic example';
     }
     root.dataset.source=L.source;
-    q('#lab-filters').innerHTML=['board','compare','matrix'].includes(L.tab)?filters():L.tab==='episodes'&&[L.track,L.category,L.group,L.robot].some(v=>v!=='all')?`<div class="episode-scope"><span>Task scope carried from results: ${selectedTasks().length} / 22 tasks</span><button class="lab-button" data-lab-action="reset">Show all tasks</button></div>`:'';
+    q('#lab-filters').innerHTML=L.tab==='board'?`<details class="leaderboard-scope"${L.scopeOpen?' open':''}><summary>Evaluation scope · ${selectedTasks().length} / 22 tasks</summary>${filters()}</details>`:['compare','matrix'].includes(L.tab)?filters():L.tab==='episodes'&&[L.track,L.category,L.group,L.robot].some(v=>v!=='all')?`<div class="episode-scope"><span>Task scope carried from results: ${selectedTasks().length} / 22 tasks</span><button class="lab-button" data-lab-action="reset">Show all tasks</button></div>`:'';
     q('#lab-panel').innerHTML=({board,compare,matrix,episodes,run,about})[L.tab]();
     q('#lab-message').textContent=L.message;
     if(L.tab==='run')updateCommand();if(L.tab==='episodes'){updateTime();wireVideo();}
@@ -211,11 +211,14 @@ window.Lab = (() => {
     const root=q('#research');if(!root)return;renderPanel();
     root.addEventListener('click',event=>{
       const b=event.target.closest('button');if(!b)return;
+      if(b.dataset.boardModel){L.selectedModel=b.dataset.boardModel;renderPanel();const detail=q('#model-breakdown');q('#model-breakdown-title')?.focus({preventScroll:true});detail?.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});return;}
       if(b.dataset.sort){L.direction=L.sort===b.dataset.sort?-L.direction:b.dataset.sort==='duration'?1:-1;L.sort=b.dataset.sort;renderPanel();return;}
       if(b.dataset.episode){clearVideo();L.episode=b.dataset.episode;L.time=0;renderPanel();q('#episode-video-title')?.focus({preventScroll:true});return;}
       if(b.dataset.eventIndex!==undefined){L.time=currentEpisode().events[Number(b.dataset.eventIndex)].time_s;const video=q('#episode-video');if(video)video.currentTime=L.time;updateTime();return;}
       const action=b.dataset.labAction;
+      if(action)b.closest('.leaderboard-data-tools')?.removeAttribute('open');
       if(action==='demo'||action==='load-demo'){clearVideo();L.source=action==='load-demo'?'demo':L.source==='demo'?'official':'demo';L.episode='';L.episodeModel=L.status='all';L.time=0;L.compare=[];L.message='';syncURL();renderPanel();}
+      if(action==='board-direction'){L.direction=-L.direction;renderPanel();}
       if(action==='reset'){L.track=L.category=L.group=L.robot='all';L.episodeTask=L.episodeModel=L.status='all';renderPanel();}
       if(action==='import')q('#result-upload').click();
       if(action==='stored'&&L.imported){clearVideo();L.source='imported';L.time=0;L.compare=[];L.episode='';L.episodeTask=L.episodeModel=L.status='all';renderPanel();}
@@ -238,6 +241,9 @@ window.Lab = (() => {
     });
     root.addEventListener('change',async event=>{
       const el=event.target;
+      if(el.id==='leaderboard-sort'){L.sort=el.value;L.direction=el.value==='duration'?1:-1;renderPanel();}
+      if(el.id==='leaderboard-model-select'){L.selectedModel=el.value;renderPanel();}
+      if(el.id==='leaderboard-task-category'){L.taskCategory=el.value;renderPanel();}
       if(el.dataset.labFilter){L[el.dataset.labFilter]=el.value;renderPanel();}
       if(el.dataset.episodeFilter){L[el.dataset.episodeFilter]=el.value;L.episode='';L.time=0;clearVideo();renderPanel();}
       if(el.dataset.compareChoice){if(el.checked&&L.compare.length>=3){el.checked=false;message('Compare at most three models.');return;}L.compare=el.checked?[...L.compare,el.dataset.compareChoice]:L.compare.filter(id=>id!==el.dataset.compareChoice);if(!L.compare.length){L.compare=[el.dataset.compareChoice];message('Keep at least one model selected.');}renderPanel();}
@@ -256,6 +262,7 @@ window.Lab = (() => {
       if(el.id==='episode-seek'){L.time=Number(el.value);const video=q('#episode-video');if(video)video.currentTime=L.time;updateTime();}
       if(el.closest('#run-form')){const keys={task:'runTask',mode:'runMode',gpu:'gpu',seeds:'seeds',layouts:'layouts',camera:'camera',agent:'runAgent',model:'runModel'};if(keys[el.name])L[keys[el.name]]=el.value;updateCommand();if(el.name==='task'){const p=new URLSearchParams(location.search);p.set('task',L.runTask);history.replaceState({},'',location.pathname+'?'+p+location.hash);Site.refreshLinks();}}
     });
+    root.addEventListener('toggle',event=>{if(event.target.matches('.leaderboard-scope'))L.scopeOpen=event.target.open;},true);
     root.addEventListener('submit',e=>{if(e.target.id==='run-form')e.preventDefault();});
   }
   document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();updateTime();}});
@@ -296,6 +303,7 @@ window.Lab = (() => {
     if(currentPage==='leaderboard'){
       L.tab=Site.section==='comparison'?'compare':'board';
       L.sort=['score','pooled','progress','duration','trials','coverage'].includes(p.get('sort'))?p.get('sort'):'score';
+      L.selectedModel=(p.get('model')||'').slice(0,160);L.taskCategory=(p.get('taskCategory')||'all').slice(0,160);
       L.direction=p.get('order')==='asc'?1:-1;L.modelQuery=(p.get('modelQuery')||'').slice(0,160);
       L.compare=(p.get('models')||'').split(',').filter(Boolean).slice(0,3);
     }

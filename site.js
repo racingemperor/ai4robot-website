@@ -13,11 +13,11 @@ window.Site=(()=>{
  const pages={
   home:['index.html','Home','AI4Robot','Code meets the physical world.','LLM EMBODIMENT BENCHMARK'],
   tasks:['tasks.html','Task','Inside each task.','Explore 22 tasks, compare model results and replay each episode with synchronized observations, responses and code.','THE TASK COLLECTION'],
-  leaderboard:['leaderboard.html','Leaderboard','How do models perform?','Measure reliability across repeated trials. Compare success, progress and coverage under one recorded evaluation protocol.','MODEL PERFORMANCE'],
+  leaderboard:['leaderboard.html','Leaderboard','Leaderboard','Start with overall performance, then select a model to explore its results across all 22 tasks.','MODEL PERFORMANCE'],
   report:['report.html','Report','Understand, reproduce, contribute.','Explore the EGE manuscript, benchmark design and evaluation method, then configure a run or access the research resources.','RESEARCH DOCUMENTATION']
  };
  const page=document.body.dataset.page,resultPages=['tasks','leaderboard'];
- const sections={tasks:[['catalog','Task catalog'],['matrix','Results matrix'],['episodes','Episode replay']],leaderboard:[['ranking','Ranking'],['comparison','Model comparison']],report:[['method','Method'],['run','Run'],['resources','Resources']]};
+ const sections={tasks:[['catalog','Task catalog'],['matrix','Results matrix'],['episodes','Episode replay']],leaderboard:[['ranking','Overall'],['comparison','Model comparison']],report:[['method','Method'],['run','Run'],['resources','Resources']]};
  const section=()=>sections[page]?.find(([id])=>id===new URLSearchParams(location.search).get('section'))?.[0]||sections[page]?.[0][0];
  function href(id,overrides={}){
   const aliases={episodes:['tasks','episodes'],documents:['report',null],compare:['leaderboard','comparison'],matrix:['tasks','matrix'],method:['report','method'],run:['report','run'],about:['report','resources']};
