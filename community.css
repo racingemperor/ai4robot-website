@@ -1,0 +1,13 @@
+[data-page=community] #main{max-width:1200px;margin-inline:auto}
+[data-page=community] .page-heading-meta{display:none}
+[data-page=community] #page-content{padding:16px var(--gutter) 64px}
+.community-channels{display:grid;grid-template-columns:repeat(2,minmax(0,320px));gap:40px;align-items:start}
+.community-channels h2{font-size:24px;font-weight:650;margin-bottom:18px}
+.community-card{margin:0;border:1px solid var(--line);border-radius:18px;padding:22px;background:var(--surface)}
+.community-card img{display:block;width:100%;height:auto;object-fit:contain;border-radius:10px;background:#fff}
+.community-invitation{display:block;border-radius:10px;cursor:zoom-in}
+.community-code-slot{aspect-ratio:1;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;border:1px dashed var(--line);border-radius:10px;background:var(--paper);color:var(--muted);font-size:14px}
+.community-code-slot>span:first-child{font-size:34px;font-weight:300}
+.community-card figcaption{font-size:14px;line-height:1.8;text-align:center;margin-top:20px}
+.community-github{margin-top:28px}.community-github a{display:inline-flex;align-items:center;min-height:44px}
+@media(max-width:650px){.community-channels{grid-template-columns:minmax(0,320px);gap:28px}.community-card{padding:20px}}

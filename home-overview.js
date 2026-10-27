@@ -21,9 +21,8 @@ window.HomeOverview = (() => {
   <p>Models may reason, use tools, write control programs, construct artifacts or develop robot policies under task-specific constraints. The evaluated foundation model remains unchanged. Repeated trials and explicit success criteria are designed to reveal both capability and reliability, with video, observations, model responses and submitted code connected to the same episode.</p>
  </div></section>`;}
  function shell(){return `<section id="home-overall" class="section home-overall" aria-labelledby="home-overall-title">
-  <div class="home-overall-heading"><div><h2 id="home-overall-title">Overall leaderboard</h2><p>One success rate across the five manuscript task categories.</p></div><a class="text-link" id="home-overall-link" href="${Site.href('leaderboard')}">Full leaderboard ↗</a></div>
+  <div class="home-overall-heading"><div><h2 id="home-overall-title">Overall leaderboard</h2></div><a class="text-link" id="home-overall-link" href="${Site.href('leaderboard')}">Full leaderboard ↗</a></div>
   <div class="home-overall-panel"><div id="home-overall-chart"></div></div>
-  <p class="home-overall-note">Overall averages task success rates within each category, then weights the five categories equally. A rank requires all 22 tasks; a dash means no complete result.</p>
  </section>`;}
  function board(report,source='official'){
   const rows=Results.summarize(report,TASKS.map(t=>t.id));

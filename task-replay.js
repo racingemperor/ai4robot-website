@@ -3,8 +3,8 @@ window.TaskReplay=(()=>{
  const h=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const pct=v=>v==null?'—':`${(v*100).toFixed(1)}%`;
  const localVideos=new Map(),positions=new Map(),selections=new Map();
- let host=null,activeTask=null,mountVersion=0,playVersion=0,activeModel='',activeEpisode='',modelOpen=false,source='official',saved=null,memoryImport=false,ignoreStored=false,playing=false,raf=0,last=0,speed=1,time=0,notice='';
- const report=()=>source==='demo'?Results.demo:source==='imported'&&saved?saved.report:Results.official;
+ let host=null,activeTask=null,recordingContext=null,mountVersion=0,playVersion=0,activeModel='',activeEpisode='',modelOpen=false,source='official',saved=null,memoryImport=false,ignoreStored=false,playing=false,raf=0,last=0,speed=1,time=0,notice='';
+ const report=()=>recordingContext?.report||(source==='demo'?Results.demo:source==='imported'&&saved?saved.report:Results.official);
  const models=()=>source==='official'&&!report().models.length?Leaderboard.roster:report().models;
  const key=e=>`${source}:${e.model_id}:${e.id}`;
  const taskKey=()=>`${source}:${activeTask.id}`;
@@ -21,8 +21,15 @@ window.TaskReplay=(()=>{
   playing=false;cancelAnimationFrame(raf);video?.pause();
   const button=host.querySelector('[data-replay-action="play"]');if(button){button.innerHTML=Evidence.playbackIcon(false);button.setAttribute('aria-label','Play');}
  }
- function unmount(){suspend();mountVersion++;host=null;activeTask=null;}
+ function unmount(){suspend();mountVersion++;host=null;activeTask=null;recordingContext=null;}
+ function clearImportedRecordings(){
+  if(source==='imported')suspend();
+  for(const [k,v]of localVideos)if(k.startsWith('imported:')){URL.revokeObjectURL(v.url);localVideos.delete(k);}
+  for(const k of positions.keys())if(k.startsWith('imported:'))positions.delete(k);
+  for(const k of selections.keys())if(k.startsWith('imported:'))selections.delete(k);
+ }
  function syncURL(){
+  if(recordingContext)return;
   const url=new URL(location.href);url.searchParams.set('task',activeTask.id);url.searchParams.delete('section');
   url.searchParams.set('data',source);
   modelOpen&&activeModel?url.searchParams.set('episodeModel',activeModel):url.searchParams.delete('episodeModel');
@@ -62,6 +69,7 @@ window.TaskReplay=(()=>{
  }
  function draw(){
   const e=episode();
+  if(recordingContext){host.innerHTML=e?viewer(e):'<p class="task-recording-empty">No recordings for this model on this task.</p>';if(e){updateTime();wireVideo();}return;}
   host.innerHTML=`<div class="task-replay-toolbar"><button type="button" class="lab-button" data-replay-action="import">Import JSON</button>${saved?'<button type="button" class="text-link" data-replay-action="clear-import">Clear local report</button>':''}<input type="file" id="task-report-upload" accept=".json,application/json" hidden></div><p id="task-replay-notice" role="status">${h(notice)}</p>${modelList()}`;
   if(modelOpen&&e){updateTime();wireVideo();}
  }
@@ -107,15 +115,15 @@ window.TaskReplay=(()=>{
   if(video){const attempt=++playVersion,version=mountVersion;video.currentTime=time;video.playbackRate=speed;video.play().catch(()=>{if(attempt!==playVersion||version!==mountVersion||host?.querySelector('video')!==video)return;playing=false;updateTime();host.querySelector('#task-video-status').textContent='Playback failed. Check the recording or use its video controls.';});updateTime();return;}
   last=performance.now();const tick=now=>{if(!playing||!host?.isConnected)return;time+=(now-last)/1000*speed;last=now;if(time>=e.duration_s){time=e.duration_s;playing=false;}updateTime();if(playing)raf=requestAnimationFrame(tick);};raf=requestAnimationFrame(tick);updateTime();
  }
- function mount(element,task){
-  suspend();mountVersion++;host=element;activeTask=task;notice='';
-  if(!memoryImport&&!ignoreStored)try{saved=Results.readSaved(sessionStorage);}catch{saved=null;notice='Saved results are unavailable. You can import a report below.';}
-  const p=new URLSearchParams(location.search);source=p.get('data')==='imported'&&saved?'imported':Results.sourceFor(p.get('data'));
-  const selection=selections.get(taskKey());activeModel=p.get('episodeModel')||selection?.model||models()[0]?.id||'';
+ function mountView(element,task,context=null){
+  suspend();mountVersion++;host=element;activeTask=task;recordingContext=context;notice='';
+  if(!context&&!memoryImport&&!ignoreStored)try{saved=Results.readSaved(sessionStorage);}catch{saved=null;notice='Saved results are unavailable. You can import a report below.';}
+  const p=new URLSearchParams(context?'':location.search);source=context?.source||(p.get('data')==='imported'&&saved?'imported':Results.sourceFor(p.get('data')));
+  const selection=selections.get(taskKey());activeModel=context?.modelId||p.get('episodeModel')||selection?.model||models()[0]?.id||'';
   if(!models().some(m=>m.id===activeModel))activeModel=models()[0]?.id||'';
   const linkedEpisode=report().episodes.find(e=>e.task_id===activeTask.id&&e.id===p.get('episode'));
   if(linkedEpisode)activeModel=linkedEpisode.model_id;
-  modelOpen=!!activeModel&&(p.has('episodeModel')||!!linkedEpisode||selection?.open===true);
+  modelOpen=!!activeModel&&(!!context||p.has('episodeModel')||!!linkedEpisode||selection?.open===true);
   const id=p.get('episode')||selections.get(modelKey())?.episode;activeEpisode=episodes().some(e=>e.id===id)?id:episodes()[0]?.id||'';
   time=episode()?positions.get(key(episode()))||0:0;
   host.onclick=event=>{
@@ -127,7 +135,7 @@ window.TaskReplay=(()=>{
    if(action==='import')host.querySelector('#task-report-upload').click();
    if(action==='remove-video'){suspend();const record=localVideos.get(key(episode()));if(record)URL.revokeObjectURL(record.url);localVideos.delete(key(episode()));draw();}
    if(action==='clear-import'){
-    suspend();let removed=true;try{sessionStorage.removeItem(Results.storageKey);}catch{removed=false;}saved=null;memoryImport=false;ignoreStored=true;source=Results.defaultSource();activeEpisode='';notice=removed?'Local report cleared.':'Report cleared from this page. Storage removal failed; close this tab to end the stored session.';chooseModel('');
+    clearImportedRecordings();let removed=true;try{sessionStorage.removeItem(Results.storageKey);}catch{removed=false;}saved=null;memoryImport=false;ignoreStored=true;source=Results.defaultSource();activeEpisode='';notice=removed?'Local report cleared.':'Report cleared from this page. Storage removal failed; close this tab to end the stored session.';chooseModel('');
    }
   };
   host.oninput=event=>{if(event.target.id==='task-episode-seek')seek(event.target.value);};
@@ -146,9 +154,7 @@ window.TaskReplay=(()=>{
      if(file.size>5*1024*1024)throw new Error('The report exceeds 5 MB.');
      const raw=JSON.parse(await file.text()),checked=Results.validate(raw);
      if(mountVersion!==versionAtRead||!host?.isConnected)return;
-     suspend();for(const [k,v]of localVideos)if(k.startsWith('imported:')){URL.revokeObjectURL(v.url);localVideos.delete(k);positions.delete(k);}
-     for(const k of positions.keys())if(k.startsWith('imported:'))positions.delete(k);
-     for(const k of selections.keys())if(k.startsWith('imported:'))selections.delete(k);
+     suspend();clearImportedRecordings();
      saved={report:checked,synthetic:raw.website_data_source==='demo'};source='imported';activeEpisode='';
      notice=`Validated ${checked.models.length} models and ${checked.episodes.length} recordings.`;
      ignoreStored=false;memoryImport=false;try{sessionStorage.setItem(Results.storageKey,JSON.stringify(saved));}catch{memoryImport=true;try{sessionStorage.removeItem(Results.storageKey);}catch{}notice+=' Storage unavailable; results remain on this page only.';}
@@ -159,7 +165,9 @@ window.TaskReplay=(()=>{
   };
   draw();syncURL();
  }
+ const mount=(element,task)=>mountView(element,task);
+ const mountRecording=(element,task,context)=>mountView(element,task,context);
  document.addEventListener('visibilitychange',()=>{if(document.hidden)suspend();});
  window.addEventListener('pagehide',()=>{suspend();for(const v of localVideos.values())URL.revokeObjectURL(v.url);localVideos.clear();});
- return {mount,suspend,unmount};
+ return {mount,mountRecording,suspend,unmount,clearImportedRecordings};
 })();

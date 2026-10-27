@@ -10,11 +10,12 @@ An English static website for 22 embodied tasks (T01–T23 excluding T18). Task 
 |---|---|
 | Home | Flowing task wall, title and benchmark scale, paper metadata, News, overview-video placeholder, introduction, compact Overall bar leaderboard and shared footer |
 | Task | Illustrated searchable task gallery; each floating task window contains its objective, model results, synchronized model recordings, paper categories, completion checks and evidence |
-| Leaderboard | Five manuscript categories plus Overall in a model-colored line chart, sortable 22-task table, model result windows and report data tools |
+| Leaderboard | News, five manuscript categories plus Overall in a model-colored line chart, sortable 22-task table, inline task recordings within model result windows and report data tools |
 | Report | Publications, project announcements and external coverage; no methods, CLI configurator or nested documentation views |
-| Contribute | Contribution guidelines, material checklists and downloadable or GitHub proposal drafts |
+| Contribute | Short invitations for new tasks, methods and models, with GitHub proposals and a contact link |
+| Community | WeChat and QQ group QR areas and a GitHub contact link |
 
-The fixed header has five links: Home, Task, Leaderboard, Report and Contribute. The logo is static. Each link opens one page with continuous content; there are no secondary page tabs, side indexes or hidden subpages. Expandable model rows and episode selectors change data in place. Task windows have no internal content tabs.
+The fixed header opens Home, Task, Leaderboard, Report, Contribute and Community. Code links to the research GitHub repository; Dataset has no target until its URL is supplied. The logo is static. Each page contains continuous content without secondary page tabs or side indexes. Expandable task/model rows and episode selectors change data in place.
 
 Eight legacy HTML URLs remain usable. Episodes opens its concrete Task recording, Compare and Matrix open Leaderboard, and Documents / Method / Run / About / Footage open Report. Old section parameters are discarded. The task, model, episode and result source remain shareable; a recording link clears task-category filters that could exclude its target.
 
@@ -41,17 +42,19 @@ Each task presents compact model rows with proportional success bars: 60% fills 
 
 No official footage or reviewed results are currently connected. The empty official task viewer provides a 90-second media layout for each planned model; these are presentation placeholders and are never exported as measured records. A model with results but no episode shows its scores and a recording empty state. Only recorded input/output/code at or before the playhead is displayed.
 
-Home retains its compact Overall board and original footer. Its model rows open the matching model details in Leaderboard. Map real wall clips in HOME_VIDEOS in app.js. Task filtering and card labels use the five paper categories; custom capability filters and model-search controls have been removed.
+Home retains its compact Overall board and original footer, without the subtitle or scoring footnote beneath the board. Its model rows open the matching model details in Leaderboard. Map real wall clips in HOME_VIDEOS in app.js. Task filtering and card labels use the five paper categories; custom capability filters and model-search controls have been removed.
+
+Leaderboard model checkboxes, logos and names only toggle curve visibility. Click a curve or table score to open a model’s results. Each task row in that window expands the shared synchronized player, without navigating to Task. Only one recording panel opens at a time; closing or switching pauses playback and retains the episode’s position. News appears above the chart. Ranking methodology is not rendered below the table.
 
 ## Publications and contributions
 
 Report follows a simple publication-entry layout inspired by LIBERO-Pro 2.0. It lists the EGE paper and website announcement. Unfilled publication metadata and press announcements are omitted. Public paper links, authors, venue and press links are added when supplied. No reference-site papers, invented publication claims or raw manuscript archives are published.
 
-Contribute explains evaluation, harness, task and research-tool contributions. Its selector updates the material checklist; downloading a proposal or opening a prefilled GitHub issue does not submit anything automatically.
+Contribute presents three short invitations: new tasks, new methods and new models. Each opens an editable GitHub proposal; nothing is submitted automatically. Community provides WeChat and QQ group areas and a GitHub contact link. Add the project’s actual QR image paths to channels in community.js; supplied images open at full size. Other projects’ QR codes and unprovided contact details are not used.
 
 ## Modules and publication
 
-site.js owns direct navigation and compatibility routing. app.js renders Home and the task gallery/details. task-replay.js/css own model performance and per-episode playback/media state. leaderboard.js/css render the chart, task table and model dossier; lab.js controls that single Leaderboard view and imports/exports. report.js/css own publication entries. results.js validates and summarizes reports; evidence.js selects timestamped snapshots. motion.js controls the task-window transition, wall and reveals. theme.js/css and typography.css provide shared appearance. contribute.js/css own proposals. tasks.js defines the reviewed catalog; illustrations.js provides original task concepts.
+site.js owns direct navigation, shared News and compatibility routing. app.js renders Home and the task gallery/details. task-replay.js/css own model performance and per-episode playback/media state, including fixed-model recordings for Leaderboard. leaderboard.js/css render the chart, task table and model dossier; lab.js controls that single Leaderboard view and imports/exports. report.js/css own publication entries. results.js validates and summarizes reports; evidence.js selects timestamped snapshots. motion.js controls the task-window transition, wall and reveals. theme.js/css and typography.css provide shared appearance. contribute.js/css own proposals; community.js/css own contact cards. tasks.js defines the reviewed catalog; illustrations.js provides original task concepts.
 
 Earlier exploration modules (paper.js, insights.js, home-insights.js, home-flow.js and insights.css) remain source references and are not loaded by current public pages. The website never executes robot programs or requests provider credentials. Simulation mean time is supported; end-to-end wall-clock time and token consumption are not yet stored.
 

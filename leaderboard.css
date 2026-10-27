@@ -157,3 +157,21 @@
 [data-page=leaderboard] .lab-source{justify-content:flex-end}
 
 .curve-unbranded{fill:var(--paper);stroke:var(--model-color);stroke-width:2}
+
+/* Model names in this selector only toggle curve visibility. */
+.chart-model-chip{position:relative;gap:8px;padding:6px 14px 6px 9px;cursor:pointer;font-size:13px;line-height:1.5}
+.chart-model-chip input{position:static;width:16px!important;height:16px;min-height:0;opacity:1;margin:0;accent-color:var(--model-color);flex-shrink:0}
+.chart-model-chip>span:last-child{white-space:nowrap}
+.model-task-name{width:100%;min-height:44px;padding:0;border:0;border-radius:8px;background:transparent;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.model-task-chevron{width:16px;height:16px;flex-shrink:0;margin-left:auto;fill:none;stroke:currentColor;stroke-width:1.5;transition:transform .2s ease}
+.model-task-name[aria-expanded=true] .model-task-chevron{transform:rotate(180deg)}
+.model-task-table [data-model-task]{cursor:pointer}
+.model-task-table [data-model-task]:hover,.model-task-table [data-model-task].is-expanded{background:var(--surface)}
+.model-task-scroll{container-type:inline-size}
+.model-task-recording-row[hidden]{display:none}
+.model-task-recording-row>td{padding:0!important}
+.model-task-recording{position:sticky;left:0;width:100cqw;max-width:100%;padding:16px 18px 22px;margin:0;background:var(--surface);min-width:0;box-sizing:border-box}
+.model-task-recording .task-recording-layout{gap:16px}
+.model-recording-count{font-size:12px;color:var(--muted);white-space:nowrap}
+@media(max-width:760px){.model-task-recording{padding:14px 12px}.model-task-recording .replay-recording-heading{display:block}.model-task-recording .replay-recording-heading p{margin-top:8px}}
+@media(prefers-reduced-motion:reduce){.model-task-chevron{transition:none}}

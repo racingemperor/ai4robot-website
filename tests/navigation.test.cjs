@@ -20,15 +20,17 @@ function site(page='home',search=''){
  return {Site:context.window.Site,shell:element('#app').innerHTML,location:context.location,redirected};
 }
 
-test('all five parent pages expose Home, Task, Leaderboard, Report and Contribute with one current item and a static logo',()=>{
- for(const page of ['home','tasks','leaderboard','report','contribute']){
+test('all six pages expose direct navigation, project resources and a static logo',()=>{
+ for(const page of ['home','tasks','leaderboard','report','contribute','community']){
   const {shell}=site(page);
   const nav=shell.match(/<nav id="primary-nav"[^>]*>(.*?)<\/nav>/)[1];
-  assert.deepEqual([...nav.matchAll(/>([^<]+)<\/a>/g)].map(m=>m[1]),['Home','Task','Leaderboard','Report','Contribute']);
+  assert.deepEqual([...nav.matchAll(/>([^<]+)<\/a>/g)].map(m=>m[1]),['Home','Task','Leaderboard','Report','Contribute','Community']);
   assert.equal([...nav.matchAll(/aria-current="page"/g)].length,1);
   assert.match(shell,/<header[^>]*><span class="brand"/);
   assert.doesNotMatch(shell,/<a class="brand"/);
   assert.doesNotMatch(shell,/section-switch|data-section=|board-page-index/);
+  assert.match(nav,/href="https:\/\/github.com\/ALEXander22568\/AI4Robot"/);
+  assert.match(nav,/<span class="dataset-link" role="link" aria-disabled="true">Dataset<\/span>/);
  }
 });
 

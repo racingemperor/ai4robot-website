@@ -97,3 +97,25 @@
  .home-results-panel,.home-case-panel{border-radius:18px}
 }
 @media(prefers-reduced-motion:reduce){.theme-toggle svg{transition:none!important}}
+
+/* Project resources sit beside the title; Community remains a main page. */
+.site-header{max-width:1190px;width:min(1190px,calc(100% - 48px));gap:18px;padding-inline:24px}
+.site-header nav{gap:22px;margin-left:auto}
+.header-resource-links{display:flex;align-items:center;gap:14px;margin-right:10px;padding-right:22px;border-right:1px solid var(--line);white-space:nowrap;font-size:13px}
+.header-resource-links a{display:inline-flex;align-items:center;gap:4px;min-height:44px;color:var(--ink);font-weight:600}
+.dataset-link{color:var(--muted);cursor:default}
+.project-news{margin:14px 0 38px}
+.project-news h2{font-size:27px;line-height:1.3;font-weight:650;letter-spacing:-.025em;margin-bottom:18px}
+.project-news-list{border:1px solid var(--line);border-radius:14px;padding:6px 22px;background:var(--surface)}
+.project-news ul{list-style:none;padding:0;margin:0}
+.project-news li{display:grid;grid-template-columns:110px minmax(0,1fr);gap:20px;padding:13px 0;font-size:14px;line-height:1.7}
+.project-news li+li{border-top:1px solid var(--line)}
+.project-news time{color:var(--muted);font-size:13px}.project-news p{margin:0}
+@media(max-width:1100px){
+ .site-header .nav-toggle{display:inline-flex;margin-left:auto;min-height:44px;align-items:center;gap:8px}
+ .site-header nav{display:none;position:absolute;top:74px;left:0;right:0;max-height:calc(100dvh - 110px);margin:0;padding:12px 18px;background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:0 4px 15px #18202810;grid-template-columns:1fr 1fr;gap:2px 20px;overflow:auto}
+ .site-header nav.is-open{display:grid}.site-header #primary-nav>a:nth-child(n){height:44px;min-height:44px;padding:0 6px}
+ .site-header nav>a[aria-current=page]::after{bottom:2px;left:6px;right:auto;width:25px}
+ .header-resource-links{grid-column:1/-1;border-right:0;border-bottom:1px solid var(--line);padding:0 6px 8px;margin:0 0 8px;gap:26px}
+}
+@media(max-width:760px){.site-header{width:calc(100% - 28px);padding-inline:16px;gap:10px}.site-header nav{top:66px}.project-news li{grid-template-columns:1fr;gap:3px;padding-block:12px}.project-news-list{padding-inline:16px}}

@@ -44,14 +44,17 @@ test('partial results distinguish zero success from missing data and never recei
  const measured=view.detailHTML.match(/data-model-task="T01"[\s\S]*?<\/tr>/)[0];
  const missing=view.detailHTML.match(/data-model-task="T21"[\s\S]*?<\/tr>/)[0];
  assert(measured.includes('0.0%'));assert(measured.includes('25.0'));assert(measured.includes('0 / 4'));
- assert(!missing.includes('0.0%'));assert(missing.includes('task-result-pending'));assert(!missing.includes('Awaiting evidence'));
+ assert(!missing.includes('0.0%'));assert(missing.includes('overall-track is-pending'));assert(!missing.includes('Awaiting evidence'));
 });
 
-test('model selection preserves both global ranks and replay links retain the selected model and task',()=>{
+test('model selection preserves global ranks and each task has an inline recording disclosure',()=>{
  const tasks=[context.TASKS[0]],report={models:[{id:'first',name:'First model',agent:'Harness',version:'v1'},{id:'second',name:'Second model',agent:'Harness',version:'v1'}],results:[{model_id:'first',task_id:'T01',trials:2,successes:2,progress_sum:2,duration_sum_s:10},{model_id:'second',task_id:'T01',trials:2,successes:1,progress_sum:1.5,duration_sum_s:20}],episodes:[{model_id:'second',task_id:'T01'}]};
  const view=render({report,rows:Results.summarize(report,['T01']),tasks,source:'imported',selectedModel:'second'});
  assert.equal(view.selectedModel,'second');assert.match(view.html,/<td class="rank-column">2/);
- assert.match(view.detailHTML,/episodes\.html\?episodeTask=T01&amp;episodeModel=second/);
+ assert.match(view.detailHTML,/data-model-task-toggle="T01" aria-expanded="false" aria-controls="model-task-panel-T01"/);
+ assert.match(view.detailHTML,/id="model-task-panel-T01" hidden/);
+ assert.match(view.detailHTML,/data-board-task-replay="T01"/);
+ assert.doesNotMatch(view.detailHTML,/episodes\.html/);
  assert(view.html.includes('50.0%'));assert(view.detailHTML.includes('75.0'));
 });
 
@@ -93,4 +96,5 @@ test('model logos replace graph markers and table monograms for all eight models
  assert.doesNotMatch(view.html,/chip-swatch|model-monogram|<circle|model-search/);
  for(const m of Results.roster)assert(view.html.includes(Results.logoPath(m)));
  assert(view.detailHTML.includes(Results.logoPath(Results.roster[0])));
+ for(const chip of view.html.matchAll(/<label class="chart-model-chip"[\s\S]*?<\/label>/g))assert.doesNotMatch(chip[0],/data-board-model|<button|<a /);
 });

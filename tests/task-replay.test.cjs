@@ -142,3 +142,50 @@ test('a direct model recording link expands the requested row on arrival',()=>{
  assert.match(r.host.innerHTML,/data-replay-model="model-a" aria-expanded="true"/);
  assert.match(r.host.innerHTML,/id="task-episode-seek"/);
 });
+
+test('a fixed-model recording keeps leaderboard URL state and only renders that model’s episode',()=>{
+ const r=replay({withVideo:true});
+ const report={models:[{id:'chosen',name:'Chosen',agent:'Harness'}],results:[],episodes:[{id:'chosen-run',task_id:'T21',model_id:'chosen',duration_s:8,status:'success',seed:1,layout:0,events:[]}]};
+ r.context.location=new URL('https://example.test/leaderboard.html?model=chosen&detail=1&replayTask=T21');
+ const before=r.context.location.href;
+ r.controller.mountRecording(r.host,{id:'T21'},{modelId:'chosen',source:'imported',report});
+ assert.equal(r.context.location.href,before);
+ assert.match(r.host.innerHTML,/chosen-run/);
+ assert.doesNotMatch(r.host.innerHTML,/data-replay-model|task-report-upload/);
+ r.host.oninput({target:{id:'task-episode-seek',value:'3.2'}});
+ r.controller.unmount();
+ r.controller.mountRecording(r.host,{id:'T21'},{modelId:'chosen',source:'imported',report});
+ assert.equal(r.element('#task-episode-seek').value,3.2);
+ assert.equal(r.context.location.href,before);
+});
+
+test('switching fixed-model recordings pauses the old player and ignores its delayed rejection',()=>{
+ const r=replay({withVideo:true});
+ const report=r.context.Results.demo;
+ r.controller.mountRecording(r.host,{id:'T06'},{modelId:'model-a',source:'demo',report});
+ r.clickPlay();const pauses=r.video.pauseCount;
+ r.controller.mountRecording(r.host,{id:'T21'},{modelId:'model-b',source:'demo',report});
+ assert.equal(r.video.pauseCount,pauses+1);
+ assert.match(r.host.innerHTML,/No recordings for this model on this task/);
+ assert.doesNotThrow(()=>r.playFailures[0](new Error('Old playback interrupted')));
+ r.controller.mount(r.host,{id:'T06'});
+ assert.match(r.host.innerHTML,/data-replay-model/,'normal Task view is restored after leaving the fixed-model mode');
+});
+
+test('replacing or clearing an imported report revokes its media and resets reused episode identities',async()=>{
+ const r=replay({withVideo:true}),revoked=[];
+ r.context.URL=class extends URL{static createObjectURL(){return 'blob:old-report';}static revokeObjectURL(url){revoked.push(url);}};
+ const report=r.context.Results.demo;
+ r.controller.mountRecording(r.host,{id:'T06'},{modelId:'model-a',source:'demo',report});
+ r.host.oninput({target:{id:'task-episode-seek',value:'1.2'}});
+ r.controller.mountRecording(r.host,{id:'T06'},{modelId:'model-a',source:'imported',report});
+ await r.host.onchange({target:{id:'task-video-upload',files:[{type:'video/webm',name:'old.webm'}]}});
+ r.host.oninput({target:{id:'task-episode-seek',value:'2.4'}});
+ assert.match(r.host.innerHTML,/blob:old-report/);
+ r.controller.unmount();r.controller.clearImportedRecordings();
+ r.controller.mountRecording(r.host,{id:'T06'},{modelId:'model-a',source:'imported',report});
+ assert.deepEqual(revoked,['blob:old-report']);assert.doesNotMatch(r.host.innerHTML,/blob:old-report|old.webm/);
+ assert.equal(r.element('#task-episode-seek').value,0);
+ r.controller.mountRecording(r.host,{id:'T06'},{modelId:'model-a',source:'demo',report});
+ assert.equal(r.element('#task-episode-seek').value,1.2,'clearing imported data preserves other sources');
+});
