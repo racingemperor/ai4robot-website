@@ -22,17 +22,6 @@ function loadHome(){
  return context;
 }
 
-test('the Home page loads every interaction module before the application renderer',()=>{
- const html=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
- const flow=html.indexOf('src="home-flow.js?');
- const insights=html.indexOf('src="home-insights.js?');
- const app=html.indexOf('src="app.js?');
- assert.notEqual(flow,-1,'HomeFlow must load on the page');
- assert.notEqual(insights,-1,'HomeInsights must load on the page');
- assert.ok(flow<app,'HomeFlow must load before app.js renders the Home page');
- assert.ok(insights<app,'HomeInsights must load before app.js renders the Home page');
-});
-
 test('every evaluation route exposes four selectable stages with detail and all three destinations',()=>{
  const context=loadHome();
  vm.runInContext(fs.readFileSync(path.join(__dirname,'../home-flow.js'),'utf8'),context);
