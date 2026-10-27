@@ -16,11 +16,11 @@ function site(page='home',search=''){
  return {Site:context.window.Site,shell:element('#app').innerHTML,sections:element('#page-content').innerHTML};
 }
 
-test('all four parent pages expose Home, Task, Leaderboard and Report with one current item and a static logo',()=>{
- for(const page of ['home','tasks','leaderboard','report']){
+test('all five parent pages expose Home, Task, Leaderboard, Report and Contribute with one current item and a static logo',()=>{
+ for(const page of ['home','tasks','leaderboard','report','contribute']){
   const {shell}=site(page);
   const nav=shell.match(/<nav id="primary-nav"[^>]*>(.*?)<\/nav>/)[1];
-  assert.deepEqual([...nav.matchAll(/>([^<]+)<\/a>/g)].map(m=>m[1]),['Home','Task','Leaderboard','Report']);
+  assert.deepEqual([...nav.matchAll(/>([^<]+)<\/a>/g)].map(m=>m[1]),['Home','Task','Leaderboard','Report','Contribute']);
   assert.equal([...nav.matchAll(/aria-current="page"/g)].length,1);
   assert.match(shell,/<header[^>]*><span class="brand"/);
   assert.doesNotMatch(shell,/<a class="brand"/);

@@ -25,6 +25,12 @@ window.Lab = (() => {
     if(L.imported)L.source='imported';
     else L.message='No imported report is available in this tab. Select the JSON file again.';
   }
+  let boardView=null;
+  const hiddenModels=new Set();
+  let tableSort=query.get('tableSort')||'overall',tableDirection=query.get('tableOrder')==='asc'?1:-1;
+  if(!['overall',...TASKS.map(t=>t.id)].includes(tableSort))tableSort='overall';
+  const modelDialog=q('#model-focus');
+  const modelWindow=modelDialog?Motion.taskWindow(modelDialog,()=>{const p=new URL(location.href);p.searchParams.delete('detail');history.replaceState({},'',p);},{title:'#model-breakdown-title',preview:false}):null;
   const data=()=>L.source==='demo'?Results.demo:L.source==='imported'?L.imported:Results.official;
   const sourceLabel=()=>({official:'Official results · forthcoming',demo:'Synthetic example · not measured',imported:L.importedSynthetic?'Local import · synthetic · unreviewed':'Local import · unreviewed'})[L.source];
   const points=v=>v===null||v===undefined?'—':(v*100).toFixed(1);
@@ -57,6 +63,7 @@ window.Lab = (() => {
     for(const key of ['lab','variant','track','category','group','robot','sort','modelQuery','episodeTask','episodeModel','status','episode','models','order','model','taskCategory'])p.delete(key);
     L.source!=='official'?p.set('data',L.source):p.delete('data');
     for(const key of pageKeys[L.tab]){const v=L[key];if(v&&v!=='all')p.set(key,v);}
+    if(currentPage==='leaderboard'){p.set('tableSort',tableSort);p.set('tableOrder',tableDirection===1?'asc':'desc');}
     if(currentPage==='leaderboard')p.set('order',L.direction===1?'asc':'desc');
     if(currentPage==='leaderboard'&&L.compare.length)p.set('models',L.compare.join(','));
     if(currentPage==='leaderboard'&&L.selectedModel)p.set('model',L.selectedModel);
@@ -67,7 +74,7 @@ window.Lab = (() => {
   function pageLink(page,extra){return h(Site.href(page,extra));}
   const option=(value,text,active)=>`<option value="${h(value)}"${value===active?' selected':''}>${h(text)}</option>`;
   function html(){
-    const tools=`<div class="lab-actions"><button class="lab-button" data-lab-action="demo">${L.source==='demo'?'View official results':'Load synthetic example'}</button><button class="lab-button" data-lab-action="import">Import JSON</button>${L.imported?'<button class="lab-button" data-lab-action="stored">View imported report</button><button class="lab-button" data-lab-action="clear-import">Clear import</button>':''}<button class="lab-button" data-lab-action="share">Copy view link</button>${L.tab==='board'?'<button class="lab-button" data-lab-action="csv">Export CSV</button><button class="lab-button" data-lab-action="json">Download report</button>':''}</div>`;
+    const tools=`<div class="lab-actions"><button class="lab-button" data-lab-action="demo">${L.source==='demo'?'View official results':'Load synthetic example'}</button><button class="lab-button" data-lab-action="import">Import JSON</button>${L.imported?'<button class="lab-button" data-lab-action="stored">View imported report</button><button class="lab-button" data-lab-action="clear-import">Clear import</button>':''}<button class="lab-button" data-lab-action="share">Copy view link</button>${L.tab==='board'?'<button class="lab-button" data-lab-action="csv">Export CSV</button><button class="lab-button" data-lab-action="json">Download report</button>':''}${L.tab==='board'?`<a class="lab-button" href="${Site.href('compare')}">Model comparison ↗</a>`:''}</div>`;
     return `<section class="research page-workspace" id="research">${reportPages.includes(L.tab)?`<div class="lab-source"><div><strong id="source-label">${sourceLabel()}</strong><span id="source-description"></span></div>${L.tab==='board'?`<details class="leaderboard-data-tools"><summary>Data &amp; exports <span aria-hidden="true">⌄</span></summary>${tools}</details>`:tools}</div>`:''}<input id="result-upload" type="file" accept=".json,application/json" hidden><p id="lab-message" class="lab-message" role="status" aria-live="polite">${h(L.message)}</p><div id="lab-filters"></div><div id="lab-panel"></div></section>`;
   }
   function filters(){return `<div class="lab-filters"><label>Evaluation category<select data-lab-filter="category">${option('all','All categories',L.category)}${CATEGORIES.map(c=>option(c.id,c.name,L.category)).join('')}</select></label><label>Delivery mode<select data-lab-filter="track">${option('all','All delivery modes',L.track)}${[['A','A · Control program'],['B','B · Training'],['C','C · Artifact construction']].map(([v,t])=>option(v,t,L.track)).join('')}</select></label><label>Capability facet<select data-lab-filter="group">${option('all','All capabilities',L.group)}${GROUPS.map(g=>option(g.id,g.name,L.group)).join('')}</select></label><label>Embodiment / scene<select data-lab-filter="robot">${option('all','All embodiments & scenes',L.robot)}${[...new Set(TASKS.map(t=>t.robot))].map(r=>option(r,r,L.robot)).join('')}</select></label><button class="lab-button" data-lab-action="reset">Reset filters</button><p>${selectedTasks().length} / 22 tasks · <span>Simulation · Single report protocol</span></p></div>`;}
@@ -76,9 +83,9 @@ window.Lab = (() => {
     return `<div class="lab-empty empty-${kind}"><h3>${text}</h3><p>${descriptions[kind]||''}</p><p>Load synthetic data to explore this page, or import a report. Examples do not represent real model performance.</p><button class="lab-button solid" data-lab-action="load-demo">Explore synthetic example</button><button class="lab-button" data-lab-action="template">Download report template</button>${kind==='compare'?'<div class="empty-comparison"><span>Model A · Awaiting a report</span><span>Model B · Awaiting a report</span><span>Common tasks · Awaiting results</span></div>':''}</div>`;
   }
   function board(){
-    const view=Leaderboard.render({report:data(),rows:orderedRows(true),tasks:selectedTasks(),source:L.source,synthetic:L.source==='demo'||(L.source==='imported'&&L.importedSynthetic),modelQuery:L.modelQuery,selectedModel:L.selectedModel,taskCategory:L.taskCategory,sort:L.sort,direction:L.direction,href:Site.href});
-    L.selectedModel=view.selectedModel;L.taskCategory=view.taskCategory;
-    return view.html+`<details class="metric-notes"><summary>How the ranking is calculated</summary><p>Overall success averages task success rates within each selected category, then averages those category means equally. The full catalog uses five distinct categories from the manuscript. Progress follows the same aggregation on a 0–100 scale. Missing tasks are never zero-filled; complete selected-task coverage is required for a rank. Ties share a rank. Sort controls change the order; overall bars always show category-balanced success.</p><p>Pooled success is total successes divided by valid trials. Its Wilson 95% interval is included in the CSV export; it does not describe uncertainty in the category-balanced score. Mean simulation time includes all valid trials. The manuscript also specifies wall-clock time and token consumption, which are not connected to this report format yet. <a class="text-link" href="${Site.href('method')}#fair-evaluation">Evaluation method ↗</a></p></details>`;
+    const view=Leaderboard.render({report:data(),rows:orderedRows(true),tasks:selectedTasks(),source:L.source,synthetic:L.source==='demo'||(L.source==='imported'&&L.importedSynthetic),modelQuery:L.modelQuery,selectedModel:L.selectedModel,taskCategory:L.taskCategory,sort:L.sort,direction:L.direction,hiddenModels:[...hiddenModels],tableSort,tableDirection,href:Site.href});
+    boardView=view;L.selectedModel=view.selectedModel;L.taskCategory=view.taskCategory;
+    return view.html+`<details id="ranking-method" class="metric-notes"><summary>How the ranking is calculated</summary><p>Overall success averages task success rates within each selected category, then averages those category means equally. The full catalog uses five distinct categories from the manuscript. Progress follows the same aggregation on a 0–100 scale. Missing tasks are never zero-filled; complete selected-task coverage is required for a rank. Ties share a rank. The chart shows category success rates and category-balanced Overall. Task table headings sort by the selected task; incomplete models remain unranked.</p><p>Pooled success is total successes divided by valid trials. Its Wilson 95% interval is included in the CSV export; it does not describe uncertainty in the category-balanced score. Mean simulation time includes all valid trials. The manuscript also specifies wall-clock time and token consumption, which are not connected to this report format yet. <a class="text-link" href="${Site.href('method')}#fair-evaluation">Evaluation method ↗</a></p></details>`;
   }
   function compare(){
     const models=data().models;
@@ -130,6 +137,7 @@ window.Lab = (() => {
  ].map(([a,b])=>`<details><summary>${a}</summary><p>${b}</p></details>`).join('')}</div><div class="document-publication">${Evidence.slot('DOCUMENT','Paper PDF and supplementary material','Reserved for the public paper PDF, finalized protocol and supplementary artifacts')}</div><div class="downloads"><h2>Reporting materials</h2><button class="lab-button" data-lab-action="tasks-json">Download 22-task catalog</button><button class="lab-button" data-lab-action="demo-json">Synthetic report example</button><button class="lab-button" data-lab-action="citation">Copy website citation</button><a class="lab-button" href="FEATURES.md">Report format & tools ↗</a><p class="lab-note">The title is confirmed as Embodied Generalist Exam. This citation identifies the website preview; the author list, paper link and paper citation will be added with the research release.</p></div>`;}
   function renderPanel(){
     stop();const root=q('#research');if(!root)return;
+    const horizontalScroll=['.task-comparison-scroll','.capability-chart-scroll'].map(selector=>[selector,q(selector)?.scrollLeft||0]);
     const focused=document.activeElement;
     const focusKey=focused?.id?`#${CSS.escape(focused.id)}`:focused?.dataset.labFilter?`[data-lab-filter="${focused.dataset.labFilter}"]`:focused?.dataset.episodeFilter?`[data-episode-filter="${focused.dataset.episodeFilter}"]`:focused?.dataset.sort?`[data-sort="${focused.dataset.sort}"]`:focused?.dataset.compareChoice?`[data-compare-choice="${CSS.escape(focused.dataset.compareChoice)}"]`:null;
     if(q('#source-label')){
@@ -140,8 +148,10 @@ window.Lab = (() => {
     root.dataset.source=L.source;
     q('#lab-filters').innerHTML=L.tab==='board'?`<details class="leaderboard-scope"${L.scopeOpen?' open':''}><summary>Evaluation scope · ${selectedTasks().length} / 22 tasks</summary>${filters()}</details>`:['compare','matrix'].includes(L.tab)?filters():L.tab==='episodes'&&[L.track,L.category,L.group,L.robot].some(v=>v!=='all')?`<div class="episode-scope"><span>Task scope carried from results: ${selectedTasks().length} / 22 tasks</span><button class="lab-button" data-lab-action="reset">Show all tasks</button></div>`:'';
     q('#lab-panel').innerHTML=({board,compare,matrix,episodes,run,about})[L.tab]();
+    horizontalScroll.forEach(([selector,left])=>{const node=q(selector);if(node)node.scrollLeft=left;});
     q('#lab-message').textContent=L.message;
     if(L.tab==='run')updateCommand();if(L.tab==='episodes'){updateTime();wireVideo();}
+    if(modelDialog?.open){q('#model-focus-content').innerHTML=boardView?.detailHTML||'';}
     if(focusKey)q(focusKey)?.focus({preventScroll:true});
     syncURL();
     document.dispatchEvent(new CustomEvent('lab:reportchange'));
@@ -207,11 +217,31 @@ window.Lab = (() => {
     else rows=[['source','benchmark_version','protocol','model','model_version','agent','trials','balanced_success_rate','pooled_success_rate','pooled_wilson_95_low','pooled_wilson_95_high','progress_0_100','duration_s','task_coverage','eligible'],...orderedRows().map(m=>[sourceLabel(),d.benchmark_version,d.protocol,m.name,m.version,m.agent,m.trials,m.score,m.pooled,m.ci?.[0],m.ci?.[1],m.progress===null?null:m.progress*100,m.duration,`${m.coverage}/${ids.length}`,m.complete])];
     download(`ai4robot-${L.source}-${kind}.csv`,Results.csv(rows),'text/csv;charset=utf-8');
   }
+  function openModel(target){
+    if(!modelWindow)return;
+    if(target.dataset.focusTask)L.taskCategory='all';
+    L.selectedModel=target.dataset.boardModel;board();
+    if(!boardView.detailHTML)return;
+    q('#model-focus-content').innerHTML=boardView.detailHTML;
+    modelWindow.open(target);
+    const p=new URL(location.href);p.searchParams.set('detail','1');history.replaceState({},'',p);syncURL();
+    if(target.dataset.focusTask){const row=q(`[data-model-task="${target.dataset.focusTask}"]`,modelDialog);row?.classList.add('is-target-task');row?.scrollIntoView({block:'center',behavior:'instant'});}
+  }
+  modelDialog?.addEventListener('change',event=>{
+    if(event.target.id==='leaderboard-model-select')L.selectedModel=event.target.value;
+    else if(event.target.id==='leaderboard-task-category')L.taskCategory=event.target.value;
+    else return;
+    const id=event.target.id;board();q('#model-focus-content').innerHTML=boardView.detailHTML;syncURL();q('#'+id)?.focus({preventScroll:true});
+  });
+  modelDialog?.addEventListener('click',event=>{if(event.target.closest('a[href]'))modelWindow.close(true);});
   function mount(){
     const root=q('#research');if(!root)return;renderPanel();
     root.addEventListener('click',event=>{
+      const modelTarget=event.target.closest('[data-board-model]');
+      if(modelTarget){openModel(modelTarget);return;}
       const b=event.target.closest('button');if(!b)return;
-      if(b.dataset.boardModel){L.selectedModel=b.dataset.boardModel;renderPanel();const detail=q('#model-breakdown');q('#model-breakdown-title')?.focus({preventScroll:true});detail?.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});return;}
+      if(b.dataset.chartSelect){hiddenModels.clear();if(b.dataset.chartSelect==='none')data().models.forEach(m=>hiddenModels.add(m.id));if(b.dataset.chartSelect==='none'&&!data().models.length)[...document.querySelectorAll('[data-chart-model]')].forEach(el=>hiddenModels.add(el.dataset.chartModel));renderPanel();return;}
+      if(b.dataset.tableSort){tableDirection=tableSort===b.dataset.tableSort?-tableDirection:-1;tableSort=b.dataset.tableSort;renderPanel();q(`[data-table-sort="${tableSort}"]`)?.focus({preventScroll:true});return;}
       if(b.dataset.sort){L.direction=L.sort===b.dataset.sort?-L.direction:b.dataset.sort==='duration'?1:-1;L.sort=b.dataset.sort;renderPanel();return;}
       if(b.dataset.episode){clearVideo();L.episode=b.dataset.episode;L.time=0;renderPanel();q('#episode-video-title')?.focus({preventScroll:true});return;}
       if(b.dataset.eventIndex!==undefined){L.time=currentEpisode().events[Number(b.dataset.eventIndex)].time_s;const video=q('#episode-video');if(video)video.currentTime=L.time;updateTime();return;}
@@ -239,8 +269,10 @@ window.Lab = (() => {
       if(action==='run-json'){command()?download('ai4robot-run-config.json',JSON.stringify(runConfig(),null,2)):message('Correct the run configuration first.');}
       if(action==='citation')copy('@misc{ai4robot_website_demo,\n  title = {Embodied Generalist Exam: Website Preview},\n  year = {2026},\n  url = {https://racingemperor.github.io/ai4robot-website/},\n  note = {Website prototype; not a published benchmark paper}\n}');
     });
+    root.addEventListener('keydown',event=>{const target=event.target.closest('.model-curve,.curve-label');if(target&&['Enter',' '].includes(event.key)){event.preventDefault();openModel(target);}});
     root.addEventListener('change',async event=>{
       const el=event.target;
+      if(el.dataset.chartModel){el.checked?hiddenModels.delete(el.dataset.chartModel):hiddenModels.add(el.dataset.chartModel);const id=el.dataset.chartModel;renderPanel();q(`[data-chart-model="${CSS.escape(id)}"]`)?.focus({preventScroll:true});}
       if(el.id==='leaderboard-sort'){L.sort=el.value;L.direction=el.value==='duration'?1:-1;renderPanel();}
       if(el.id==='leaderboard-model-select'){L.selectedModel=el.value;renderPanel();}
       if(el.id==='leaderboard-task-category'){L.taskCategory=el.value;renderPanel();}
@@ -274,7 +306,8 @@ window.Lab = (() => {
       document.dispatchEvent(new CustomEvent('lab:reportchange'));return;
     }
     const host=currentPage==='report'?q(`#report-${Site.section}-panel`):currentPage==='tasks'?q(`#tasks-${Site.section}-panel`):q(`#leaderboard-${Site.section}-panel`);
-    q('#research')?.remove();host.innerHTML=html();mount();
+    modelWindow?.close(true);q('#research')?.remove();host.innerHTML=html();mount();
+    if(currentPage==='leaderboard'&&L.tab==='board'&&new URLSearchParams(location.search).get('detail')==='1'){const target=q(`[data-board-model="${CSS.escape(L.selectedModel)}"]`);if(target)openModel(target);}
   }
   document.addEventListener('site:sectionchange',()=>{
     if(currentPage==='report'){

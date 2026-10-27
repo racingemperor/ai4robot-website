@@ -55,7 +55,7 @@ window.Motion = (() => {
   window.addEventListener('pageshow',()=>{inView=hero.getBoundingClientRect().bottom>0;sync();});
   sync();
  }
- function taskWindow(dialog,onClose) {
+ function taskWindow(dialog,onClose,{title='#task-title',preview=true}={}) {
   let opener=null,phase='closed',animation=null;
   const finish=()=>{
    animation?.cancel();animation=null;phase='closed';dialog.close();
@@ -78,10 +78,10 @@ window.Motion = (() => {
    opener=source;phase='opening';dialog.showModal();
    document.documentElement.classList.add('task-modal-open');
    dialog.querySelector('.task-focus-scroll').scrollTop=0;
-   dialog.querySelector('#task-title')?.focus({preventScroll:true});
+   dialog.querySelector(title)?.focus({preventScroll:true});
    const rect=dialog.getBoundingClientRect();
    if(preference.matches||!dialog.animate){phase='open';return;}
-   if(source){const preview=document.createElement('div');preview.className='task-window-preview';preview.style.setProperty('--task-color',source.style.getPropertyValue('--task-color'));preview.setAttribute('aria-hidden','true');preview.innerHTML=source.innerHTML;dialog.append(preview);}
+   if(source&&preview){const tile=document.createElement('div');tile.className='task-window-preview';tile.style.setProperty('--task-color',source.style.getPropertyValue('--task-color'));tile.setAttribute('aria-hidden','true');tile.innerHTML=source.innerHTML;dialog.append(tile);}
    dialog.classList.add('is-opening');
    const dx=from?from.left-rect.left:0,dy=from?from.top-rect.top:26;
    const sx=from?from.width/rect.width:.96,sy=from?from.height/rect.height:.96;

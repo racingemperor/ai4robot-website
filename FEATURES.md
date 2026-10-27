@@ -2,10 +2,10 @@
 
 ## Available tools
 
-- Four main pages with four fixed header destinations: Home, Task, Leaderboard and Report. The logo is a static brand mark; small screens use a menu. Model comparison is a local Leaderboard view; the results matrix and episode replay are local Task views; Method, Run and Resources are local Report views. Switching preserves the parent document and header highlight, with shareable section links and browser history. Eight legacy URLs redirect to the current structure.
+- Five main pages with fixed header destinations: Home, Task, Leaderboard, Report and Contribute. The logo is a static brand mark; small screens use a menu. Model comparison is a local Leaderboard view; the results matrix and episode replay are local Task views; Method, Run and Resources are local Report views. Switching preserves the parent document and header highlight, with shareable section links and browser history. Eight legacy URLs redirect to the current structure.
 - Twenty-two detailed task briefs with goals, three capability explanations, completion checks, embodiment, deliverable, input, execution stages and current scope. A searchable illustrated card gallery replaces the directory. Each card has three capability cells and a hover lift. Clicking moves and enlarges the card into a centered floating window with Overview, Capabilities, Model results and Evidence views. The window supports Escape, backdrop/close dismissal, focus return and reduced motion; it remains smaller than the screen.
 - Home route switch, interactive T06 judge examples and once-per-section scroll reveals. Reduced motion presents content immediately.
-- Overall leaderboard with selectable horizontal model rows, success bars, progress and coverage. The selected model updates a dossier below with five category summaries and a task-by-task success/progress/trial/time/evidence table. Model selection and the detail category filter are shareable. Search preserves global ranks. Sorting, advanced scope filters, imports and exports remain available; the parent navigation stays Leaderboard.
+- LIBERO-Pro-style chart of the five manuscript categories plus Overall. Model-colored curves, direct labels, visibility checkboxes and a raw category table support inspection. Click a curve, model name or task score to open a centered floating result window. The task comparison matrix uses 22 task columns plus Overall; headings sort the table while preserving global Overall ranks. Model selection and the detail category filter are shareable. Search, scope filters, imports, exports and replay links preserve provenance and the parent navigation.
 - Up to three-model comparison on common capability-task coverage.
 - Numeric task/model matrix within Tasks, linked to matching episode records. Catalog and matrix share category/capability scope; switching preserves catalog search/selection. Importing or clearing a report leaves the catalog intact.
 - Grid placeholders for Home video/evidence, per-task video/detail frames/deliverables and Report figures/output/publication material.
@@ -77,7 +77,7 @@ Attach local footage with the same time origin as the event log. The video posit
 4. A selected category with no data makes the balanced summary unavailable. Partial task coverage is labeled and receives no rank. Missing tasks are never zero-filled.
 5. Pooled success is separately total successes / total trials. Its Wilson 95% interval is not an interval for the balanced score and does not model task/seed correlations.
 6. Mean simulation time is total simulation seconds / valid trials, including unsuccessful outcomes. Wall time and model latency are different measures.
-7. Complete coverage sorts first. The selected metric controls ranking, with ties sharing rank; mean time sorts ascending by default.
+7. Only complete coverage earns an Overall rank, with ties sharing rank. Task table headers sort by task success or Overall, with missing values last; task sorting does not change Overall ranks. Legacy comparison/export metrics remain available.
 8. Capability bars use only tasks covered by every selected model; summary cards show individual coverage. Do not treat different coverage as directly comparable.
 
 CSV success fields are fractions, progress_0_100 is points, and duration_s is simulation seconds. Leaderboard exports include pooled_success_rate and pooled_wilson_95_low/high separately from balanced_success_rate. Exports retain source and protocol.
@@ -105,7 +105,7 @@ Four flowing columns link to the 22 task dossiers. Tiles use original, labeled c
 
 ## Appearance
 
-A shared header sun/moon control switches all four pages, task windows, evidence frames, result tables, trace/code blocks and the run configurator. Saved preference is applied before styles, with system fallback and storage-error handling. Page snapshots fade for 280 ms without remounting content or resetting a timeline, scroll position or form. Browsers without View Transitions apply the final palette immediately. Rapid repeated switches honor the latest choice; failed or interrupted transitions settle on that choice. Reduced motion disables the color/icon transition. Home fades its media wall into the page background; main sections and the footer share that canvas and use spacing in place of hard horizontal dividers.
+A shared header sun/moon control switches all five pages, task windows, evidence frames, result tables, trace/code blocks and the run configurator. Saved preference is applied before styles, with system fallback and storage-error handling. Page snapshots fade for 280 ms without remounting content or resetting a timeline, scroll position or form. Browsers without View Transitions apply the final palette immediately. Rapid repeated switches honor the latest choice; failed or interrupted transitions settle on that choice. Reduced motion disables the color/icon transition. Home fades its media wall into the page background; main sections and the footer share that canvas and use spacing in place of hard horizontal dividers.
 
 ## Home insights
 
