@@ -2,7 +2,7 @@
 
 ## Page roles
 
-Home introduces Embodied Generalist Exam: flowing task wall, identity and three scale figures, paper metadata, News, overview video, introduction, Overall bar board and shared footer. It ends there.
+Home introduces Embodied Generalist Exam: flowing task wall, identity and three scale figures, paper metadata, News, overview video, introduction, Overall bar board, Citation and shared footer. The Citation section follows LIBERO-Pro2.0's heading, bordered code panel and copy control; it uses confirmed project metadata without inventing paper authors or publication details.
 
 Task is the task collection. Clicking a card animates into a centered floating window. It contains the task objective, model performance, model/episode recording, synchronized video/input/output/code, paper category, completion checks and evidence in one continuous document. No inner tabs or standalone episode/matrix workspace remain. Each model has a compact row with a proportional success bar, numeric score and supporting metrics. Clicking it reveals the synchronized player directly beneath that row, within the same model item. Only one row expands at a time; collapsing pauses its recording and preserves its position. Specific model/episode links open the corresponding row, while ordinary task visits start collapsed. No detached task-recording heading or model selector remains. Step history stays available as an inline disclosure. The per-task success summary covers all valid aggregate trials, independently of the selected video sample.
 
@@ -12,7 +12,7 @@ Report follows LIBERO-Pro 2.0’s publication-entry style and contains only publ
 
 The fixed header groups the AI for Robots identity with Code, Datasets and Community on the left, and the five main pages on the right. Code and Datasets use attributed GitHub/Hugging Face icons; Datasets remains inactive until supplied. Community is independently active within the resource group. Mobile resources remain visible on their own row, separate from the five-link Menu. No secondary page bars or side index are mounted. The logo is static. Existing section URLs canonicalize to the parent; Episodes links select their task/model directly. Active links work with native modified clicks and browser navigation.
 
-Task and Leaderboard share task-filters.js/css: paper categories, embodiments/scenes and delivery modes, with validation and intersecting filters. Both display Evaluation scope directly, with labels, reset and count. Task adds search. The panel has internal padding and a 30–40px gap before cards/charts. URL state restores the scope, and conflicting task recording links clear it. Pointer focus uses a restrained border while keyboard focus stays explicit.
+Task and Leaderboard share task-filters.js/css: paper categories, embodiments/scenes and delivery modes, with validation and intersecting filters. Both display Evaluation scope directly, with labels, bordered reset and count. Task adds search and pagination, using eight cards per page and three pages for the complete catalog. The URL restores the page; filter changes start at page one and task/episode links select the matching page. The panel has internal padding and a 30–40px gap before cards/charts. URL state restores the scope, and conflicting task recording links clear it. Pointer focus uses a restrained border while keyboard focus stays explicit.
 
 ## Visual and accessibility rules
 

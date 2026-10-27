@@ -25,7 +25,7 @@ function homeHero(){return `<section class="hero hero-cinema" aria-labelledby="h
  <div class="hero-shade" aria-hidden="true"></div>
  <div class="hero-copy"><h1 id="hero-title">Embodied Generalist Exam</h1><p class="hero-question">Evaluating General-Purpose Models in the Physical World</p><dl class="home-hero-statistics" aria-label="Benchmark scale"><div><dt>Tasks</dt><dd>22</dd></div><div><dt>Task categories</dt><dd>5</dd></div><div><dt>Robot platforms</dt><dd>6</dd></div></dl></div>
  </section>`;}
-function home(){return homeHero()+HomeOverview.introduction()+HomeOverview.shell();}
+function home(){return homeHero()+HomeOverview.introduction()+HomeOverview.shell()+HomeOverview.citation();}
 function taskCard(t) {
 
  return `<button class="task-card" data-select="${t.id}" aria-haspopup="dialog" aria-controls="task-focus" aria-label="Open ${t.id}: ${t.name}" style="--task-color:${group(t.group).color}">
@@ -38,6 +38,7 @@ function explorer() {
  return `<section class="task-gallery" aria-label="Task explorer">
   ${TaskFilters.render({id:'task',values:state,count:TASKS.length,search:state.search})}
   <div id="task-collection" class="task-card-grid"></div>
+  <div id="task-pages"></div>
   <dialog id="task-focus" class="task-focus" aria-labelledby="task-title"><div class="task-window-bar"><span id="task-window-label">TASK EXPLORER</span><button type="button" data-close-task aria-label="Close task" title="Close task"><span aria-hidden="true">×</span></button></div><div class="task-focus-scroll"><article id="task-detail" class="task-article" aria-labelledby="task-title"></article></div></dialog>
   <span id="task-selection-status" class="sr-only" role="status" aria-live="polite"></span>
  </section>`;
@@ -49,8 +50,10 @@ function filteredTasks() {
 }
 function collection() {
  const ts=filteredTasks();
+ const page=TaskPagination.select(ts,state.page);state.page=page.page;
  $('#task-scope-count').textContent=`${ts.length} / ${TASKS.length} tasks`;
- $('#task-collection').innerHTML=ts.length?ts.map(taskCard).join(''):'<div class="task-gallery-empty"><h2>No matching tasks.</h2><p>Try a task ID, a paper category or a robot such as “Go2”.</p><button class="button" data-action="reset-search">Clear filters</button></div>';
+ $('#task-collection').innerHTML=ts.length?page.items.map(taskCard).join(''):'<div class="task-gallery-empty"><h2>No matching tasks.</h2><p>Try a task ID, a paper category or a robot such as “Go2”.</p><button class="button" data-action="reset-search">Clear filters</button></div>';
+ $('#task-pages').innerHTML=page.pages>1?`<nav class="task-page-controls" aria-label="Task pages"><p role="status" aria-live="polite">${page.start}–${page.end} of ${page.total} tasks</p><div><button type="button" data-task-page="${page.page-1}"${page.page===1?' disabled':''} aria-label="Previous page">←</button>${Array.from({length:page.pages},(_,i)=>`<button type="button" data-task-page="${i+1}" aria-label="Page ${i+1}"${page.page===i+1?' aria-current="page"':''}>${i+1}</button>`).join('')}<button type="button" data-task-page="${page.page+1}"${page.page===page.pages?' disabled':''} aria-label="Next page">→</button></div></nav>`:'';
  if(ts.length&&!ts.some(t=>t.id===state.selected))state.selected=ts[0].id;
 }
 function detail() {
@@ -67,7 +70,7 @@ function detail() {
  <nav class="task-pagination" aria-label="Previous and next task"><button data-select="${ts[index-1]?.id||''}" ${index<=0?'disabled':''}><span>Previous task</span><strong>${ts[index-1]?`${ts[index-1].id} · ${ts[index-1].name}`:'Start of selection'}</strong></button><span>${index+1} / ${ts.length}</span><button data-select="${ts[index+1]?.id||''}" ${index===ts.length-1?'disabled':''}><span>Next task</span><strong>${ts[index+1]?`${ts[index+1].id} · ${ts[index+1].name}`:'End of selection'}</strong></button></nav>`;
  TaskReplay.mount($('#task-replay'),t);
 }
-function saveTaskView(){const p=new URLSearchParams(location.search);for(const [key,value]of Object.entries({task:state.taskOpen?state.selected:'',...TaskFilters.normalize(state),q:state.search}))if(value&&value!=='all')p.set(key,value);else p.delete(key);p.delete('view');p.delete('group');if(!state.taskOpen){p.delete('episode');p.delete('episodeModel');}history.replaceState({},'',location.pathname+(p.size?'?'+p:'')+location.hash);Site.refreshLinks();}
+function saveTaskView(){const p=new URLSearchParams(location.search);for(const [key,value]of Object.entries({task:state.taskOpen?state.selected:'',...TaskFilters.normalize(state),q:state.search,page:state.page>1?state.page:''}))if(value&&value!=='all')p.set(key,value);else p.delete(key);p.delete('view');p.delete('group');if(!state.taskOpen){p.delete('episode');p.delete('episodeModel');}history.replaceState({},'',location.pathname+(p.size?'?'+p:'')+location.hash);Site.refreshLinks();}
 function syncFilters(){for(const key of ['category','robot','track'])if($('#task-'+key))$('#task-'+key).value=state[key];}
 const infoPage=document.body.dataset.page;
 let taskWindow;
@@ -75,17 +78,18 @@ state.taskOpen=false;
 if(infoPage==='home'){$('#page-content').innerHTML=home();Motion.revealHome($('#page-content'));Motion.videoWall($('.hero-cinema'));HomeOverview.mount();}
 if(infoPage==='tasks'){
  $('#page-content').innerHTML=explorer();
- taskWindow=Motion.taskWindow($('#task-focus'),()=>{TaskReplay.unmount();state.taskOpen=false;saveTaskView();});
+ taskWindow=Motion.taskWindow($('#task-focus'),()=>{TaskReplay.unmount();state.taskOpen=false;saveTaskView();$('#task-collection [data-select="'+state.selected+'"]')?.focus({preventScroll:true});});
  const loadSelection=()=>{
   const p=new URLSearchParams(location.search);
   Object.assign(state,TaskFilters.normalize(Object.fromEntries(p)));
   state.search=(p.get('q')||'').slice(0,160);
+  state.page=p.get('page')||1;
   let linked=TASKS.some(t=>t.id===p.get('task'))?p.get('task'):null;
   if(!linked&&p.has('episode')){
    const activeReport=Results[Results.sourceFor(p.get('data'))];
    linked=activeReport.episodes.find(e=>e.id===p.get('episode'))?.task_id||'T06';
   }
-  if(linked){state.selected=linked;if(!filteredTasks().some(t=>t.id===linked)){Object.assign(state,TaskFilters.normalize({}));state.search='';}}
+  if(linked){state.selected=linked;if(!filteredTasks().some(t=>t.id===linked)){Object.assign(state,TaskFilters.normalize({}));state.search='';}state.page=Math.floor(filteredTasks().findIndex(t=>t.id===linked)/TaskPagination.size)+1;}
   collection();syncFilters();$('#task-search').value=state.search;
   if(linked){state.taskOpen=true;detail();taskWindow.open();}else taskWindow.close(true);
   saveTaskView();
@@ -96,11 +100,14 @@ document.addEventListener('click',e=>{
  const b=e.target.closest('button');if(!b)return;
  if(b.dataset.select){
   TaskReplay.suspend();const source=b.closest('.task-card');state.selected=b.dataset.select;state.taskOpen=true;
+  const selectedPage=Math.floor(filteredTasks().findIndex(t=>t.id===state.selected)/TaskPagination.size)+1;
+  if(selectedPage!==state.page){state.page=selectedPage;collection();}
   const url=new URL(location.href);for(const key of ['episode','episodeModel'])url.searchParams.delete(key);history.replaceState({},'',url);
   saveTaskView();detail();$('#task-selection-status').textContent=`${state.selected}: ${task(state.selected).name}`;
   if(source)taskWindow.open(source);else{$('.task-focus-scroll').scrollTop=0;$('#task-title').focus({preventScroll:true});}
  }
- if(b.dataset.action==='reset-search'||b.hasAttribute('data-scope-reset')){state.search='';Object.assign(state,TaskFilters.normalize({}));$('#task-search').value='';collection();syncFilters();saveTaskView();}
+ if(b.hasAttribute('data-task-page')){state.page=Number(b.dataset.taskPage);collection();saveTaskView();const first=$('#task-collection .task-card');first?.focus({preventScroll:true});first?.scrollIntoView({block:'start',behavior:'instant'});}
+ if(b.dataset.action==='reset-search'||b.hasAttribute('data-scope-reset')){state.search='';state.page=1;Object.assign(state,TaskFilters.normalize({}));$('#task-search').value='';collection();syncFilters();saveTaskView();}
 });
-document.addEventListener('input',e=>{if(e.target.id==='task-search'){state.search=e.target.value;collection();saveTaskView();}});
-document.addEventListener('change',e=>{if(e.target.dataset.scopeFilter){state[e.target.dataset.scopeFilter]=e.target.value;collection();saveTaskView();}});
+document.addEventListener('input',e=>{if(e.target.id==='task-search'){state.search=e.target.value;state.page=1;collection();saveTaskView();}});
+document.addEventListener('change',e=>{if(e.target.dataset.scopeFilter){state[e.target.dataset.scopeFilter]=e.target.value;state.page=1;collection();saveTaskView();}});

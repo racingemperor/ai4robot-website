@@ -42,7 +42,38 @@ window.HomeOverview = (() => {
    </a>`;
   }).join('')||'<p class="home-rank-empty">No models in this report.</p>'}</div>`;
  }
+ function citation(){
+  const bibtex=`@misc{embodiedgeneralistexam2026,
+  title = {Embodied Generalist Exam},
+  year = {2026},
+  howpublished = {GitHub repository},
+  url = {${RESEARCH_REPO}}
+}`;
+  return `<section id="citation" class="section home-citation" aria-labelledby="home-citation-title"><h2 id="home-citation-title">Citation</h2><div class="home-citation-card"><button type="button" class="home-citation-copy" aria-label="Copy BibTeX" title="Copy BibTeX"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"/><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"/></svg><span>Copy</span></button><pre class="home-citation-code" tabindex="0" aria-label="BibTeX citation"><code>${h(bibtex)}</code></pre></div><p class="sr-only" id="home-citation-status" role="status" aria-live="polite"></p></section>`;
+ }
+ function mountCitation(){
+  const button=document.querySelector('.home-citation-copy');
+  if(!button)return;
+  const code=document.querySelector('.home-citation-code');
+  const status=document.querySelector('#home-citation-status');
+  let timer;
+  button.addEventListener('click',async()=>{
+   if(button.getAttribute('aria-busy')==='true')return;
+   clearTimeout(timer);button.setAttribute('aria-busy','true');
+   try{
+    await navigator.clipboard.writeText(code.textContent.trim());
+    button.querySelector('span').textContent='Copied';button.setAttribute('aria-label','BibTeX copied');
+    status.className='sr-only';status.textContent='Citation copied to clipboard.';
+    timer=setTimeout(()=>{button.querySelector('span').textContent='Copy';button.setAttribute('aria-label','Copy BibTeX');status.textContent='';},2500);
+   }catch{
+    button.querySelector('span').textContent='Copy';button.setAttribute('aria-label','Copy BibTeX');
+    status.className='home-citation-status';status.textContent='Select the citation text and copy it manually.';
+    const range=document.createRange();range.selectNodeContents(code);const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);code.focus();
+   }finally{button.removeAttribute('aria-busy');}
+  });
+ }
  function mount(){
+  mountCitation();
   const host=document.querySelector('#home-overall-chart');
   if(!host)return;
   const initial=new URLSearchParams(location.search).get('data');
@@ -55,5 +86,5 @@ window.HomeOverview = (() => {
   document.querySelector('#home-overall-link').href=Site.href('leaderboard',{data:source,category:null,group:null,robot:null,track:null});
  }
 
- return {introduction,shell,board,mount};
+ return {introduction,shell,citation,board,mount};
 })();
