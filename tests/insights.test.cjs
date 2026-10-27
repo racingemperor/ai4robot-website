@@ -15,7 +15,7 @@ const tasks=context.TASKS;
 test('Home selects the same five complete models by balanced success, retaining that cohort for progress',()=>{
  const rows=Insights.topModels(Results.demo),progress=Insights.topModels(Results.demo,'progress');
  const expected=Results.summarize(Results.demo,tasks.map(t=>t.id)).sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));
- assert.equal(rows.length,5);assert.deepEqual(Array.from(rows,m=>m.id),Array.from(expected,m=>m.id));
+ assert.equal(rows.length,5);assert.deepEqual(Array.from(rows,m=>m.id),Array.from(expected.slice(0,5),m=>m.id));
  assert.deepEqual(Array.from(progress,m=>m.id),Array.from(rows,m=>m.id));
  for(const model of rows)for(const category of context.CATEGORIES){
   const expected=Results.summarize(Results.demo,tasks.filter(t=>t.category===category.id).map(t=>t.id)).find(m=>m.id===model.id);
@@ -25,8 +25,8 @@ test('Home selects the same five complete models by balanced success, retaining 
 test('missing categories and incomplete reports never become top-five model claims',()=>{
  assert.equal(Insights.topModels(Results.official).length,0);
  const partial=JSON.parse(JSON.stringify(Results.demo));
- partial.results=partial.results.filter(r=>!(r.model_id==='example-a'&&r.task_id==='T01'));
- assert.equal(Insights.topModels(partial).length,4);assert.ok(!Insights.topModels(partial).some(m=>m.id==='example-a'));
+ partial.results=partial.results.filter(r=>!(r.model_id===Results.demo.models[0].id&&r.task_id==='T01'));
+ assert.equal(Insights.topModels(partial).length,5);assert.ok(!Insights.topModels(partial).some(m=>m.id===Results.demo.models[0].id));
  for(const category of ['scene-generation','reconstruction','policy-development']){
   const missingCategory=JSON.parse(JSON.stringify(Results.demo));
   missingCategory.results=missingCategory.results.filter(r=>tasks.find(t=>t.id===r.task_id).category!==category);

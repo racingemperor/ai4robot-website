@@ -13,8 +13,8 @@ const clone=value=>JSON.parse(JSON.stringify(value));
 
 test('official data has no fabricated model scores; examples cover all 22 tasks',()=>{
   assert.equal(R.official.results.length,0);assert.equal(R.official.models.length,0);
-  const d=R.validate(R.demo);assert.equal(d.models.length,5);assert.equal(d.results.length,110);assert.equal(d.episodes.length,110);
-  assert.ok(d.models.every(m=>m.name.startsWith('Example model')));
+  const d=R.validate(R.demo);assert.equal(d.models.length,8);assert.equal(d.results.length,176);assert.equal(d.episodes.length,176);
+  assert.deepEqual(Array.from(d.models,m=>m.id),Array.from(R.roster,m=>m.id));
 });
 test('category-balanced metrics differ from pooled trials and do not hide missing categories',()=>{
   const result=(task,trials,successes,progress)=>({model_id:'a',task_id:task,trials,successes,progress_sum:progress,duration_sum_s:trials*15});
@@ -43,7 +43,7 @@ test('catalog follows the five manuscript abstract categories and preserves task
   assert.equal(ts.find(t=>t.id==='T11').track,'A');assert.equal(ts.find(t=>t.id==='T21').robot,'Unitree Go2');assert.equal(ts.find(t=>t.id==='T03').robot,'Franka Panda');
 });
 test('reject duplicate, excluded, malformed or contradictory results',()=>{
-  const changes=[d=>d.results.push(d.results[0]),d=>d.results[0].task_id='T18',d=>d.results[0].successes=11,d=>d.results[0].trials=1.5,d=>d.results[0].duration_sum_s=NaN,d=>d.models[0].id='bad"id',d=>d.results[0].progress_sum=-1,d=>d.environment='real'];
+  const changes=[d=>d.results.push(d.results[0]),d=>d.results[0].task_id='T18',d=>d.results[0].successes=21,d=>d.results[0].trials=1.5,d=>d.results[0].duration_sum_s=NaN,d=>d.models[0].id='bad"id',d=>d.results[0].progress_sum=-1,d=>d.environment='real'];
   for(const change of changes){const data=clone(R.demo);change(data);assert.throws(()=>R.validate(data));}
 });
 test('reject invalid episode references and out-of-order times; strip unknown fields',()=>{
@@ -85,7 +85,7 @@ test('saved reports share validation, storage key and synthetic provenance acros
  const read=raw=>R.readSaved({getItem:key=>{assert.equal(key,R.storageKey);return raw;}});
  assert.equal(read(null),null);
  for(const raw of [{report:R.demo,synthetic:true},{...R.demo,website_data_source:'demo'}]){
-  const saved=read(JSON.stringify(raw));assert.equal(saved.synthetic,true);assert.equal(saved.report.models.length,5);assert.equal(saved.report.results.length,110);
+  const saved=read(JSON.stringify(raw));assert.equal(saved.synthetic,true);assert.equal(saved.report.models.length,8);assert.equal(saved.report.results.length,176);
  }
  assert.equal(read(JSON.stringify({report:R.demo,synthetic:false})).synthetic,false);
 });
@@ -102,4 +102,24 @@ test('episode media and timestamped observations survive validation while unsafe
  const clean=R.validate(raw).episodes[0];assert.equal(clean.video.src,'media/T01/model-a.mp4');assert.equal(clean.events[1].images[0].alt,'Head camera input');
  const E=context.window.Evidence;assert.equal(E.atTime(clean,0).images,undefined);assert.equal(E.atTime(clean,clean.events[1].time_s).images.images[0].src,'media/observation.png');
  for(const src of ['javascript:alert(1)','data:text/html,hello','//unknown.test/file.mp4']){const bad=clone(raw);bad.episodes[0].video.src=src;assert.throws(()=>R.validate(bad),/media URL/);}
+});
+
+test('all eight roster models resolve to local official logos while unrelated imports stay unbranded',()=>{
+ for(const m of R.roster){
+  const src=R.logoPath(m);assert.ok(fs.existsSync(path.join(__dirname,'..',src)));
+  assert.match(R.logo(m),/aria-hidden="true"/);assert.match(R.logo(m),/alt=""/);
+  assert.equal(R.logoPath({id:'imported-id',name:m.name,agent:'Other harness'}),src);
+ }
+ const unknown={id:'unknown',name:'Unrelated model',agent:'Custom harness',logo:'javascript:alert(1)'};
+ assert.equal(R.logoPath(unknown),'');assert.equal(R.logo(unknown),'');
+ assert.equal(R.logoPath({id:'qwen',name:'Qwen',agent:'Claude Code'}),'');
+ assert.equal(R.defaultSource(),'demo');assert.equal(R.official.models.length,0);
+});
+
+test('explicit report sources survive replacing the layout default with real models',()=>{
+ assert.equal(R.sourceFor('official'),'official');assert.equal(R.sourceFor('demo'),'demo');
+ assert.equal(R.sourceFor(null),'demo');
+ R.official.models.push({id:'measured'});
+ try{assert.equal(R.sourceFor(null),'official');assert.equal(R.sourceFor('demo'),'demo');assert.equal(R.sourceFor('official'),'official');}
+ finally{R.official.models.pop();}
 });

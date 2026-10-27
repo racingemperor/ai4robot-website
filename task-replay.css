@@ -12,7 +12,7 @@
 .task-model-heading{margin:0;font:inherit}.task-focus .task-model-summary{width:100%;padding:12px 14px;min-height:66px;text-align:left;border-radius:10px;font-family:var(--sans);font-size:14px;font-weight:400;color:var(--ink);transition:background .18s ease}
 .task-model-summary:hover,.task-model-summary[aria-expanded=true]{background:var(--surface)}
 .task-model-summary:focus-visible{outline-offset:-3px}
-.task-model-identity{display:flex;flex-direction:column;gap:3px;min-width:0}.task-model-identity strong{font-size:14px;font-weight:700;overflow-wrap:anywhere}.task-model-identity small{font-size:12px;font-weight:400;color:var(--muted);overflow-wrap:anywhere}
+.task-model-identity{display:flex;align-items:center;gap:10px;min-width:0}.task-model-identity>span:last-child{display:flex;flex-direction:column;gap:3px;min-width:0}.task-model-identity strong{font-size:14px;font-weight:700;overflow-wrap:anywhere}.task-model-identity small{font-size:12px;font-weight:400;color:var(--muted);overflow-wrap:anywhere}
 .task-model-success{display:flex;align-items:center;gap:10px;min-width:0}.task-model-success>strong{min-width:53px;text-align:right;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
 .task-success-track{height:9px;flex:1;min-width:40px;overflow:hidden;border-radius:20px;background:color-mix(in srgb,var(--accent) 12%,var(--paper))}
 .task-success-track i{display:block;height:100%;border-radius:inherit;background:var(--accent)}.task-success-track.is-pending{background:transparent;border:1px dashed var(--line)}

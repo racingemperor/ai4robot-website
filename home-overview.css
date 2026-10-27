@@ -116,3 +116,6 @@
  .home-film-slot .evidence-slot-center p{font-size:12px}
 }
 @media(prefers-reduced-motion:reduce){.home-rank-row{transition:none}.home-rank-row:hover{transform:none}}
+
+.home-rank-logo>.model-logo{width:26px;height:26px;flex-basis:26px;border-radius:7px}
+.home-rank-logo>.model-logo img{width:20px;height:20px}

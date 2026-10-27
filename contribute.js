@@ -15,7 +15,7 @@ window.Contribute = (() => {
    ['Reproducible','Record versions, seeds, layouts and budgets. Give reviewers enough information to rerun the same conditions.'],
    ['Fair','Declare the evaluation route and permitted observations. Keep hidden state, seeds and judge internals out of agent inputs.'],
    ['Inspectable','Keep videos, input/output events and code on one timeline. Include unsuccessful valid trials as well as successes.'],
-   ['Clearly scoped','State what is implemented, what was measured and what remains pending. Label synthetic examples and local reports.']
+   ['Clearly scoped','State the task scope, evaluation conditions and measurement method.']
   ].map(([name,text])=>`<article><h3>${name}</h3><p>${text}</p></article>`).join('')}</div></section>
   <section class="contribution-section" aria-labelledby="contribution-process-title"><h2 id="contribution-process-title">From proposal to benchmark</h2><ol class="contribution-process">${[
    ['Propose','Describe the model, harness, task or tool and its intended scope.'],['Prepare','Assemble code, configuration and the materials listed below.'],['Self-check','Validate the report and inspect the replay against its timestamps.'],['Review','Maintainers review reproducibility, evaluation boundaries and evidence.'],['Publish','Accepted, reviewed materials can be connected to the catalog and results.']

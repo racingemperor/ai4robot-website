@@ -32,7 +32,7 @@ test('model selection and task filtering preserve the exact task scope and safel
  assert.deepEqual([...view.detailHTML.matchAll(/data-model-task="(T\d+)"/g)].map(m=>m[1]),['T21','T22','T23']);
  assert.equal(render({selectedModel:'missing',taskCategory:'missing'}).selectedModel,'gpt6-astra');
  assert.equal(render({selectedModel:'missing',taskCategory:'missing'}).taskCategory,'all');
- const empty=render({modelQuery:'nonexistent'});assert.equal(empty.selectedModel,'');assert.equal(empty.detailHTML,'');
+ const legacy=render({modelQuery:'nonexistent'});assert.equal(legacy.selectedModel,'gpt6-astra');assert.equal((legacy.html.match(/data-chart-model=/g)||[]).length,8);assert(!legacy.html.includes('model-search'));
 });
 
 test('partial results distinguish zero success from missing data and never receive a rank',()=>{
@@ -40,25 +40,25 @@ test('partial results distinguish zero success from missing data and never recei
  const report={models:[{id:'partial',name:'Partial model',agent:'Harness',version:'v1'}],results:[{model_id:'partial',task_id:'T01',trials:4,successes:0,progress_sum:1,duration_sum_s:40}],episodes:[]};
  const rows=Results.summarize(report,tasks.map(t=>t.id));
  const view=render({report,rows,tasks,source:'imported'});
- assert.match(view.html,/<td class="rank-column">—/);assert.match(view.detailHTML,/Incomplete coverage; this model is unranked/);
+ assert.match(view.html,/<td class="rank-column">—/);assert.equal(rows[0].complete,false);assert.match(view.html,/curve-unbranded/);
  const measured=view.detailHTML.match(/data-model-task="T01"[\s\S]*?<\/tr>/)[0];
  const missing=view.detailHTML.match(/data-model-task="T21"[\s\S]*?<\/tr>/)[0];
  assert(measured.includes('0.0%'));assert(measured.includes('25.0'));assert(measured.includes('0 / 4'));
- assert(!missing.includes('0.0%'));assert(missing.includes('Awaiting evidence'));
+ assert(!missing.includes('0.0%'));assert(missing.includes('task-result-pending'));assert(!missing.includes('Awaiting evidence'));
 });
 
-test('search preserves the global rank and replay links retain the selected model and task',()=>{
+test('model selection preserves both global ranks and replay links retain the selected model and task',()=>{
  const tasks=[context.TASKS[0]],report={models:[{id:'first',name:'First model',agent:'Harness',version:'v1'},{id:'second',name:'Second model',agent:'Harness',version:'v1'}],results:[{model_id:'first',task_id:'T01',trials:2,successes:2,progress_sum:2,duration_sum_s:10},{model_id:'second',task_id:'T01',trials:2,successes:1,progress_sum:1.5,duration_sum_s:20}],episodes:[{model_id:'second',task_id:'T01'}]};
- const view=render({report,rows:Results.summarize(report,['T01']),tasks,source:'imported',modelQuery:'Second'});
+ const view=render({report,rows:Results.summarize(report,['T01']),tasks,source:'imported',selectedModel:'second'});
  assert.equal(view.selectedModel,'second');assert.match(view.html,/<td class="rank-column">2/);
  assert.match(view.detailHTML,/episodes\.html\?episodeTask=T01&amp;episodeModel=second/);
  assert(view.html.includes('50.0%'));assert(view.detailHTML.includes('75.0'));
 });
 
-test('known synthetic imports retain their provenance in the model dossier and task table',()=>{
+test('model dossiers and tables omit data-status notices',()=>{
  const view=render({report:Results.demo,rows:Results.summarize(Results.demo,context.TASKS.map(t=>t.id)),source:'imported',synthetic:true});
- assert.match(view.detailHTML,/class="model-detail-status"[^>]*>Synthetic example · Local report · unreviewed/);
- assert.match(view.detailHTML,/<caption>[^<]*Synthetic example · Local report · unreviewed/);
+ assert.doesNotMatch(view.html+view.detailHTML,/Synthetic|unreviewed|forthcoming|model-search|board-search/i);
+ assert.match(view.detailHTML,/model-breakdown-title/);
 });
 
 
@@ -85,4 +85,12 @@ test('task sorting puts missing results last in both directions without changing
  const ascending=render({...options,tableDirection:1}).html;
  assert.match(ascending,/<td class="rank-column">2<\/td>[\s\S]*?data-board-model="zero"/);
  assert.match(ascending,/<td class="rank-column">1<\/td>[\s\S]*?data-board-model="full"/);
+});
+
+test('model logos replace graph markers and table monograms for all eight models',()=>{
+ const view=render({report:Results.demo,rows:Results.summarize(Results.demo,context.TASKS.map(t=>t.id)),source:'demo'});
+ assert.equal((view.html.match(/class="curve-logo"/g)||[]).length,48);
+ assert.doesNotMatch(view.html,/chip-swatch|model-monogram|<circle|model-search/);
+ for(const m of Results.roster)assert(view.html.includes(Results.logoPath(m)));
+ assert(view.detailHTML.includes(Results.logoPath(Results.roster[0])));
 });

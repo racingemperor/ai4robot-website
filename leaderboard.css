@@ -32,10 +32,10 @@
 .chart-controls>div{display:flex;gap:8px}
 .chart-models{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
 .chart-model-chip{display:flex;align-items:center;border:1px solid color-mix(in srgb,var(--model-color) 65%,var(--line));border-radius:24px;background:color-mix(in srgb,var(--model-color) 5%,var(--paper));color:var(--model-color);overflow:hidden;min-height:44px}
-.chart-model-chip label{position:relative;display:grid;place-items:center;width:38px;height:44px;cursor:pointer;margin:0}
+.chart-model-chip label{position:relative;display:grid;place-items:center;width:44px;height:44px;cursor:pointer;margin:0}
 .chart-model-chip input{position:absolute;opacity:0;width:30px!important;height:36px;cursor:pointer}
-.chip-swatch{width:12px;height:12px;background:currentColor;border:2px solid currentColor;border-radius:50%;pointer-events:none}
-.chart-model-chip[data-hidden=true] .chip-swatch{background:transparent}
+.chart-model-chip .model-logo{width:26px;height:26px;flex-basis:26px;pointer-events:none}.chart-model-chip .model-logo img{width:20px;height:20px}
+.chart-model-chip[data-hidden=true] .model-logo{opacity:.35;filter:grayscale(1)}
 .chart-model-chip[data-hidden=true]{background:var(--paper);color:var(--muted);border-color:var(--line)}
 .chart-model-chip:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:3px}
 .chart-model-chip button{border:0;background:transparent;color:inherit;padding:8px 16px 8px 0;font-size:13px;min-height:44px;cursor:pointer}
@@ -49,10 +49,10 @@
 .chart-grid .category-axis text{fill:var(--ink);font-size:12px}
 .curve-hit{fill:none;stroke:transparent;stroke-width:20;pointer-events:stroke}
 .curve-line{fill:none;stroke:var(--model-color);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
-.model-curve circle{fill:var(--paper);stroke:var(--model-color);stroke-width:2.2}
+.curve-logo rect{fill:#fff;stroke:var(--model-color);stroke-width:1.4}.curve-logo image{pointer-events:none}
 .model-curve,.curve-label{cursor:pointer;transition:opacity .18s ease;outline:none}
 .model-curve:is(:hover,:focus-visible) .curve-line{stroke-width:4}
-.model-curve:focus-visible circle{stroke-width:4}
+.model-curve:focus-visible .curve-logo rect{stroke-width:3}
 .curve-label path{fill:none;stroke:var(--model-color);stroke-width:1;opacity:.6}
 .curve-label text{fill:var(--model-color);font-size:12px}
 .curve-label:is(:hover,:focus-visible) text{font-weight:800;text-decoration:underline}
@@ -149,3 +149,11 @@
  .leaderboard-scope .lab-filters{flex-direction:column;align-items:stretch}.leaderboard-scope .lab-filters>p{margin-left:0}
  .model-focus select{font-size:16px}
 }
+
+.model-source-name{display:flex;align-items:center;gap:9px}
+#model-breakdown-title{display:flex;align-items:center;gap:12px}
+#model-breakdown-title .model-logo{width:42px;height:42px;flex-basis:42px}
+#model-breakdown-title .model-logo img{width:30px;height:30px}
+[data-page=leaderboard] .lab-source{justify-content:flex-end}
+
+.curve-unbranded{fill:var(--paper);stroke:var(--model-color);stroke-width:2}

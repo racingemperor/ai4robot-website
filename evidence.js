@@ -2,7 +2,7 @@
 window.Evidence = (() => {
  const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function slot(kind,title,note,extra='') {
-  return `<div class="evidence-slot ${extra}" role="group" aria-label="${escape(title)} placeholder"><span class="evidence-kind">${escape(kind)} / PLACEHOLDER</span><div class="evidence-slot-center"><span class="evidence-cross ${kind==='VIDEO'?'evidence-play':''}" aria-hidden="true">${kind==='VIDEO'?playbackIcon(false):'+'}</span><strong>${escape(title)}</strong><p>${escape(note)}</p></div><span class="evidence-slot-footer">Reserved for research evidence</span></div>`;
+  return `<div class="evidence-slot ${extra}" role="group" aria-label="${escape(title)}"><span class="evidence-kind">${escape(kind)}</span><div class="evidence-slot-center"><span class="evidence-cross ${kind==='VIDEO'?'evidence-play':''}" aria-hidden="true">${kind==='VIDEO'?playbackIcon(false):'+'}</span><strong>${escape(title)}</strong><p>${escape(note)}</p></div></div>`;
  }
  function playbackIcon(playing) {
   return `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" focusable="false">${playing?'<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>':'<path d="m8 4 12 8-12 8z"/>'}</svg>`;

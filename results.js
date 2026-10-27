@@ -3,16 +3,39 @@ window.Results = (() => {
   const version = 'preview-v1';
   const storageKey='ai4robot-imported-report-v1';
   const official = {schema_version:1,benchmark_version:version,protocol:'preview-v1 / simulation / fixed-interface',environment:'simulation',models:[],results:[],episodes:[]};
-  const demoModels = ['A','B','C','D','E'].map((n,i)=>({id:`example-${n.toLowerCase()}`,name:`Example model ${n}`,version:'synthetic-v1',agent:['Synthetic coding agent','Synthetic visual agent','Synthetic coding agent','Synthetic baseline','Synthetic visual agent'][i]}));
+  const roster = Object.freeze([
+    ['gpt6-astra','gpt6-astra','codex','openai','svg'],
+    ['opus5-5','opus5.5','claude code','claude','svg'],
+    ['gemini-4','gemini 4','argon','gemini','png'],
+    ['grok-4-7','Grok 4.7','Grok Build','grok','png'],
+    ['deepseek-v4-1-flash','deepseek v4.1 flash','dsh','deepseek','png'],
+    ['glm-5-3-flash','glm 5.3 flash','zcode','glm','png'],
+    ['kimi-k3-1-pro','kimi k3.1 pro','kimi code','kimi','png'],
+    ['minimax-m3-1-flash','MiniMax-M3.1-Flash','MiniMax Code','minimax','png']
+  ].map(([id,name,agent,brand,extension])=>Object.freeze({id,name,agent,brand,logo:`assets/model-logos/${brand}.${extension}`,version:name})));
+  const brandPatterns=[/gpt|openai|codex/i,/claude|opus|anthropic/i,/gemini|argon/i,/grok|xai/i,/deepseek|\bdsh\b/i,/\bglm|zhipu|zcode/i,/kimi|moonshot/i,/minimax/i];
+  function logoPath(model){
+    const exact=roster.find(m=>m.id===model.id);
+    if(exact)return exact.logo;
+    const index=brandPatterns.findIndex(pattern=>pattern.test(`${model.name||''} ${model.id||''}`));
+    return index<0?'':roster[index].logo;
+  }
+  function logo(model){
+    const src=logoPath(model);
+    return src?`<span class="model-logo" aria-hidden="true"><img src="${src}" alt="" width="28" height="28"></span>`:'';
+  }
+  const defaultSource=()=>official.models.length?'official':'demo';
+  const sourceFor=value=>['official','demo'].includes(value)?value:defaultSource();
+  const demoModels = roster.map(({id,name,agent,version})=>({id,name,agent,version}));
   const demo = {...official,models:demoModels,results:[],episodes:[]};
   demoModels.forEach((m,mi)=>TASKS.forEach((t,ti)=>{
-    const successes = Math.max(0,Math.min(10,9-mi-((ti*3+mi*2)%6)));
-    const progress = successes+(10-successes)*(0.2+((ti+mi)%5)*0.1);
+    const trials=20,successes=Math.max(0,18-mi-((ti*3+mi*2)%7));
+    const progress = successes+(trials-successes)*(0.2+((ti+mi)%5)*0.1);
     const duration = 35+ti*7+mi*11;
-    demo.results.push({model_id:m.id,task_id:t.id,trials:10,successes,progress_sum:Number(progress.toFixed(3)),duration_sum_s:duration*10});
-    const success=successes>=5;
-    const texts=[`Initial state and goal: ${t.goal}`,`Allowed observation: cameras and measured body state.`,`Key action: ${t.beats[1]}.`,`${success?'Success':'Failure'} synthetic outcome; actual criterion: ${t.proof}`];
-    demo.episodes.push({id:`example-${mi+1}-${t.id.toLowerCase()}`,model_id:m.id,task_id:t.id,status:success?'success':'failure',duration_s:duration,seed:0,layout:0,events:texts.map((text,i)=>({time_s:Math.round(duration*i/3),type:['Goal','Observation','Action','Judgment'][i],text,input:`[SYNTHETIC INPUT] ${i===0?t.goal:'Example camera observation and permitted measured state.'}`,output:`[SYNTHETIC OUTPUT] ${text}`,...(i===2?{code:{filename:'policy.py',content:'# SYNTHETIC CODE SNAPSHOT\n# Interface example only; no robot program is executed.'}}:{})}))});
+    demo.results.push({model_id:m.id,task_id:t.id,trials,successes,progress_sum:Number(progress.toFixed(3)),duration_sum_s:duration*trials});
+    const success=successes>=trials/2;
+    const texts=[`Initial state and goal: ${t.goal}`,`Allowed observation: cameras and measured body state.`,`Key action: ${t.beats[1]}.`,`${success?'Success':'Failure'} criterion: ${t.proof}`];
+    demo.episodes.push({id:`${m.id}-${t.id.toLowerCase()}`,model_id:m.id,task_id:t.id,status:success?'success':'failure',duration_s:duration,seed:0,layout:0,events:texts.map((text,i)=>({time_s:Math.round(duration*i/3),type:['Goal','Observation','Action','Judgment'][i],text,input:i===0?t.goal:'Camera observation and permitted measured state.',output:text,...(i===2?{code:{filename:'policy.py',content:'# policy.py\n# Control program'}}:{})}))});
   }));
   function validate(raw){
     const fail=m=>{throw new Error(m);};
@@ -109,5 +132,5 @@ window.Results = (() => {
     });
   }
   function csv(rows){return '\uFEFF'+rows.map(row=>row.map(v=>{let value=String(v??'');if(typeof v==='string'&&/^[=+\-@\t\r]/.test(value))value="'"+value;return '"'+value.replaceAll('"','""')+'"';}).join(',')).join('\r\n');}
-  return {version,official,demo,validate,summarize,csv,storageKey,readSaved};
+  return {version,official,demo,validate,summarize,csv,storageKey,readSaved,roster,logo,logoPath,defaultSource,sourceFor};
 })();

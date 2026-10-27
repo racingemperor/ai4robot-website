@@ -21,7 +21,7 @@ test('the empty official Home board reserves models without inventing scores, ba
  assert.equal((html.match(/is-pending/g)||[]).length,8);
  assert.doesNotMatch(html,/style="width:/);
  assert.match(html,/model=gpt6-astra&amp;detail=1/);
- assert.match(html,/Awaiting evaluation/);
+ assert.doesNotMatch(html,/Awaiting evaluation|forthcoming|Synthetic/i);
  assert.equal(Results.official.models.length,0);
 });
 
@@ -35,17 +35,18 @@ test('Home ranks by category-balanced success, preserves ties and links to the e
  assert.deepEqual([...html.matchAll(/home-rank-number">([^<]+)/g)].map(m=>m[1]),['1','1','3']);
  assert.match(html,/40\.0%/);assert.match(html,/20\.0%/);
  assert.match(html,/data=demo&amp;model=balanced&amp;detail=1/);
- assert.match(html,/Synthetic preview · Not measured/);
+ assert.doesNotMatch(html,/Synthetic|Not measured|Unreviewed/i);
 });
 
-test('a genuine zero is drawn, incomplete results stay unranked and local synthetic provenance survives',()=>{
+test('a genuine zero is drawn, incomplete results stay unranked and local reports keep their exact links without status copy',()=>{
  const report={models:['zero','partial','<unsafe>'].map(model),results:[...TASKS.map(t=>result('zero',t,0)),...TASKS.slice(1).map(t=>result('partial',t,10))]};
  const html=HomeOverview.board(report,'imported',true);
  assert.match(html,/style="width:0%"/);
  assert.match(html,/0\.0%/);
  assert.equal((html.match(/home-rank-number">—/g)||[]).length,2);
  assert.match(html,/21 \/ 22/);
- assert.match(html,/Synthetic preview · Not measured/);
+ assert.doesNotMatch(html,/Synthetic|Not measured|Unreviewed/i);
  assert.match(html,/&lt;unsafe&gt;/);assert.doesNotMatch(html,/<unsafe>/);
  assert.match(html,/data=imported/);
+ assert.equal((html.match(/class="home-rank-logo"/g)||[]).length,3);
 });

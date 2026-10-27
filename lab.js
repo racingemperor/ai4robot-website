@@ -2,8 +2,8 @@
 window.Lab=(()=>{
  const q=(s,r=document)=>r.querySelector(s),h=esc;
  const query=new URLSearchParams(location.search);
- let source=query.get('data')==='demo'?'demo':'official',imported=null,synthetic=false,message='',saved=false;
- let selectedModel=(query.get('model')||'').slice(0,160),taskCategory=query.get('taskCategory')||'all',modelQuery=(query.get('modelQuery')||'').slice(0,160);
+ let source=Results.sourceFor(query.get('data')),imported=null,synthetic=false,message='',saved=false;
+ let selectedModel=(query.get('model')||'').slice(0,160),taskCategory=query.get('taskCategory')||'all';
  let tableSort=query.get('tableSort')||'overall',tableDirection=query.get('tableOrder')==='asc'?1:-1,scopeOpen=false,view;
  const scope={category:'all',group:'all',robot:'all',track:'all'},hiddenModels=new Set();
  for(const key of Object.keys(scope))scope[key]=query.get(key)||'all';
@@ -15,21 +15,21 @@ window.Lab=(()=>{
  try{const stored=Results.readSaved(sessionStorage);if(stored){imported=stored.report;synthetic=stored.synthetic;saved=true;}}catch{message='Saved results are unavailable. Import the report again.';}
  if(query.get('data')==='imported'){if(imported)source='imported';else message='No local report is available in this tab. Import it again.';}
  const report=()=>source==='demo'?Results.demo:source==='imported'?imported:Results.official;
- const provenance=()=>source==='demo'?'Synthetic example · Not measured':source==='imported'?`Local import · ${synthetic?'Synthetic · ':''}Unreviewed`:'Official results · Awaiting evaluation';
+ const provenance=()=>source==='imported'?'Local report':'Model results';
  const tasks=()=>TASKS.filter(t=>Object.entries(scope).every(([key,value])=>value==='all'||t[key]===value));
  const dialog=q('#model-focus'),modelWindow=Motion.taskWindow(dialog,()=>{const url=new URL(location.href);url.searchParams.delete('detail');history.replaceState({},'',url);},{title:'#model-breakdown-title',preview:false});
  function syncURL(){
-  const url=new URL(location.href);for(const key of ['section','sort','order','models','task','episodeTask','episodeModel','episode'])url.searchParams.delete(key);
-  for(const [key,value]of Object.entries({...scope,data:source==='official'?'':source,model:selectedModel,taskCategory,modelQuery,tableSort,tableOrder:tableDirection===1?'asc':'desc'}))value&&value!=='all'?url.searchParams.set(key,value):url.searchParams.delete(key);
+  const url=new URL(location.href);for(const key of ['section','sort','order','models','task','episodeTask','episodeModel','episode','modelQuery'])url.searchParams.delete(key);
+  for(const [key,value]of Object.entries({...scope,data:source,model:selectedModel,taskCategory,tableSort,tableOrder:tableDirection===1?'asc':'desc'}))value&&value!=='all'?url.searchParams.set(key,value):url.searchParams.delete(key);
   history.replaceState({},'',url);Site.refreshLinks();
  }
  const option=(v,label,active)=>`<option value="${h(v)}"${v===active?' selected':''}>${h(label)}</option>`;
  function filters(){return `<details class="leaderboard-scope"${scopeOpen?' open':''}><summary>Evaluation scope · ${tasks().length} / 22 tasks</summary><div class="lab-filters">${[
   ['category','Task category',CATEGORIES.map(c=>[c.id,c.name])],['group','Capability facet',GROUPS.map(g=>[g.id,g.name])],['robot','Embodiment / scene',[...new Set(TASKS.map(t=>t.robot))].map(v=>[v,v])],['track','Delivery mode',[['A','Control program'],['B','Training'],['C','Artifact construction']]]
  ].map(([key,label,entries])=>`<label>${label}<select data-lab-filter="${key}">${option('all','All',scope[key])}${entries.map(([v,name])=>option(v,name,scope[key])).join('')}</select></label>`).join('')}<button type="button" class="lab-button" data-lab-action="reset">Reset filters</button></div></details>`;}
- function tools(){return `<div class="lab-source"><div><strong>${h(provenance())}</strong><span>${source==='official'?'Reviewed results are forthcoming.':source==='demo'?'All example values and records are synthetic.':saved?'Stored in this tab; never uploaded.':'Page memory only; storage is unavailable.'}</span></div><details class="leaderboard-data-tools"><summary>Data &amp; exports</summary><div class="lab-actions"><button class="lab-button" data-lab-action="demo">${source==='demo'?'View official results':'Load synthetic example'}</button><button class="lab-button" data-lab-action="import">Import JSON</button>${imported?'<button class="lab-button" data-lab-action="stored">View imported report</button><button class="lab-button" data-lab-action="clear-import">Clear import</button>':''}<button class="lab-button" data-lab-action="share">Copy view link</button><button class="lab-button" data-lab-action="csv">Export CSV</button><button class="lab-button" data-lab-action="json">Download report</button><button class="lab-button" data-lab-action="template">Report template</button></div></details></div>`;}
+ function tools(){return `<div class="lab-source"><details class="leaderboard-data-tools"><summary>Data &amp; exports</summary><div class="lab-actions"><button class="lab-button" data-lab-action="import">Import JSON</button>${imported?'<button class="lab-button" data-lab-action="stored">View imported report</button><button class="lab-button" data-lab-action="clear-import">Clear import</button>':''}<button class="lab-button" data-lab-action="share">Copy view link</button><button class="lab-button" data-lab-action="csv">Export CSV</button><button class="lab-button" data-lab-action="json">Download report</button><button class="lab-button" data-lab-action="template">Report template</button></div></details></div>`;}
  function board(){
-  view=Leaderboard.render({report:report(),rows:Results.summarize(report(),tasks().map(t=>t.id)),tasks:tasks(),source,synthetic:source==='demo'||(source==='imported'&&synthetic),modelQuery,selectedModel,taskCategory,hiddenModels:[...hiddenModels],tableSort,tableDirection,href:Site.href});
+  view=Leaderboard.render({report:report(),rows:Results.summarize(report(),tasks().map(t=>t.id)),tasks:tasks(),source,selectedModel,taskCategory,hiddenModels:[...hiddenModels],tableSort,tableDirection,href:Site.href});
   selectedModel=view.selectedModel;taskCategory=view.taskCategory;
   return view.html+`<details id="ranking-method" class="metric-notes"><summary>How the ranking is calculated</summary><p>Overall averages task success rates within each manuscript category, then weights category means equally. A rank requires full coverage of the selected task scope. Missing data is never counted as zero; tied scores share a rank. The five task categories remain separate.</p><p>Progress uses the same category weighting on a 0–100 scale. Pooled trial success and its Wilson interval appear separately in CSV exports. Mean simulation time includes every valid trial; wall-clock time and token consumption are not supplied by this schema.</p></details>`;
  }
@@ -59,11 +59,10 @@ window.Lab=(()=>{
    if(b.dataset.chartSelect){hiddenModels.clear();if(b.dataset.chartSelect==='none')root.querySelectorAll('[data-chart-model]').forEach(el=>hiddenModels.add(el.dataset.chartModel));draw();q(`[data-chart-select="${b.dataset.chartSelect}"]`)?.focus({preventScroll:true});return;}
    if(b.dataset.tableSort){tableDirection=tableSort===b.dataset.tableSort?-tableDirection:-1;tableSort=b.dataset.tableSort;draw();q(`[data-table-sort="${tableSort}"]`)?.focus({preventScroll:true});return;}
    const action=b.dataset.labAction;
-   if(action==='load-demo'||action==='demo'){source=action==='load-demo'?'demo':source==='demo'?'official':'demo';hiddenModels.clear();message='';draw();}
    if(action==='import')q('#result-upload').click();
    if(action==='stored'&&imported){source='imported';hiddenModels.clear();draw();}
    if(action==='reset'){for(const k of Object.keys(scope))scope[k]='all';draw();}
-   if(action==='clear-import'){let cleared=true;try{sessionStorage.removeItem(Results.storageKey);}catch{cleared=false;}imported=null;synthetic=false;saved=false;if(source==='imported')source='official';message=cleared?'Local report cleared.':'Cleared from this page. Close the tab to end its storage session.';draw();}
+   if(action==='clear-import'){let cleared=true;try{sessionStorage.removeItem(Results.storageKey);}catch{cleared=false;}imported=null;synthetic=false;saved=false;if(source==='imported')source=Results.defaultSource();message=cleared?'Local report cleared.':'Cleared from this page. Close the tab to end its storage session.';draw();}
    if(action==='share'){syncURL();share();}
    if(action==='json')download(`ai4robot-${source}-report.json`,JSON.stringify({...report(),website_data_source:source==='imported'&&synthetic?'demo':source},null,2));
    if(action==='template')download('ai4robot-report-template.json',JSON.stringify({...Results.official,models:[{id:'your-model',name:'Your model',version:'Exact version',agent:'Exact harness'}],results:[],episodes:[]},null,2));
@@ -80,11 +79,10 @@ window.Lab=(()=>{
      const file=el.files[0];if(file.size>5*1024*1024)throw new Error('The report exceeds 5 MB.');const raw=JSON.parse(await file.text()),checked=Results.validate(raw);
      imported=checked;synthetic=raw.website_data_source==='demo';source='imported';saved=false;hiddenModels.clear();
      try{sessionStorage.setItem(Results.storageKey,JSON.stringify({report:checked,synthetic}));saved=true;}catch{try{sessionStorage.removeItem(Results.storageKey);}catch{}}
-     message=`Validated ${checked.models.length} models and ${checked.episodes.length} recordings. Local and unreviewed.`;draw();
+     message=`Validated ${checked.models.length} models and ${checked.episodes.length} recordings.`;draw();
     }catch(error){message=`Import failed: ${error.message}`;q('#lab-message').textContent=message;}finally{el.value='';}
    }
   });
-  root.addEventListener('input',e=>{if(e.target.id==='model-search'){modelQuery=e.target.value;const start=e.target.selectionStart;q('#lab-panel').innerHTML=board();const input=q('#model-search');input.focus();input.setSelectionRange(start,start);syncURL();}});
   if(query.get('detail')==='1'){const target=q(`[data-board-model="${CSS.escape(selectedModel)}"]`);if(target)openModel(target);}
  }
  dialog.addEventListener('change',e=>{if(e.target.id==='leaderboard-model-select')selectedModel=e.target.value;else if(e.target.id==='leaderboard-task-category')taskCategory=e.target.value;else return;const id=e.target.id;board();q('#model-focus-content').innerHTML=view.detailHTML;syncURL();q('#'+id)?.focus({preventScroll:true});});

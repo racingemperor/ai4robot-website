@@ -16,7 +16,7 @@ function replay({withVideo=false,withResults=false,search}={}){
   window:{addEventListener(){}},document:{addEventListener(){}},URL,URLSearchParams,
   location:new URL('https://example.test/tasks.html'+(search??`?data=demo${withVideo?'&episodeModel=model-a':''}`)),
   Site:{refreshLinks(){}},Leaderboard:{roster:[]},cancelAnimationFrame(){},
-  Results:{official:empty,demo:withVideo||withResults?recorded:empty,readSaved:()=>null,validate:v=>v,summarize:()=>[{id:'model-a',score:.6,progress:.8,trials:10},{id:'model-b',score:0,progress:0,trials:10}],storageKey:'test-report'},
+  Results:{sourceFor:v=>v==='official'?'official':'demo',defaultSource:()=>'demo',logo:()=>'',official:empty,demo:withVideo||withResults?recorded:empty,readSaved:()=>null,validate:v=>v,summarize:()=>[{id:'model-a',score:.6,progress:.8,trials:10},{id:'model-b',score:0,progress:0,trials:10}],storageKey:'test-report'},
   sessionStorage:{setItem(key,value){writes.push({key,value});},removeItem(){}}
  };
  context.history={replaceState(_a,_b,url){context.location=new URL(url,context.location);}};
