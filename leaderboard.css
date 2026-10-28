@@ -1,12 +1,7 @@
 /* LIBERO-Pro-style chart first, followed by the task score matrix. */
-[data-page=leaderboard] #main{max-width:1200px;margin-inline:auto}
-[data-page=leaderboard] .page-heading{margin-left:175px;padding-inline:0}
-[data-page=leaderboard] #page-content{margin-left:175px}
+[data-page=leaderboard] #main{width:min(1200px,calc(100% - 2*var(--gutter)));margin-inline:auto}
+[data-page=leaderboard] .page-heading{padding-inline:0}
 [data-page=leaderboard] .research{padding-inline:0}
-.board-page-index{position:fixed;left:max(24px,calc((100vw - 1200px)/2));top:155px;width:145px;display:grid;gap:0;font-size:13px;z-index:3}
-.board-page-index>span{font-size:11px;letter-spacing:.08em;color:var(--muted);margin-bottom:12px}
-.board-page-index a{display:flex;align-items:center;min-height:44px;border-left:2px solid var(--line);padding-left:12px;text-decoration:none;color:var(--muted)}
-.board-page-index a:hover,.board-page-index a:focus-visible{border-color:var(--accent);color:var(--accent)}
 .metric-notes{scroll-margin-top:110px}
 [data-page=leaderboard] .page-heading-meta{display:none}
 [data-page=leaderboard] .page-heading{padding-bottom:20px}
@@ -101,7 +96,6 @@
 [data-theme=dark] .curve-label text{fill:color-mix(in srgb,var(--model-color) 70%,#fff)}
 @media(max-width:760px){.board-section-heading{display:block}.board-search{margin-top:18px;max-width:none}.board-section h2{font-size:27px}.board-section{margin-bottom:48px}.chart-controls .lab-button{padding:7px 10px}.model-focus{width:calc(100vw - 28px);height:90dvh}.model-focus .task-focus-scroll{padding:24px 18px}.task-column-key>div{grid-template-columns:1fr}.task-comparison-table .model-column{min-width:185px;width:185px}.chart-model-chip button{font-size:12px}}
 @media(prefers-reduced-motion:reduce){.model-curve,.curve-label{transition:none}}
-@media(max-width:1100px){.board-page-index{display:none}[data-page=leaderboard] .page-heading{margin-left:0;padding-inline:var(--gutter)}[data-page=leaderboard] #page-content{margin-left:0;padding-inline:var(--gutter)}}
 .model-breakdown{margin-top:64px;scroll-margin-top:110px}
 .model-breakdown-heading h2{font-size:clamp(27px,3vw,36px);line-height:1.2;letter-spacing:-.035em;overflow-wrap:anywhere}
 .model-breakdown-heading h2:focus{outline:none}
