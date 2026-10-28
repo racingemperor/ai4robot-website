@@ -35,7 +35,7 @@ test('all six pages separate three project resources from five primary pages',()
   assert.doesNotMatch(shell,/section-switch|data-section=|board-page-index/);
   assert.match(resources,/href="https:\/\/github.com\/ALEXander22568\/AI4Robot"/);
   assert.match(resources,/<span class="dataset-link" role="link" aria-disabled="true">[\s\S]*Datasets<\/span>/);
-  assert.match(shell,/<header[^>]*><span class="brand">Imported Gallery List Exam<\/span>/);
+  assert.match(shell,/<header[^>]*><span class="brand">Embodied Generalist Exam<\/span>/);
   assert.doesNotMatch(shell,/class="brand-mark"/);
  }
 });
