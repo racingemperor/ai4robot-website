@@ -9,11 +9,13 @@ const {normalize,matches}=context.window.TaskFilters;
 
 test('task category, embodiment and delivery mode intersect using the same catalog',()=>{
  const ids=values=>context.TASKS.filter(t=>matches(t,normalize(values))).map(t=>t.id);
- assert.equal(ids({}).length,22);assert(!ids({}).includes('T18'));
- assert.deepEqual([...ids({category:'navigation'})],['T21','T22','T23']);
+ assert.equal(ids({}).length,23);assert(ids({}).includes('T18'));
+ assert.deepEqual([...ids({category:'navigation'})],['T21','T22']);
  assert.deepEqual([...ids({category:'navigation',robot:'Unitree Go2',track:'A'})],['T21']);
  assert.equal(ids({category:'navigation',track:'B'}).length,0);
  assert.equal(ids({category:'policy-development',track:'B'}).length,2);
+ assert.deepEqual([...ids({category:'in-context-learning'})],['T12','T18']);
+ assert.deepEqual([...ids({category:'training-data',track:'D'})],['T23']);
 });
 
 test('invalid and retired filter values recover to the complete selection',()=>{

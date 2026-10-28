@@ -19,7 +19,7 @@ window.Leaderboard = (() => {
   const summaryByCategory=new Map(categories.map(c=>[c.id,Results.summarize(report,tasks.filter(t=>t.category===c.id).map(t=>t.id))]));
   const values=m=>[...categories.map(c=>summaryByCategory.get(c.id).find(r=>r.id===m.id)?.score??null),m.score];
   const hidden=new Set(hiddenModels),visible=models.filter(m=>!hidden.has(m.id));
-  const axes=[...categories.map(c=>({name:c.name,lines:({'manipulation':['Robotic','manipulation'],'navigation':['Navigation'],'scene-generation':['Scene','generation'],'reconstruction':['Scene and interaction','reconstruction'],'policy-development':['Policy','development']})[c.id]})),{name:'Overall',lines:['Overall']}];
+  const axes=[...categories.map(c=>({name:c.name,lines:({'manipulation':['Robotic','manipulation'],'navigation':['Navigation'],'scene-generation':['Scene generation','& interaction','reconstruction'],'policy-development':['Policy development','& training'],'training-data':['Training data','collection'],'in-context-learning':['In-context','learning']})[c.id]})),{name:'Overall',lines:['Overall']}];
   const x=i=>66+i*(710/Math.max(1,axes.length-1)),y=v=>368-v*310;
   const grid=[0,20,40,60,80,100].map(n=>`<line x1="66" x2="776" y1="${y(n/100)}" y2="${y(n/100)}"/><text x="53" y="${y(n/100)+4}" text-anchor="end">${n}${n===100?'%':''}</text>`).join('');
   const labels=axes.map((axis,i)=>`<g class="category-axis"><line x1="${x(i)}" x2="${x(i)}" y1="58" y2="368"/><text x="${x(i)}" y="396" text-anchor="middle">${axis.lines.map((line,k)=>`<tspan x="${x(i)}" dy="${k?17:0}">${h(line)}</tspan>`).join('')}</text></g>`).join('');

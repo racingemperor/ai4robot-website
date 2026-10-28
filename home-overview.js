@@ -11,14 +11,14 @@ window.HomeOverview = (() => {
  </section>
  <section id="home-news" class="home-news section" aria-labelledby="home-news-title"><h2 id="home-news-title">News</h2>
   <div class="home-news-list" role="region" aria-label="Project updates" tabindex="0"><ul>
-   <li><time datetime="2026-10-27">Oct 27 <span>2026</span></time><p>Explore the five manuscript categories and all 22 tasks in the new <a href="${Site.href('leaderboard')}">interactive leaderboard</a>.</p></li>
+   <li><time datetime="2026-10-28">Oct 28 <span>2026</span></time><p>The updated manuscript defines <strong>23 tasks in six categories</strong>, including training data collection and in-context learning. Explore the <a href="${Site.href('leaderboard')}">interactive leaderboard</a>.</p></li>
    <li><time datetime="2026-10-27">Oct 27 <span>2026</span></time><p><a href="${Site.href('contribute')}">Contribution guidelines</a> are available for model evaluations, agent harnesses, task proposals and reproducible evidence.</p></li>
   </ul></div>
  </section>
  <section id="benchmark-video" class="home-overview-film" aria-label="Benchmark overview video">${Evidence.slot('VIDEO','Embodied Generalist Exam · Overview','','home-film-slot')}</section>
  <section id="benchmark-introduction" class="section home-introduction" aria-labelledby="home-introduction-title"><h2 id="home-introduction-title">Beyond the digital world</h2><div class="home-introduction-copy">
-  <p>The <strong>Embodied Generalist Exam (EGE)</strong> evaluates what general-purpose foundation models can do in the physical world. Its <strong>22 tasks</strong> span five categories: robotic manipulation, navigation, scene generation, scene and interaction reconstruction, and policy development. Each task pairs a concrete objective with an executable environment, an interaction interface and an independent evaluator.</p>
-  <p>Models may reason, use tools, write control programs, construct artifacts or develop robot policies under task-specific constraints. The evaluated foundation model remains unchanged. Repeated trials and explicit success criteria are designed to reveal both capability and reliability, with video, observations, model responses and submitted code connected to the same episode.</p>
+  <p>The <strong>Embodied Generalist Exam (EGE)</strong> evaluates the breadth of foundation models’ embodied capabilities beyond robot control. Its <strong>23 tasks</strong> span six categories: robotic manipulation, navigation, scene generation and interaction reconstruction, policy development and training, training data collection, and in-context learning. The tasks cover five classes of robot embodiments: robotic arms, dexterous hands, mobile robots, quadrupeds and humanoids.</p>
+  <p>Built with <strong>NVIDIA Isaac Sim 5.1 and Isaac Lab</strong>, each task combines an instruction, an executable environment, available observations and tools, interaction constraints and independent success criteria. Eight foundation models use their corresponding agent harnesses without task-specific fine-tuning, under matched initial conditions and resource budgets. The protocol specifies <strong>three independent trials per task and model</strong>, including failures and timeouts, and reports success rate, intermediate progress, full-process wall-clock time and token consumption.</p>
  </div></section>`;}
  function shell(){return `<section id="home-overall" class="section home-overall" aria-labelledby="home-overall-title">
   <div class="home-overall-heading"><div><h2 id="home-overall-title">Overall leaderboard</h2></div><a class="text-link" id="home-overall-link" href="${Site.href('leaderboard')}">Full leaderboard ↗</a></div>
@@ -31,11 +31,11 @@ window.HomeOverview = (() => {
   let rank=0,previous;
   const data=source;
   const links={data,category:null,group:null,robot:null,track:null,section:null};
-  return `<div class="home-rank-axis" aria-hidden="true"><span></span><span class="home-rank-ticks">${[0,25,50,75,100].map(n=>`<i style="left:${n}%">${n}%</i>`).join('')}</span><span>22 tasks</span></div><div class="home-rank-rows" aria-label="Overall success rates">${models.map((model,index)=>{
+  return `<div class="home-rank-axis" aria-hidden="true"><span></span><span class="home-rank-ticks">${[0,25,50,75,100].map(n=>`<i style="left:${n}%">${n}%</i>`).join('')}</span><span>${TASKS.length} tasks</span></div><div class="home-rank-rows" aria-label="Overall success rates">${models.map((model,index)=>{
    const value=model.complete?model.score:null;
    if(value!==null){if(previous!==value)rank=index+1;previous=value;}
    const score=value===null?'—':`${(value*100).toFixed(1)}%`;
-   const coverage=model.complete?'22 / 22':model.scheduled?'0 / 22':`${model.coverage} / 22`;
+   const coverage=`${model.complete?TASKS.length:model.scheduled?0:model.coverage} / ${TASKS.length}`;
    return `<a class="home-rank-row${value===null?' is-pending':''}" href="${h(Site.href('leaderboard',{...links,model:model.id,detail:1}))}" data-overall-model="${h(model.id)}" aria-label="${h(model.name)} · ${value===null?'Unranked':`Rank ${rank}, Overall success ${score}`} · Open model results" style="--model-color:${Leaderboard.colorFor(model)}">
     <span class="home-rank-number">${value===null?'—':rank}</span><span class="home-rank-logo">${Results.logo(model)}</span><span class="home-rank-name"><strong>${h(model.name)}</strong><span>${h(model.agent)}</span></span>
     <span class="home-rank-track" aria-hidden="true">${value===null?'':`<span style="width:${value*100}%"></span>`}</span><span class="home-rank-value"><strong>${score}</strong><small>${coverage}</small></span>

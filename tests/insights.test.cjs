@@ -27,15 +27,15 @@ test('missing categories and incomplete reports never become top-five model clai
  const partial=JSON.parse(JSON.stringify(Results.demo));
  partial.results=partial.results.filter(r=>!(r.model_id===Results.demo.models[0].id&&r.task_id==='T01'));
  assert.equal(Insights.topModels(partial).length,5);assert.ok(!Insights.topModels(partial).some(m=>m.id===Results.demo.models[0].id));
- for(const category of ['scene-generation','reconstruction','policy-development']){
+ for(const category of context.CATEGORIES.map(c=>c.id)){
   const missingCategory=JSON.parse(JSON.stringify(Results.demo));
   missingCategory.results=missingCategory.results.filter(r=>tasks.find(t=>t.id===r.task_id).category!==category);
   assert.equal(Insights.topModels(missingCategory).length,0);
  }
 });
-test('all 22 tasks have explained qualitative demands across the same seven capabilities',()=>{
- assert.equal(tasks.length,22);assert.equal(Insights.dimensions.length,7);
- assert.ok(!tasks.some(t=>t.id==='T18'));
+test('all 23 tasks have explained qualitative demands across the same seven capabilities',()=>{
+ assert.equal(tasks.length,23);assert.equal(Insights.dimensions.length,7);
+ assert.ok(tasks.some(t=>t.id==='T18'));
  for(const task of tasks){
   const profile=Insights.profile(task);assert.equal(profile.length,7);
   assert.deepEqual(Array.from(profile,d=>d.id),Array.from(Insights.dimensions,d=>d.id));
@@ -58,7 +58,7 @@ test('switching capabilities keeps every task in the same clockwise position, in
  for(const dimension of Insights.dimensions){
   const wave=Insights.waveform(dimension.id);
   assert.deepEqual(Array.from(wave,d=>d.task.id),order);
-  assert.equal(wave.length,22);
+  assert.equal(wave.length,23);
  }
  const learning=Insights.waveform('learning');
  assert.equal(learning.find(d=>d.task.id==='T12').value,3);

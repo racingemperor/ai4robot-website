@@ -3,7 +3,7 @@ window.TaskFilters=(()=>{
  const fields=[
   {key:'category',label:'Task category',all:'All categories',options:CATEGORIES.map(c=>[c.id,c.name])},
   {key:'robot',label:'Embodiment / scene',all:'All embodiments',options:[...new Set(TASKS.map(t=>t.robot))].map(name=>[name,name])},
-  {key:'track',label:'Delivery mode',all:'All delivery modes',options:[['A','Control program'],['B','Training'],['C','Artifact construction']]}
+  {key:'track',label:'Delivery mode',all:'All delivery modes',options:[['A','Control program'],['B','Training'],['C','Artifact construction'],['D','Trajectory dataset']]}
  ];
  const h=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const normalize=values=>Object.fromEntries(fields.map(f=>[f.key,f.options.some(([id])=>id===values?.[f.key])?values[f.key]:'all']));

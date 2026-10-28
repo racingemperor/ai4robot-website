@@ -14,14 +14,14 @@ const render=options=>context.window.Leaderboard.render({report:Results.official
 
 test('the eight requested model/harness pairs are selectable without becoming measured or exported results',()=>{
  const view=render({});
- for(const [model,harness]of [['gpt6-astra','codex'],['opus5.5','claude code'],['gemini 4','argon'],['Grok 4.7','Grok Build'],['deepseek v4.1 flash','dsh'],['glm 5.3 flash','zcode'],['kimi k3.1 pro','kimi code'],['MiniMax-M3.1-Flash','MiniMax Code']]){
+ for(const [model,harness]of [['GPT-6-Astra','Codex'],['Claude Opus 5.5','Claude Code'],['Gemini 4','Argon'],['Grok 4.7','Grok Build'],['DeepSeek V4.1 Flash','DSH'],['GLM-5.3-Flash','ZCode'],['Kimi K3.1 Pro','Kimi Code'],['MiniMax-M3.1-Flash','MiniMax Code']]){
   assert(view.html.includes(model));assert(view.html.includes(harness));
  }
  assert.equal((view.html.match(/data-chart-model=/g)||[]).length,8);
  assert(!view.html.includes('class="model-curve"'));
  assert.deepEqual([...view.html.matchAll(/<td class="rank-column">([^<]+)/g)].map(m=>m[1]),Array(8).fill('—'));
- assert.equal((view.detailHTML.match(/data-model-task=/g)||[]).length,22);
- assert(!view.detailHTML.includes('data-model-task="T18"'));assert(view.detailHTML.includes('data-model-task="T23"'));
+ assert.equal((view.detailHTML.match(/data-model-task=/g)||[]).length,23);
+ assert(view.detailHTML.includes('data-model-task="T18"'));assert(view.detailHTML.includes('data-model-task="T23"'));
  assert.equal(Results.official.models.length,0);assert.equal(Results.official.results.length,0);
  assert(!view.detailHTML.includes('class="model-episode-link"'));
 });
@@ -29,7 +29,7 @@ test('the eight requested model/harness pairs are selectable without becoming me
 test('model selection and task filtering preserve the exact task scope and safely recover invalid selections',()=>{
  const view=render({selectedModel:'grok-4-7',taskCategory:'navigation'});
  assert.equal(view.selectedModel,'grok-4-7');assert.equal(view.taskCategory,'navigation');
- assert.deepEqual([...view.detailHTML.matchAll(/data-model-task="(T\d+)"/g)].map(m=>m[1]),['T21','T22','T23']);
+ assert.deepEqual([...view.detailHTML.matchAll(/data-model-task="(T\d+)"/g)].map(m=>m[1]),['T21','T22']);
  assert.equal(render({selectedModel:'missing',taskCategory:'missing'}).selectedModel,'gpt6-astra');
  assert.equal(render({selectedModel:'missing',taskCategory:'missing'}).taskCategory,'all');
  const legacy=render({modelQuery:'nonexistent'});assert.equal(legacy.selectedModel,'gpt6-astra');assert.equal((legacy.html.match(/data-chart-model=/g)||[]).length,8);assert(!legacy.html.includes('model-search'));
@@ -92,7 +92,7 @@ test('task sorting puts missing results last in both directions without changing
 
 test('model logos replace graph markers and table monograms for all eight models',()=>{
  const view=render({report:Results.demo,rows:Results.summarize(Results.demo,context.TASKS.map(t=>t.id)),source:'demo'});
- assert.equal((view.html.match(/class="curve-logo"/g)||[]).length,48);
+ assert.equal((view.html.match(/class="curve-logo"/g)||[]).length,56);
  assert.doesNotMatch(view.html,/chip-swatch|model-monogram|<circle|model-search/);
  for(const m of Results.roster)assert(view.html.includes(Results.logoPath(m)));
  assert(view.detailHTML.includes(Results.logoPath(Results.roster[0])));

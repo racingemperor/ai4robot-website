@@ -147,6 +147,14 @@ window.Insights = (() => {
    'Design curriculum and check outcomes under fixed evaluation conditions.',
    'Develop rewards and train a policy within the declared budget.'
   ]},
+  T18:{values:[2,2,2,2,3,3,0],reasons:[
+   'Interpret observations from an unfamiliar robot.',
+   'Relate the new control interface to object and target geometry.',
+   'Establish a valid grasp through the supplied interface.',
+   'Connect unfamiliar commands to observed movement.',
+   'Use limited exploration before completing the requested task.',
+   'Adapt to the new embodiment from documentation and interaction feedback.'
+  ]},
   T19:{values:[3,2,2,3,3,0,0],reasons:[
    'Estimate the observed liquid surface relative to the target line.',
    'Relate pitcher orientation to the cup and final placement.',
@@ -175,12 +183,13 @@ window.Insights = (() => {
    'Execute navigation commands to reach the accepted goal region.',
    'Honor the intermediate visit and recognize when to stop.'
   ]},
-  T23:{values:[2,3,0,2,3,0,0],reasons:[
-   'Observe the destination and moving people or declared proxies.',
-   'Reason about crossing traffic and changes in free space.',
+  T23:{values:[2,1,0,2,3,1,0],reasons:[
+   'Record observations and outcomes relevant to the collection objective.',
+   'Retain the task geometry in the collected observations.',
    null,
-   'Execute movement and maintain the required clearance.',
-   'Reactively choose when to proceed, wait or detour.'
+   'Execute and record robot actions on the trajectory clock.',
+   'Organize collection and check record completeness.',
+   'Prepare interaction records for downstream policy training.'
   ]}
  };
  function profile(task){

@@ -2,7 +2,7 @@
 
 Live: https://racingemperor.github.io/ai4robot-website/
 
-An English static website for 22 embodied tasks (T01–T23 excluding T18). Task definitions follow https://github.com/ALEXander22568/AI4Robot. T23 is dynamic crowd navigation. No framework, package installation or build step is required.
+An English static website for 23 embodied tasks (T01–T23), aligned with the EGE manuscript supplied on October 28, 2026. T18 is unfamiliar robot adaptation and T23 is training trajectory collection; this supersedes the older research-repository catalog for those entries. No framework, package installation or build step is required.
 
 ## Pages
 
@@ -10,7 +10,7 @@ An English static website for 22 embodied tasks (T01–T23 excluding T18). Task 
 |---|---|
 | Home | Flowing task wall, title and benchmark scale, paper metadata, News, overview-video placeholder, introduction, compact Overall bar leaderboard, copyable BibTeX Citation and shared footer |
 | Task | Illustrated searchable task gallery; each floating task window contains its objective, model results, synchronized model recordings, paper categories, completion checks and evidence |
-| Leaderboard | News, five manuscript categories plus Overall in a model-colored line chart, sortable 22-task table, inline task recordings within model result windows and report data tools |
+| Leaderboard | News, six manuscript categories plus Overall in a model-colored line chart, sortable 23-task table, inline task recordings within model result windows and report data tools |
 | Report | Publications, project announcements and external coverage; no methods, CLI configurator or nested documentation views |
 | Contribute | Short invitations for new tasks, methods and models, with GitHub proposals and a contact link |
 | Community | WeChat and QQ group QR areas and a GitHub contact link |
@@ -34,7 +34,7 @@ The Lato files originate from the reference site's assets/fonts/ directory and a
 
 ## Results and recordings
 
-The five manuscript categories are Robotic manipulation (14), Navigation (3), Scene generation (1), Scene and interaction reconstruction (2), and Policy development (2). Overall averages task success rates within each category and then category means equally. Complete selected-task coverage is required for a rank; missing values are never zero-filled. Ties share a rank. Pooled trial success and its Wilson interval are separate from category-balanced success.
+The six manuscript categories are Robotic manipulation (13), Navigation (2), Scene generation and interaction reconstruction (3), Policy development and training (2), Training data collection (1), and In-context learning (2). Overall averages task success rates within each category and then category means equally. Complete selected-task coverage is required for a rank; missing values are never zero-filled. Ties share a rank. Pooled trial success and its Wilson interval are separate from category-balanced success.
 
 Results.roster defines the same eight model/harness identities for every page. Brand logos are local official assets; assets/model-logos/SOURCES.md records their origins. Results.defaultSource uses the layout dataset until Results.official contains models. Replace the layout aggregates and episode content with experiment records before interpreting the displayed rates as measurements. The official report remains a separate dataset. The public UI omits data-provenance and release-wait notices as requested. Public views use the website report and hosted media. Shared URLs carry view selections.
 
@@ -44,7 +44,7 @@ The recording workspace keeps a stable height across timestamp updates. Video an
 
 No official footage or reviewed results are currently connected. The empty official task viewer provides a 90-second media layout for each planned model; these are presentation placeholders and are never exported as measured records. A model with results but no episode shows its scores and a recording empty state. Only recorded input/output/code at or before the playhead is displayed.
 
-Home retains its compact Overall board and original footer, without the subtitle or scoring footnote beneath the board. Its model rows open the matching model details in Leaderboard. Citation follows LIBERO-Pro2.0's bordered code panel and copy control, using the confirmed project title, year and repository rather than unprovided paper metadata. Map real wall clips in HOME_VIDEOS in app.js. Task and Leaderboard share an always-visible Evaluation scope panel for paper category, embodiment/scene and delivery mode, with a bordered Reset filters button. Task also includes text search, compact four-column desktop cards and centered page controls without a range caption. There are eight tasks per page: the full catalog occupies three pages (8 / 8 / 6). Page numbers restore from the URL; search, filters and reset return to page one. Task/episode links open their matching page, including navigation between tasks inside the recording window. Filters intersect, persist in the URL and carry between the pages; recording links clear conflicting filters. The scope has its own padding and spacing above cards/charts. Custom capability filters and model-search controls have been removed.
+Home retains its compact Overall board and original footer, without the subtitle or scoring footnote beneath the board. Its model rows open the matching model details in Leaderboard. Citation follows LIBERO-Pro2.0's bordered code panel and copy control, using the confirmed project title, year and repository rather than unprovided paper metadata. Map real wall clips in HOME_VIDEOS in app.js. Task and Leaderboard share an always-visible Evaluation scope panel for paper category, embodiment/scene and delivery mode, with a bordered Reset filters button. Task also includes text search, compact four-column desktop cards and centered page controls without a range caption. There are eight tasks per page: the full catalog occupies three pages (8 / 8 / 7). Page numbers restore from the URL; search, filters and reset return to page one. Task/episode links open their matching page, including navigation between tasks inside the recording window. Filters intersect, persist in the URL and carry between the pages; recording links clear conflicting filters. The scope has its own padding and spacing above cards/charts. Custom capability filters and model-search controls have been removed.
 
 Leaderboard model checkboxes, logos and names only toggle curve visibility. Click a curve or table score to open a model’s results. Each task row in that window expands the shared synchronized player, without navigating to Task. Only one recording panel opens at a time; closing or switching pauses playback and retains the episode’s position. News appears above the chart. Ranking methodology is not rendered below the table.
 

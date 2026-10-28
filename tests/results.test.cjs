@@ -11,43 +11,50 @@ vm.runInContext(fs.readFileSync(path.join(__dirname,'../evidence.js'),'utf8'),co
 const R=context.window.Results;
 const clone=value=>JSON.parse(JSON.stringify(value));
 
-test('official data has no fabricated model scores; examples cover all 22 tasks',()=>{
+test('official data has no fabricated model scores; examples cover all 23 tasks',()=>{
   assert.equal(R.official.results.length,0);assert.equal(R.official.models.length,0);
-  const d=R.validate(R.demo);assert.equal(d.models.length,8);assert.equal(d.results.length,176);assert.equal(d.episodes.length,176);
+  const d=R.validate(R.demo);assert.equal(d.models.length,8);assert.equal(d.results.length,184);assert.equal(d.episodes.length,184);
   assert.deepEqual(Array.from(d.models,m=>m.id),Array.from(R.roster,m=>m.id));
 });
 test('category-balanced metrics differ from pooled trials and do not hide missing categories',()=>{
   const result=(task,trials,successes,progress)=>({model_id:'a',task_id:task,trials,successes,progress_sum:progress,duration_sum_s:trials*15});
-  const data={models:[{id:'a'}],results:[result('T01',2,1,1.5),result('T02',8,2,4),result('T21',10,10,10),result('T16',5,0,1),result('T13',5,0,1),result('T14',5,5,5),result('T15',5,0,2)]};
-  const row=R.summarize(data,['T01','T02','T21','T16','T13','T14','T15'])[0];
-  assert.equal(row.score,.375); // Five category means: .375, 1, 0, .5, 0.
-  assert.ok(Math.abs(row.progress-.545)<1e-12); // Means: .625, 1, .2, .7, .2.
-  assert.equal(row.pooled,18/40);assert.equal(row.duration,15);assert.equal(row.complete,true);assert.ok(row.ci[0]<row.pooled&&row.ci[1]>row.pooled);
+  const data={models:[{id:'a'}],results:[result('T01',2,1,1.5),result('T02',8,2,4),result('T21',10,10,10),result('T16',5,0,1),result('T13',5,0,1),result('T14',5,5,5),result('T15',5,0,2),result('T23',2,1,1.5),result('T12',2,0,1),result('T18',2,2,2)]};
+  const row=R.summarize(data,['T01','T02','T21','T16','T13','T14','T15','T23','T12','T18'])[0];
+  assert.ok(Math.abs(row.score-(.375+1+1/3+0+.5+.5)/6)<1e-12);
+  assert.ok(Math.abs(row.progress-(.625+1+8/15+.2+.75+.75)/6)<1e-12);
+  assert.equal(row.pooled,21/46);assert.equal(row.duration,15);assert.equal(row.complete,true);assert.ok(row.ci[0]<row.pooled&&row.ci[1]>row.pooled);
   const partial=R.summarize(data,['T01','T02','T03'])[0];assert.equal(partial.complete,false);assert.equal(partial.coverage,2);assert.equal(partial.score,.375);
   assert.equal(R.summarize(data,['T01','T17'])[0].score,null);
   assert.equal(R.summarize(data,[])[0].score,null);
 });
-test('catalog follows the five manuscript abstract categories and preserves task scope and embodiments',()=>{
-  const ts=context.TASKS;assert.equal(ts.length,22);assert.ok(!ts.some(t=>t.id==='T18'));
+test('catalog follows all six manuscript categories and restores T18 and trajectory collection',()=>{
+  const ts=context.TASKS;assert.equal(ts.length,23);
+  assert.deepEqual(Array.from(ts,t=>t.id),Array.from({length:23},(_,i)=>'T'+String(i+1).padStart(2,'0')));
   assert.deepEqual(Array.from(context.window.CATEGORIES,c=>[c.id,c.name,c.count]),[
-    ['manipulation','Robotic manipulation',14],['navigation','Navigation',3],
-    ['scene-generation','Scene generation',1],['reconstruction','Scene and interaction reconstruction',2],
-    ['policy-development','Policy development',2]
+    ['manipulation','Robotic manipulation',13],['navigation','Navigation',2],
+    ['scene-generation','Scene generation and interaction reconstruction',3],
+    ['policy-development','Policy development and training',2],
+    ['training-data','Training data collection',1],['in-context-learning','In-context learning',2]
   ]);
-  assert.deepEqual(Array.from(context.window.CATEGORIES,c=>ts.filter(t=>t.category===c.id).length),[14,3,1,2,2]);
+  assert.deepEqual(Array.from(context.window.CATEGORIES,c=>ts.filter(t=>t.category===c.id).length),[13,2,3,2,1,2]);
   assert.equal(ts.find(t=>t.id==='T13').category,'scene-generation');
-  assert.equal(ts.find(t=>t.id==='T14').category,'reconstruction');
-  assert.equal(ts.find(t=>t.id==='T15').category,'reconstruction');
-  assert.equal(ts.find(t=>t.id==='T12').category,'manipulation');
+  assert.equal(ts.find(t=>t.id==='T14').category,'scene-generation');
+  assert.equal(ts.find(t=>t.id==='T15').category,'scene-generation');
+  assert.equal(ts.find(t=>t.id==='T12').category,'in-context-learning');
+  assert.equal(ts.find(t=>t.id==='T18').category,'in-context-learning');
+  assert.equal(ts.find(t=>t.id==='T18').name,'Unfamiliar robot adaptation');
+  assert.equal(ts.find(t=>t.id==='T23').category,'training-data');
+  assert.equal(ts.find(t=>t.id==='T23').name,'Training trajectory collection');
+  assert.equal(ts.find(t=>t.id==='T23').track,'D');
   assert.equal(ts.find(t=>t.id==='T17').category,'policy-development');
   assert.equal(ts.find(t=>t.id==='T11').track,'A');assert.equal(ts.find(t=>t.id==='T21').robot,'Unitree Go2');assert.equal(ts.find(t=>t.id==='T03').robot,'Franka Panda');
 });
-test('reject duplicate, excluded, malformed or contradictory results',()=>{
-  const changes=[d=>d.results.push(d.results[0]),d=>d.results[0].task_id='T18',d=>d.results[0].successes=21,d=>d.results[0].trials=1.5,d=>d.results[0].duration_sum_s=NaN,d=>d.models[0].id='bad"id',d=>d.results[0].progress_sum=-1,d=>d.environment='real'];
+test('reject duplicate, unknown, malformed or contradictory results',()=>{
+  const changes=[d=>d.results.push(d.results[0]),d=>d.results[0].task_id='T24',d=>d.results[0].successes=21,d=>d.results[0].trials=1.5,d=>d.results[0].duration_sum_s=NaN,d=>d.models[0].id='bad"id',d=>d.results[0].progress_sum=-1,d=>d.environment='real'];
   for(const change of changes){const data=clone(R.demo);change(data);assert.throws(()=>R.validate(data));}
 });
 test('reject invalid episode references and out-of-order times; strip unknown fields',()=>{
-  for(const change of [d=>d.episodes[0].task_id='T18',d=>d.episodes[0].events[1].time_s=-1,d=>d.episodes[0].events[2].time_s=0,d=>d.episodes[0].duration_s=0,d=>d.episodes.push(d.episodes[0]),d=>{d.results[0].trials=1;d.results[0].successes=0;d.results[0].progress_sum=0;d.episodes[0].status='success';}]){const d=clone(R.demo);change(d);assert.throws(()=>R.validate(d));}
+  for(const change of [d=>d.episodes[0].task_id='T24',d=>d.episodes[0].events[1].time_s=-1,d=>d.episodes[0].events[2].time_s=0,d=>d.episodes[0].duration_s=0,d=>d.episodes.push(d.episodes[0]),d=>{d.results[0].trials=1;d.results[0].successes=0;d.results[0].progress_sum=0;d.episodes[0].status='success';}]){const d=clone(R.demo);change(d);assert.throws(()=>R.validate(d));}
   const d=clone(R.demo);d.episodes[0].video_url='https://example.com/private.mp4';d.models[0].html='<script>bad</script>';const clean=R.validate(d);assert.equal(clean.episodes[0].video_url,undefined);assert.equal(clean.models[0].html,undefined);
 });
 test('CSV escapes quotes and spreadsheet formulas while preserving numeric negatives',()=>{

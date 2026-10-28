@@ -3,13 +3,13 @@ window.Results = (() => {
   const version = 'preview-v1';
   const official = {schema_version:1,benchmark_version:version,protocol:'preview-v1 / simulation / fixed-interface',environment:'simulation',models:[],results:[],episodes:[]};
   const roster = Object.freeze([
-    ['gpt6-astra','gpt6-astra','codex','openai','svg'],
-    ['opus5-5','opus5.5','claude code','claude','svg'],
-    ['gemini-4','gemini 4','argon','gemini','png'],
+    ['gpt6-astra','GPT-6-Astra','Codex','openai','svg'],
+    ['opus5-5','Claude Opus 5.5','Claude Code','claude','svg'],
+    ['gemini-4','Gemini 4','Argon','gemini','png'],
     ['grok-4-7','Grok 4.7','Grok Build','grok','png'],
-    ['deepseek-v4-1-flash','deepseek v4.1 flash','dsh','deepseek','png'],
-    ['glm-5-3-flash','glm 5.3 flash','zcode','glm','png'],
-    ['kimi-k3-1-pro','kimi k3.1 pro','kimi code','kimi','png'],
+    ['deepseek-v4-1-flash','DeepSeek V4.1 Flash','DSH','deepseek','png'],
+    ['glm-5-3-flash','GLM-5.3-Flash','ZCode','glm','png'],
+    ['kimi-k3-1-pro','Kimi K3.1 Pro','Kimi Code','kimi','png'],
     ['minimax-m3-1-flash','MiniMax-M3.1-Flash','MiniMax Code','minimax','png']
   ].map(([id,name,agent,brand,extension])=>Object.freeze({id,name,agent,brand,logo:`assets/model-logos/${brand}.${extension}`,version:name})));
   const brandPatterns=[/gpt|openai|codex/i,/claude|opus|anthropic/i,/gemini|argon/i,/grok|xai/i,/deepseek|\bdsh\b/i,/\bglm|zhipu|zcode/i,/kimi|moonshot/i,/minimax/i];
@@ -57,9 +57,9 @@ window.Results = (() => {
       const id=str(m.id,'model.id',64);if(!/^[a-zA-Z0-9_-]+$/.test(id)||modelIds.has(id))fail('Model IDs must be unique and use only letters, digits, hyphens or underscores.');modelIds.add(id);
       clean.models.push({id,name:str(m.name,'model.name',80),version:str(m.version,'model.version',80),agent:str(m.agent,'model.agent',80)});
     }
-    if(!Array.isArray(raw.results)||raw.results.length>660)fail('results must be an array of at most 660 aggregates.');
+    if(!Array.isArray(raw.results)||raw.results.length>30*TASKS.length)fail(`results must be an array of at most ${30*TASKS.length} aggregates.`);
     for(const r of raw.results){
-      if(!r||!modelIds.has(r.model_id)||!TASKS.some(t=>t.id===r.task_id))fail('A result references an unknown model or task; T18 is excluded.');
+      if(!r||!modelIds.has(r.model_id)||!TASKS.some(t=>t.id===r.task_id))fail('A result references an unknown model or task.');
       const key=`${r.model_id}/${r.task_id}`;if(pairs.has(key))fail(`Duplicate result: ${key}. Combine trial aggregates first.`);pairs.add(key);
       const trials=integer(r.trials,'trials',1),successes=integer(r.successes,'successes',0,trials);
       clean.results.push({model_id:r.model_id,task_id:r.task_id,trials,successes,progress_sum:num(r.progress_sum,'progress_sum',successes,trials),duration_sum_s:num(r.duration_sum_s,'duration_sum_s')});

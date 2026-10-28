@@ -33,7 +33,7 @@ test('Home ranks by category-balanced success, preserves ties and links to the e
  const html=HomeOverview.board(report,'demo');
  assert.deepEqual([...html.matchAll(/data-overall-model="([^"]+)"/g)].map(m=>m[1]),['balanced','tied','many-manipulation']);
  assert.deepEqual([...html.matchAll(/home-rank-number">([^<]+)/g)].map(m=>m[1]),['1','1','3']);
- assert.match(html,/40\.0%/);assert.match(html,/20\.0%/);
+ assert.match(html,/40\.0%/);assert.match(html,/16\.7%/);
  assert.match(html,/data=demo&amp;model=balanced&amp;detail=1/);
  assert.doesNotMatch(html,/Synthetic|Not measured|Unreviewed/i);
 });
@@ -44,7 +44,7 @@ test('a genuine zero is drawn, incomplete results stay unranked and report model
  assert.match(html,/style="width:0%"/);
  assert.match(html,/0\.0%/);
  assert.equal((html.match(/home-rank-number">—/g)||[]).length,2);
- assert.match(html,/21 \/ 22/);
+ assert.match(html,/22 \/ 23/);
  assert.doesNotMatch(html,/Synthetic|Not measured|Unreviewed/i);
  assert.match(html,/&lt;unsafe&gt;/);assert.doesNotMatch(html,/<unsafe>/);
  assert.match(html,/data=official/);

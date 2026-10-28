@@ -10,7 +10,7 @@ const HOME_WALL_COLUMNS=[
  ['T03','T09','T15','T22'],
  ['T04','T10','T16','T23'],
  ['T05','T11','T17'],
- ['T06','T12','T19']
+ ['T06','T12','T18','T19']
 ];
 function homeWallTile(id,copy) {
  const t=task(id),clip=HOME_VIDEOS[id];
@@ -23,7 +23,7 @@ function homeWallTile(id,copy) {
 function homeHero(){return `<section class="hero hero-cinema" aria-labelledby="hero-title" data-motion="paused">
  <div class="hero-wall" aria-label="Task previews: open any tile to explore its task"><div class="wall-plane">${HOME_WALL_COLUMNS.map(ids=>`<div class="wall-column"><div class="wall-track">${[0,1].map(copy=>`<div class="wall-cycle" ${copy?'aria-hidden="true"':''}>${ids.map(id=>homeWallTile(id,copy)).join('')}</div>`).join('')}</div></div>`).join('')}</div></div>
  <div class="hero-shade" aria-hidden="true"></div>
- <div class="hero-copy"><h1 id="hero-title">Embodied Generalist Exam</h1><p class="hero-question">Evaluating General-Purpose Models in the Physical World</p><dl class="home-hero-statistics" aria-label="Benchmark scale"><div><dt>Tasks</dt><dd>22</dd></div><div><dt>Task categories</dt><dd>5</dd></div><div><dt>Robot platforms</dt><dd>6</dd></div></dl></div>
+ <div class="hero-copy"><h1 id="hero-title">Embodied Generalist Exam</h1><p class="hero-question">Evaluating Embodied Generalists Beyond Robot Control</p><dl class="home-hero-statistics" aria-label="Benchmark scale"><div><dt>Tasks</dt><dd>${TASKS.length}</dd></div><div><dt>Task categories</dt><dd>${CATEGORIES.length}</dd></div><div><dt>Embodiment classes</dt><dd>5</dd></div></dl></div>
  </section>`;}
 function home(){return homeHero()+HomeOverview.introduction()+HomeOverview.shell()+HomeOverview.citation();}
 function taskCard(t) {
