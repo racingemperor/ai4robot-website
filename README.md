@@ -12,10 +12,10 @@ An English static website for 23 embodied tasks (T01–T23), aligned with the EG
 | Task | Illustrated searchable task gallery; each floating task window contains its objective, model results, synchronized model recordings, paper categories, completion checks and evidence |
 | Leaderboard | News, six manuscript categories plus Overall in a model-colored line chart, sortable 23-task table, inline task recordings within model result windows and report data tools |
 | Report | Publications, project announcements and external coverage; no methods, CLI configurator or nested documentation views |
-| Contribute | Short invitations for new tasks, methods and models, with GitHub proposals and a contact link |
+| Contribute | Short invitations for new tasks, methods and models, with email proposals and a contact link |
 | Community | WeChat and QQ group QR areas and a GitHub contact link |
 
-The fixed header groups the AI for Robots identity, Code, Datasets and Community on the left. GitHub and Hugging Face icons identify the resource entries; Datasets remains inactive until its URL is supplied. Home, Task, Leaderboard, Report and Contribute form the right navigation. Community is a separate contact page. The logo is static. Each page contains continuous content without secondary tabs or side indexes. On phones the resource row stays visible and Menu opens the five page links.
+The fixed header groups the Imported Gallery List Exam identity, Code, Datasets and Community on the left. GitHub and Hugging Face icons identify the resource entries; Datasets remains inactive until its URL is supplied. Home, Task, Leaderboard, Report and Contribute form the right navigation. Community is a separate contact page. The header has no logo artwork; its text matches the Home hero title. The paper retains its manuscript title. Each page contains continuous content without secondary tabs or side indexes. On phones the resource row stays visible and Menu opens the five page links.
 
 Eight legacy HTML URLs remain usable. Episodes opens its concrete Task recording, Compare and Matrix open Leaderboard, and Documents / Method / Run / About / Footage open Report. Old section parameters are discarded. The task, model, episode and result source remain shareable; a recording link clears task-category filters that could exclude its target.
 
@@ -52,7 +52,7 @@ Leaderboard model checkboxes, logos and names only toggle curve visibility. Clic
 
 Report follows a simple publication-entry layout inspired by LIBERO-Pro 2.0. It lists the EGE paper and website announcement. Unfilled publication metadata and press announcements are omitted. Public paper links, authors, venue and press links are added when supplied. No reference-site papers, invented publication claims or raw manuscript archives are published.
 
-Contribute presents three short invitations: new tasks, new methods and new models. Each opens an editable GitHub proposal; nothing is submitted automatically. Community provides WeChat and QQ group areas and a GitHub contact link. Add the project’s actual QR image paths to channels in community.js; supplied images open at full size. Other projects’ QR codes and unprovided contact details are not used.
+Contribute presents three short invitations: new tasks, new methods and new models. Each opens an email draft addressed to racingemperor@outlook.com with the corresponding contribution subject; nothing is sent automatically. Community provides WeChat and QQ group areas and a GitHub contact link. Add the project’s actual QR image paths to channels in community.js; supplied images open at full size. Other projects’ QR codes and unprovided contact details are not used.
 
 ## Modules and publication
 
