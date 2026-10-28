@@ -1,9 +1,9 @@
 /* Research narrative, catalog and evaluation method. */
 const params=new URLSearchParams(location.search);
 const state={...TaskFilters.normalize(Object.fromEntries(params)),search:(params.get('q')||'').slice(0,160),selected:TASKS.some(t=>t.id===params.get('task'))?params.get('task'):'T06'};
-// Add reviewed task clips here; the same task ID supplies the wall destination.
+// Add representative task clips here; Home and task demonstrations share them.
 // Example entry: T06: {src:'media/T06.mp4', poster:'media/T06.jpg'}.
-const HOME_VIDEOS=Object.freeze({});
+const TASK_VIDEOS=Object.freeze({});
 const HOME_WALL_COLUMNS=[
  ['T01','T07','T13','T20'],
  ['T02','T08','T14','T21'],
@@ -13,7 +13,7 @@ const HOME_WALL_COLUMNS=[
  ['T06','T12','T18','T19']
 ];
 function homeWallTile(id,copy) {
- const t=task(id),clip=HOME_VIDEOS[id];
+ const t=task(id),clip=TASK_VIDEOS[id];
  return `<a class="wall-tile" data-wall-task="${id}" href="${Site.href('tasks',{task:id})}" aria-label="Open ${id}: ${esc(t.name)}" ${copy?'tabindex="-1" aria-hidden="true"':''} style="--task-color:${group(t.group).color}">
   ${thumbnail(t,`wall-${id}-${copy}`)}${clip?`<video data-home-video src="${esc(clip.src)}" ${clip.poster?`poster="${esc(clip.poster)}"`:''} muted loop playsinline preload="none" disablepictureinpicture aria-hidden="true"></video>`:''}
   <span class="wall-tile-top"><span>${id} / ${esc(t.robot)}</span><span class="wall-tile-arrow" aria-hidden="true">↗</span></span>
@@ -56,13 +56,19 @@ function collection() {
  $('#task-pages').innerHTML=page.pages>1?`<nav class="task-page-controls" aria-label="Task pages"><div><button type="button" data-task-page="${page.page-1}"${page.page===1?' disabled':''} aria-label="Previous page">←</button>${Array.from({length:page.pages},(_,i)=>`<button type="button" data-task-page="${i+1}" aria-label="Page ${i+1}"${page.page===i+1?' aria-current="page"':''}>${i+1}</button>`).join('')}<button type="button" data-task-page="${page.page+1}"${page.page===page.pages?' disabled':''} aria-label="Next page">→</button></div></nav>`:'';
  if(ts.length&&!ts.some(t=>t.id===state.selected))state.selected=ts[0].id;
 }
+function taskDemonstration(t) {
+ const clip=TASK_VIDEOS[t.id];
+ return `<figure class="task-demo" aria-label="${esc(t.id)} task demonstration"><div class="task-demo-stage">${clip?`<video id="task-demo-video" src="${esc(clip.src)}"${clip.poster?` poster="${esc(clip.poster)}"`:''} controls playsinline preload="metadata" aria-label="${esc(t.name)} demonstration"></video>`:Evidence.slot('VIDEO','Task demonstration','')}</div><figcaption class="sr-only">${esc(t.name)} task demonstration</figcaption></figure>`;
+}
+function pauseTaskDemonstration(){ $('#task-demo-video')?.pause(); }
 function detail() {
  const t=task(state.selected),ts=filteredTasks(),index=ts.findIndex(item=>item.id===t.id);
- TaskReplay.suspend();
+ pauseTaskDemonstration();TaskReplay.suspend();
  $('#task-window-label').textContent=`${t.id} / ${category(t.category).name.toUpperCase()}`;
  $('#task-detail').innerHTML=`<header class="task-article-header"><div class="task-identity"><span>${t.id}</span><span>${category(t.category).name}</span></div>
-  <h2 id="task-title" tabindex="-1">${t.name}</h2><p class="task-objective">${t.goal}</p>
-  <dl class="task-facts"><div><dt>Embodiment / scene</dt><dd>${t.robot}</dd></div><div><dt>Model deliverable</dt><dd>${tracks[t.track].output}</dd></div><div><dt>Task category</dt><dd>${category(t.category).name}</dd></div></dl></header>
+  <h2 id="task-title" tabindex="-1">${t.name}</h2><p class="task-objective">${t.goal}</p></header>
+ ${taskDemonstration(t)}
+ <dl class="task-facts"><div><dt>Embodiment / scene</dt><dd>${t.robot}</dd></div><div><dt>Model deliverable</dt><dd>${tracks[t.track].output}</dd></div><div><dt>Task category</dt><dd>${category(t.category).name}</dd></div></dl>
  <section id="task-replay" class="task-integrated-replay" aria-label="Model performance and synchronized task demonstrations"></section>
  <section class="task-article-section task-completion" aria-labelledby="task-completion-title"><h3 id="task-completion-title">What counts as completion?</h3><p>${t.proof}</p><ul>${t.checks.map(check=>`<li>${check}</li>`).join('')}</ul></section>
  <section class="task-procedure task-article-section" aria-labelledby="task-procedure-title"><h3 id="task-procedure-title">From input to verification</h3><div class="task-input"><h4>Task input</h4><p>${t.input}</p></div><ol class="task-sequence">${t.beats.map(beat=>`<li>${beat}</li>`).join('')}</ol></section>
@@ -78,7 +84,7 @@ state.taskOpen=false;
 if(infoPage==='home'){$('#page-content').innerHTML=home();Motion.revealHome($('#page-content'));Motion.videoWall($('.hero-cinema'));HomeOverview.mount();}
 if(infoPage==='tasks'){
  $('#page-content').innerHTML=explorer();
- taskWindow=Motion.taskWindow($('#task-focus'),()=>{TaskReplay.unmount();state.taskOpen=false;saveTaskView();$('#task-collection [data-select="'+state.selected+'"]')?.focus({preventScroll:true});});
+ taskWindow=Motion.taskWindow($('#task-focus'),()=>{pauseTaskDemonstration();TaskReplay.unmount();state.taskOpen=false;saveTaskView();$('#task-collection [data-select="'+state.selected+'"]')?.focus({preventScroll:true});});
  const loadSelection=()=>{
   const p=new URLSearchParams(location.search);
   Object.assign(state,TaskFilters.normalize(Object.fromEntries(p)));
@@ -111,3 +117,6 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('input',e=>{if(e.target.id==='task-search'){state.search=e.target.value;state.page=1;collection();saveTaskView();}});
 document.addEventListener('change',e=>{if(e.target.dataset.scopeFilter){state[e.target.dataset.scopeFilter]=e.target.value;state.page=1;collection();saveTaskView();}});
+
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseTaskDemonstration();});
+window.addEventListener('pagehide',pauseTaskDemonstration);
