@@ -14,7 +14,7 @@ window.Site=(()=>{
   home:['index.html','Home','AI4Robot','Code meets the physical world.','LLM EMBODIMENT BENCHMARK'],
   tasks:['tasks.html','Task','Inside each task.','Explore 23 tasks across six embodied categories, with model performance, recordings, inputs, outputs and submitted artifacts in one place.','THE TASK COLLECTION'],
   leaderboard:['leaderboard.html','Leaderboard','Leaderboard','Compare eight foundation models across six task categories and 23 tasks. Overall gives each category equal weight. Select a model to inspect its results.','MODEL PERFORMANCE'],
-  report:['report.html','Report','Report','Publications, project announcements and coverage of the Embodied Generalist Exam.','PUBLICATIONS & UPDATES'],
+  report:['report.html','Report','Report','The Embodied Generalist Exam research paper.','RESEARCH PAPER'],
   contribute:['contribute.html','Contribute','Contribute','Bring a new task, method or model to the Embodied Generalist Exam.','CONTRIBUTE'],
   community:['community.html','Community','Community','Connect with the Embodied Generalist Exam team and community.','COMMUNITY']
  };

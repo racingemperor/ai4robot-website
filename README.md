@@ -11,7 +11,7 @@ An English static website for 23 embodied tasks (T01–T23), aligned with the EG
 | Home | Flowing task wall, title and benchmark scale, paper metadata, News, overview-video placeholder, introduction, compact Overall bar leaderboard, copyable BibTeX Citation and shared footer |
 | Task | Illustrated searchable task gallery; each floating task window contains its objective, model results, synchronized model recordings, paper categories, completion checks and evidence |
 | Leaderboard | News, six manuscript categories plus Overall in a model-colored line chart, sortable 23-task table, inline task recordings within model result windows and report data tools |
-| Report | Publications, project announcements and external coverage; no methods, CLI configurator or nested documentation views |
+| Report | One research-paper entry with its cover, title, short summary and repository link |
 | Contribute | Short invitations for new tasks, methods and models, with email proposals and a contact link |
 | Community | WeChat and QQ group QR areas and a GitHub contact link |
 
@@ -50,7 +50,7 @@ Leaderboard model checkboxes, logos and names only toggle curve visibility. Clic
 
 ## Publications and contributions
 
-Report follows a simple publication-entry layout inspired by LIBERO-Pro 2.0. It lists the EGE paper and website announcement. Unfilled publication metadata and press announcements are omitted. Public paper links, authors, venue and press links are added when supplied. No reference-site papers, invented publication claims or raw manuscript archives are published.
+Report contains only the EGE research paper: a cover placeholder, its confirmed title, a short summary and a research-repository link. Dates, project updates, website announcements and external coverage are omitted. No unprovided paper metadata, reference-site papers, invented publication claims or raw manuscript archives are published.
 
 Contribute presents three short invitations: new tasks, new methods and new models. Each opens an email draft addressed to racingemperor@outlook.com with the corresponding contribution subject; nothing is sent automatically. Community provides WeChat and QQ group areas and a GitHub contact link. Add the project’s actual QR image paths to channels in community.js; supplied images open at full size. Other projects’ QR codes and unprovided contact details are not used.
 
