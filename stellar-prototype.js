@@ -35,15 +35,62 @@
   const x=Math.cos(angle)*radius*rx,y=Math.sin(angle)*radius*ry+jitter;
   return {x:cx+x*Math.cos(tilt)-y*Math.sin(tilt),y:cy+x*Math.sin(tilt)+y*Math.cos(tilt)};
  }
+ function paintNebula(c,rand){
+  // Cloud structure is baked once; animation never reruns these fractal samples.
+  const texture=document.createElement('canvas');
+  texture.width=mobile()?340:1000;texture.height=Math.round(texture.width*height/width);
+  const tc=texture.getContext('2d'),pixels=tc.createImageData(texture.width,texture.height),grid=new Float32Array(256*256);
+  for(let i=0;i<grid.length;i++)grid[i]=rand();
+  const noise=(x,y)=>{
+   const ix=Math.floor(x),iy=Math.floor(y);let fx=x-ix,fy=y-iy;fx=fx*fx*(3-2*fx);fy=fy*fy*(3-2*fy);
+   const a=grid[(iy&255)*256+(ix&255)],b=grid[(iy&255)*256+((ix+1)&255)],d=grid[((iy+1)&255)*256+(ix&255)],e=grid[((iy+1)&255)*256+((ix+1)&255)];
+   return (a+(b-a)*fx)*(1-fy)+(d+(e-d)*fx)*fy;
+  };
+  const fbm=(x,y)=>{let value=0,amp=.54;for(let o=0;o<5;o++){value+=noise(x,y)*amp;x=x*2.03+13.7;y=y*2.03+7.2;amp*=.49;}return value;};
+  const palettes={solar:[[29,78,153],[113,42,158],[221,75,58]],andromeda:[[30,117,183],[127,51,178],[221,63,126]],voyage:[[15,127,143],[55,66,180],[213,46,133]],vault:[[28,109,163],[125,47,178],[228,69,114]]};
+  const palette=palettes[variant.id];
+  for(let py=0;py<texture.height;py++)for(let px=0;px<texture.width;px++){
+   const u=px/texture.width,v=py/texture.height;
+   const warp=fbm(u*3+19,v*3+41),n=fbm(u*6+warp*2,v*5+warp*2),fine=fbm(u*24+4,v*22+9);
+   const middle=variant.id==='vault'?.59-.26*u:variant.id==='voyage'?.86-.60*u:.70-.32*u;
+   const ribbon=Math.exp(-(((v-middle+(warp-.5)*.5)/.25)**2));
+   const wisps=Math.max(0,n-.27)*2.6,ridge=Math.max(0,1-Math.abs(fine-.51)*8);
+   const dust=1-Math.max(0,fbm(u*11+60,v*9)-.48)*2.7;
+   const density=Math.min(1.4,wisps*wisps*ribbon*(.5+ridge*.75))*dust;
+   const mix=Math.max(0,Math.min(1,(warp-.31)*3.8)),p0=palette[mix<.5?0:1],p1=palette[mix<.5?1:2],t=mix<.5?mix*2:(mix-.5)*2;
+   let red=(p0[0]*(1-t)+p1[0]*t)*density,green=(p0[1]*(1-t)+p1[1]*t)*density,blue=(p0[2]*(1-t)+p1[2]*t)*density;
+   if(variant.id==='andromeda'){
+    const dx=u-.51,dy=(v-.54)*height/width,tilt=-.25;
+    const gx=(dx*Math.cos(tilt)+dy*Math.sin(tilt))/.43,gy=(-dx*Math.sin(tilt)+dy*Math.cos(tilt))/(height/width*.32);
+    const r=Math.hypot(gx,gy),a=Math.atan2(gy,gx),arms=(.5+.5*Math.cos((a-r*5.3)*3+(n-.5)*2))**5;
+    const disc=Math.exp(-r*r*1.8),structure=(.22+arms*.95)*(fine*.7+.3)*disc;
+    const core=Math.exp(-r*r*28)*.95,young=structure*Math.min(1,r*2),gas=arms*disc*Math.max(0,warp-.5)*2;
+    red=red*.52+core*255+young*83+gas*220;green=green*.52+core*183+young*124+gas*36;blue=blue*.52+core*105+young*236+gas*121;
+    const lane=1-Math.max(0,noise(gx*20+100,gy*20+100)-.45)*disc*.85;red*=lane;green*=lane;blue*=lane;
+   }
+   const edge=Math.min(1,u*5,(1-u)*5)*Math.min(1,v*5,(1-v)*5),index=(py*texture.width+px)*4;
+   pixels.data[index]=red*edge;pixels.data[index+1]=green*edge;pixels.data[index+2]=blue*edge;pixels.data[index+3]=255;
+  }
+  tc.putImageData(pixels,0,0);c.save();c.globalCompositeOperation='screen';c.drawImage(texture,0,0,width,height);c.restore();
+ }
  function baseStars(c,rand){
-  const bg=c.createLinearGradient(0,0,width,height);bg.addColorStop(0,'#060c19');bg.addColorStop(.6,'#0b1524');bg.addColorStop(1,'#050a13');c.fillStyle=bg;c.fillRect(0,0,width,height);
-  bloom(c,width*.25,height*.75,width*.6,'39,79,119',.16);bloom(c,width*.84,height*.22,width*.45,'76,68,111',.12);
-  const count=mobile()?500:1500;
+  const bg=c.createLinearGradient(0,0,width,height);bg.addColorStop(0,'#040512');bg.addColorStop(.6,'#0b0b21');bg.addColorStop(1,'#020812');c.fillStyle=bg;c.fillRect(0,0,width,height);
+  paintNebula(c,rand);
+  const count=mobile()?2600:10500,starColors=['177,210,255','254,219,168','223,192,255','255,173,190','165,243,236'];
   for(let i=0;i<count;i++){
-   const x=rand()*width,y=rand()*height,r=rand(),alpha=.1+rand()*.6;
-   c.fillStyle=i%4===0?`rgba(178,202,240,${alpha})`:`rgba(237,235,224,${alpha})`;
-   c.beginPath();c.arc(x,y,r>.985?1.45:r>.8?.8:.45,0,Math.PI*2);c.fill();
-   if(r>.994){bloom(c,x,y,10,'170,196,245',.35);line(c,[{x:x-5,y},{x:x+5,y}],'#aec5ed55',.5);line(c,[{x,y:y-5},{x,y:y+5}],'#aec5ed55',.5);}
+   const x=rand()*width,y=rand()*height,r=rand(),alpha=.12+rand()*.65,color=starColors[i%starColors.length];
+   c.fillStyle=`rgba(${color},${alpha})`;
+   c.beginPath();c.arc(x,y,r>.996?1.6:r>.96?.9:.25+rand()*.4,0,Math.PI*2);c.fill();
+   if(r>.997){bloom(c,x,y,13,color,.55);line(c,[{x:x-7,y},{x:x+7,y}],'#d2e5ff77',.5);line(c,[{x,y:y-7},{x,y:y+7}],'#d2e5ff77',.5);}
+  }
+  // Small foreground clusters and distant island galaxies give the field several scales.
+  for(let cluster=0;cluster<(mobile()?8:19);cluster++){
+   const cx=rand()*width,cy=height*(.20+rand()*.65),radius=7+rand()*28,color=starColors[cluster%starColors.length];
+   bloom(c,cx,cy,radius*2,color,.10);
+   for(let j=0;j<75;j++){const x=cx+gaussian(rand)*radius*.45,y=cy+gaussian(rand)*radius*.28;c.fillStyle=`rgba(${color},${.15+rand()*.55})`;c.fillRect(x,y,.6,.6);}
+  }
+  for(let i=0;i<4;i++){
+   c.save();c.translate(width*(.12+i*.25),height*(i%2?.20:.80));c.rotate(-.5+i*.3);c.scale(1,.27);bloom(c,0,0,14+i*3,'220,195,162',.36);c.restore();
   }
  }
  function paintSolar(c,rand){
@@ -68,16 +115,16 @@
   }
   for(let arm=0;arm<3;arm++)for(let i=0;i<(mobile()?3700:6400);i++){
    const r=Math.pow(rand(),.68),a=arm*Math.PI*2/3+r*5.3+gaussian(rand)*(.08+r*.12),p=galaxyPoint(r,a,gaussian(rand)*(2+r*9));
-   const warm=r<.30,alpha=(.035+rand()*.18)*(1-r*.45),size=.35+rand()*(warm?1.65:1.25);
+   const warm=r<.30,alpha=(.07+rand()*.23)*(1-r*.45),size=.35+rand()*(warm?1.65:1.25);
    c.fillStyle=warm?`rgba(255,209,147,${alpha})`:r>.6?`rgba(151,181,247,${alpha})`:`rgba(212,199,241,${alpha})`;
    c.fillRect(p.x,p.y,size,size);
-   if(i%147===0)bloom(c,p.x,p.y,4+rand()*9,'164,192,255',.1);
+   if(i%147===0)bloom(c,p.x,p.y,4+rand()*9,i%3===0?'255,102,168':'130,196,255',.3);
   }
   for(let i=0;i<2800;i++){
    const a=rand()*Math.PI*2,r=Math.abs(gaussian(rand))*.13,p=galaxyPoint(r,a,gaussian(rand)*3);
    c.fillStyle=`rgba(255,225,169,${.05+rand()*.24})`;c.fillRect(p.x,p.y,1.2,1.2);
   }
-  bloom(c,core.x,core.y,mobile()?90:140,'255,219,158',.7);bloom(c,core.x,core.y,25,'255,247,221',.85);c.restore();
+  bloom(c,core.x,core.y,mobile()?90:140,'255,191,119',.7);bloom(c,core.x,core.y,25,'255,239,195',.85);c.restore();
   const p=galaxyPoint(1,5.8);line(c,[core,p],'#e4d0a624',.75);
  }
  function positions(){
