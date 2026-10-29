@@ -24,7 +24,7 @@ window.Results = (() => {
     return src?`<span class="model-logo" aria-hidden="true"><img src="${src}" alt="" width="28" height="28"></span>`:'';
   }
   const defaultSource=()=>official.models.length?'official':'demo';
-  const sourceFor=value=>['official','demo'].includes(value)?value:defaultSource();
+  const sourceFor=value=>official.results.length?'official':['official','demo'].includes(value)?value:defaultSource();
   const demoModels = roster.map(({id,name,agent,version})=>({id,name,agent,version}));
   const demo = {...official,models:demoModels,results:[],episodes:[]};
   demoModels.forEach((m,mi)=>TASKS.forEach((t,ti)=>{
@@ -76,7 +76,7 @@ window.Results = (() => {
       const count=seenCounts.get(pairKey)||{total:0,success:0};count.total++;if(e.status==='success')count.success++;seenCounts.set(pairKey,count);
       if(count.total>aggregate.trials||count.success>aggregate.successes||count.total-count.success>aggregate.trials-aggregate.successes)fail('Episode counts or outcomes contradict their aggregate.');
       const duration=num(e.duration_s,'duration_s',0.001,10000000);
-      if(!Array.isArray(e.events)||!e.events.length||e.events.length>200)fail('Each episode requires 1–200 events.');
+      if(!Array.isArray(e.events)||!e.events.length||e.events.length>2000)fail('Each episode requires 1–2000 events.');
       let previous=-1;
       const multiline=(value,label,max)=>{if(typeof value!=='string'||!value.trim()||value.length>max||/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value))fail(`${label} must be nonempty text of at most ${max} characters.`);return value;};
       const events=e.events.map(event=>{
@@ -84,7 +84,12 @@ window.Results = (() => {
         const time=num(event.time_s,'event.time_s',0,duration);
         if(time<previous)fail('Event times must be ordered and within the episode duration.');previous=time;
         const cleanEvent={time_s:time,type:str(event.type,'event.type',30),text:str(event.text,'event.text',1000)};
-        for(const key of ['input','output'])if(event[key]!==undefined)cleanEvent[key]=multiline(event[key],`event.${key}`,16000);
+        for(const key of ['input','output'])if(event[key]!==undefined)cleanEvent[key]=multiline(event[key],`event.${key}`,64000);
+        if(event.recorded_at!==undefined){
+          const recorded=str(event.recorded_at,'event.recorded_at',40);
+          if(!/^\d{4}-\d{2}-\d{2}T[\d:.]+Z$/.test(recorded)||!Number.isFinite(Date.parse(recorded)))fail('event.recorded_at must be a UTC timestamp.');
+          cleanEvent.recorded_at=recorded;
+        }
         if(event.code!==undefined){
           if(!event.code||typeof event.code!=='object'||Array.isArray(event.code))fail('event.code must contain a filename and content.');
           cleanEvent.code={filename:str(event.code.filename,'code.filename',160),content:multiline(event.code.content,'code.content',64000)};
@@ -124,5 +129,6 @@ window.Results = (() => {
     });
   }
   function csv(rows){return '\uFEFF'+rows.map(row=>row.map(v=>{let value=String(v??'');if(typeof v==='string'&&/^[=+\-@\t\r]/.test(value))value="'"+value;return '"'+value.replaceAll('"','""')+'"';}).join(',')).join('\r\n');}
+  if(window.PUBLISHED_RESULTS)Object.assign(official,validate(window.PUBLISHED_RESULTS));
   return {version,official,demo,validate,summarize,csv,roster,logo,logoPath,defaultSource,sourceFor};
 })();

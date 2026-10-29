@@ -1,9 +1,8 @@
 /* Research narrative, catalog and evaluation method. */
 const params=new URLSearchParams(location.search);
 const state={...TaskFilters.normalize(Object.fromEntries(params)),search:(params.get('q')||'').slice(0,160),selected:TASKS.some(t=>t.id===params.get('task'))?params.get('task'):'T06'};
-// Add representative task clips here; Home and task demonstrations share them.
-// Example entry: T06: {src:'media/T06.mp4', poster:'media/T06.jpg'}.
-const TASK_VIDEOS=Object.freeze({});
+// Home, the task gallery and task demonstrations reuse the published recordings.
+const TASK_VIDEOS=Object.freeze(Object.fromEntries(Results.official.episodes.filter(e=>e.video).map(e=>[e.task_id,e.video])));
 const HOME_WALL_COLUMNS=[
  ['T01','T07','T13','T20'],
  ['T02','T08','T14','T21'],
@@ -29,7 +28,7 @@ function home(){return homeHero()+HomeOverview.introduction()+HomeOverview.shell
 function taskCard(t) {
 
  return `<button class="task-card" data-select="${t.id}" aria-haspopup="dialog" aria-controls="task-focus" aria-label="Open ${t.id}: ${t.name}" style="--task-color:${group(t.group).color}">
-  <span class="task-card-image">${thumbnail(t)}<span class="task-card-id">${t.id}</span><span class="task-card-open" aria-hidden="true">↗</span></span>
+  <span class="task-card-image">${TASK_VIDEOS[t.id]?.poster?`<img class="task-thumbnail" src="${esc(TASK_VIDEOS[t.id].poster)}" alt="" loading="lazy" width="400" height="300">`:thumbnail(t)}<span class="task-card-id">${t.id}</span><span class="task-card-open" aria-hidden="true">↗</span></span>
   <span class="task-card-body"><span class="task-card-category">${t.robot}</span><strong class="task-card-title">${t.name}</strong><span class="task-card-goal">${t.goal}</span>
   <span class="task-trait-cells" aria-label="Paper category"><span>${category(t.category).name}</span></span><span class="task-card-bottom"><span>${tracks[t.track].output}</span><span>Explore task <b aria-hidden="true">↗</b></span></span></span>
  </button>`;

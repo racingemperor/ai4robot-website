@@ -20,7 +20,7 @@ Use a white canvas, neutral surfaces, dark ink and restrained blue controls, wit
 
 Controls and media frames retain soft corners. Keep native labels, visible focus, one H1 per page, a skip link and aria-current on the active primary navigation link. Tables scroll within labeled regions. Small screens stack replay media and traces, retaining a usable range input and 44 px controls. Task windows leave surrounding context visible and return focus to the opening card. Reduced motion skips animated card transforms and scroll entry effects.
 
-Home tiles use original task concepts until footage is supplied. Duplicate wall cycles have distinct SVG IDs and are hidden from keyboard/accessibility output. Videos decode only while visible; page visibility, focus and reduced motion pause the wall. The theme transition fades page snapshots without replacing live recording elements.
+Home tiles use supplied footage for the 12 recorded tasks and original concepts elsewhere. Duplicate wall cycles have distinct SVG IDs and are hidden from keyboard/accessibility output. Videos decode only while visible; page visibility, focus and reduced motion pause the wall. The theme transition fades page snapshots without replacing live recording elements.
 
 ## Data and media boundaries
 
@@ -35,3 +35,5 @@ The six paper categories are robotic manipulation, navigation, scene generation 
 The October 28 EGE manuscript supplies the framing, six categories, task titles and eight model–harness names. Existing task specifications draw on https://github.com/ALEXander22568/AI4Robot; the latest manuscript takes precedence for T18 and T23. Its blank results table and Score figure do not establish trial-level success data. Do not publish template authors, figure captions or unverified figure scores as success rates. LIBERO-Pro 2.0 informed typography, whitespace, theme and publication layout; First Exam informed the compact Overall rows and synchronized recording presentation. The site retains its own branding, text and task concepts.
 
 Legacy Episodes opens Task, Compare/Matrix open Leaderboard, and Documents/Method/Run/About/Footage open Report. Earlier paper/exploration modules remain unmounted source references. Progress records, QA captures and private research materials are not published.
+
+The GPT-6 package is converted into a validated published report; both Task and Leaderboard reuse the same episodes. Media is compressed for static hosting without changing frame count or playback time. Simulation observations anchor recorded events; interpolation is used only between observation anchors for intermediate control commands. Original UTC model timestamps remain available. Same-time step selection is explicit, preserving compressed simulation-time histories without inventing thinking-time video frames.

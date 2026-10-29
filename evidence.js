@@ -7,8 +7,8 @@ window.Evidence = (() => {
  function playbackIcon(playing) {
   return `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" focusable="false">${playing?'<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>':'<path d="m8 4 12 8-12 8z"/>'}</svg>`;
  }
- function atTime(episode,time) {
-  const index=episode.events.findLastIndex(event=>event.time_s<=time);
+ function atTime(episode,time,selectedIndex) {
+  const index=Number.isInteger(selectedIndex)&&episode.events[selectedIndex]?.time_s<=time?selectedIndex:episode.events.findLastIndex(event=>event.time_s<=time);
   const past=episode.events.slice(0,index+1);
   return {index,event:index<0?null:episode.events[index],input:past.findLast(event=>event.input),output:past.findLast(event=>event.output),code:past.findLast(event=>event.code),images:past.findLast(event=>event.images?.length)};
  }

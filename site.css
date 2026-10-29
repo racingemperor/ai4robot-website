@@ -349,6 +349,7 @@ h1,h2,h3,h4{text-wrap:wrap}
 .task-card{position:relative;display:flex;flex-direction:column;text-align:left;width:100%;min-width:0;background:var(--paper);border:1px solid var(--line);padding:0;cursor:pointer;transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s,border-color .3s;isolation:isolate}
 .task-card-image{display:block;position:relative;aspect-ratio:16/10;overflow:hidden;background:color-mix(in srgb,var(--task-color) 7%,var(--paper));color:var(--task-color);border-bottom:1px solid var(--line)}
 .task-thumbnail{display:block;width:100%;height:100%;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.task-card-image img.task-thumbnail{object-fit:cover}
 .task-thumbnail text{fill:currentColor;stroke:none;font:12px var(--sans)}
 .task-card-id{position:absolute;top:16px;left:17px;font:11px var(--sans);color:var(--ink)}
 .task-card-open{position:absolute;right:14px;top:12px;font-size:22px;color:var(--ink);transition:transform .3s}

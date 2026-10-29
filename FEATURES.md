@@ -26,19 +26,19 @@ Each model has unique id (letters, numbers, underscore or hyphen), name, version
 
 Each aggregate has model_id, task_id, trials (positive integer), successes (0 to trials), progress_sum (successes to trials) and duration_sum_s (nonnegative simulation seconds). Normalize task progress to 0–1 before summing; successful trials contribute 1. Merge seeds/layouts into one aggregate per task/model. Include all valid outcomes and rerun infrastructure-invalid trials.
 
-Each episode has a unique id, model_id, task_id, status (success/failure/incomplete), positive duration_s, nonnegative integer seed/layout and 1–200 ordered events. The task/model aggregate must exist; selected episode counts and outcomes cannot contradict it. Displayed recordings may be a subset of trials, so their success fraction is not the model’s benchmark score.
+Each episode has a unique id, model_id, task_id, status (success/failure/incomplete), positive duration_s, nonnegative integer seed/layout and 1–2000 ordered events. The task/model aggregate must exist; selected episode counts and outcomes cannot contradict it. Displayed recordings may be a subset of trials, so their success fraction is not the model’s benchmark score.
 
 Optional episode video is an object with src and optional poster. URLs must use HTTP(S) or be relative media paths; script/data/protocol-relative URLs are rejected. For example:
 
     "video": {"src": "media/T06/model-a/episode-01.mp4", "poster": "media/T06/model-a/poster.jpg"}
 
-Each event has time_s within episode duration, type and text. Optional input/output preserve multiline text up to 16,000 characters. Optional code contains filename (up to 160 characters) and content (up to 64,000 characters). Code is displayed only. Optional images contains up to four observation objects with src and descriptive alt text. For example:
+Each event has time_s within episode duration, type and text. Optional input/output preserve multiline text up to 64,000 characters. Optional code contains filename (up to 160 characters) and content (up to 64,000 characters). Code is displayed only. Optional images contains up to four observation objects with src and descriptive alt text. For example:
 
     "images": [{"src": "media/T06/model-a/frame-008.jpg", "alt": "Head camera supplied to the model"}]
 
 The playhead retains the latest supplied input, output, code and images at or before the current time. Before their first event these remain absent. Video starts on the same original clock as event timestamps.  A duration mismatch is explicitly shown.
 
-Public pages render the website report and hosted media; prior local reports do not change these views. Internal source metadata survives navigation and export; the public UI omits provenance and release-wait labels. The eight-model roster and official brand assets are shared by Home, Task and Leaderboard. Card tags and task filters use only the paper taxonomy. Leaderboard has no model-search field or modelQuery filtering. Shared links contain view state. The official empty report and layout placeholders never enter exports as model results.
+Public pages render the website report and hosted media; prior local reports do not change these views. Internal source metadata survives navigation and export; the public UI omits provenance and release-wait labels. The eight-model roster and official brand assets are shared by Home, Task and Leaderboard. Card tags and task filters use only the paper taxonomy. Leaderboard has no model-search field or modelQuery filtering. Shared links contain view state. Published exports contain the GPT-6 measurements; no layout results are included. Older data=demo links resolve to the published report when it is available.
 
 ## Scoring
 
@@ -49,3 +49,5 @@ Pooled success divides all successes by all trials; its Wilson 95% interval is d
 ## Verification and publication
 
 Run node --test tests/*.test.cjs, syntax-check JavaScript, verify hashes and git diff --check. Browser checks cover direct and legacy navigation, model/episode isolation, replay retention, video/range/trace synchronization, downloads, absence of import controls, keyboard and reduced motion, mobile layout, theme persistence and Home regression. Publish only website assets and verify the Pages deployment and files.
+
+Published GPT-6 episodes include optional event.recorded_at UTC timestamps. Dense timelines show up to seven markers while the complete history scrolls within 320 px. Selecting one of several steps at the same simulation time inspects that particular record without exposing later output or code. The supplied 12-task report leaves incomplete Overall and all unavailable task/model values empty.

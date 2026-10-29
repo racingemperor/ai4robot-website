@@ -68,7 +68,7 @@ test('episode input, output and code preserve multiline text and strip unknown f
   const clean=R.validate(d).episodes[0].events[1];
   assert.equal(clean.input,event.input);assert.equal(clean.output,event.output);assert.equal(clean.code.content,event.code.content);
   assert.equal(clean.code.execute,undefined);assert.equal(clean.private_token,undefined);
-  for(const change of [e=>e.output='x'.repeat(16001),e=>e.code.content='x'.repeat(64001),e=>e.input='bad\u0000text',e=>e.code=[],e=>e.code.filename='']){
+  for(const change of [e=>e.output='x'.repeat(64001),e=>e.code.content='x'.repeat(64001),e=>e.input='bad\u0000text',e=>e.code=[],e=>e.code.filename='']){
     const invalid=clone(d);change(invalid.episodes[0].events[1]);assert.throws(()=>R.validate(invalid));
   }
 });
