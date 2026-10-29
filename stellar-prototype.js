@@ -3,7 +3,7 @@
 (()=>{
  const variants=[
   {id:'solar',name:'Solar System',title:'A center of gravity.',text:'One leading star. Seven worlds in its orbit.',direction:'Stronger models move toward the center.',description:'The leading model becomes the sun. The others orbit it in ranked rings. A strong identity for the model in first place.'},
-  {id:'andromeda',name:'Andromeda',title:'Overall leaderboard',text:'',direction:'',description:'The leading model anchors the core. Seven models occupy seven colorful spiral arms; closer to the center means stronger.'},
+  {id:'andromeda',name:'Andromeda',title:'Intelligence, expanding outward.',text:'Follow the spiral from its core to the frontier.',direction:'Farther from the galactic core means stronger.',description:'A tilted galaxy with luminous spiral arms. Models spread outward as they advance, leaving room for a growing field.'},
   {id:'voyage',name:'Deep Space',title:'How far can intelligence go?',text:'A shared starting point. Different frontiers.',direction:'Longer journeys mean stronger performance.',description:'Eight comet trails depart from one origin. The farthest model leads. The clearest overall comparison at a glance.'},
   {id:'vault',name:'Celestial Vault',title:'The next frontier is overhead.',text:'An ascending constellation across an open sky.',direction:'Higher in the sky means stronger performance.',description:'Models form an ascending constellation above a planetary horizon. The leader sits highest in the celestial vault.'}
  ];
@@ -26,7 +26,7 @@
   <div class="prototype-switcher" role="group" aria-label="Switch visual concept"><button type="button" data-switch="-1" aria-label="Previous concept">‹</button><div><strong id="switcher-title"></strong><span>DESIGN EXPLORATION · ← / →</span></div><button type="button" data-switch="1" aria-label="Next concept">›</button><nav class="prototype-dots" aria-label="Visual concepts">${variants.map((v,i)=>`<a href="${urlFor(v.id)}" data-variant="${v.id}" aria-label="${v.name}">0${i+1}</a>`).join('')}</nav></div>`;
  const scene=document.querySelector('.stellar-scene'),canvas=scene.querySelector('canvas'),ctx=canvas.getContext('2d'),nodes=scene.querySelector('.star-nodes');
  const mobile=()=>width<650;
- const whiteGalaxy=()=>variant.id==='andromeda';
+ const isAndromeda=()=>variant.id==='andromeda';
  function random(seed){let value=seed;return ()=>{value=(Math.imul(value,1664525)+1013904223)>>>0;return value/4294967296;};}
  function gaussian(rand){return (rand()+rand()+rand()+rand()+rand()+rand()-3)*1.42;}
  function bloom(c,x,y,r,color,opacity=1){const gradient=c.createRadialGradient(x,y,0,x,y,r);gradient.addColorStop(0,`rgba(${color},${opacity})`);gradient.addColorStop(.15,`rgba(${color},${opacity*.36})`);gradient.addColorStop(.55,`rgba(${color},${opacity*.08})`);gradient.addColorStop(1,`rgba(${color},0)`);c.fillStyle=gradient;c.fillRect(x-r,y-r,r*2,r*2);}
@@ -35,72 +35,6 @@
   const cx=width*(mobile()?.50:.51),cy=height*(mobile()?.57:.54),rx=width*(mobile()?.42:.43),ry=height*(mobile()?.34:.32),tilt=mobile()?-.18:-.25;
   const x=Math.cos(angle)*radius*rx,y=Math.sin(angle)*radius*ry+jitter;
   return {x:cx+x*Math.cos(tilt)-y*Math.sin(tilt),y:cy+x*Math.sin(tilt)+y*Math.cos(tilt)};
- }
- function armLayout(){
-  // Distribute the models across seven arms. Their distances increase with display order.
-  return mobile()
-   ? [[0,.60],[-154,.66],[154,.74],[-51,.77],[51,.85],[-103,.92],[103,1.01]]
-   : [[-103,.42],[103,.50],[-51,.59],[51,.69],[-154,.77],[154,.87],[0,.98]];
- }
- function armPoint(arm,radius,jitter=0){
-  const [degrees,modelRadius]=armLayout()[arm],angle=degrees*Math.PI/180+(radius-modelRadius)*1.55;
-  return {x:width*.5+Math.cos(angle)*width*.425*radius,y:height*.49+Math.sin(angle)*height*(mobile()?.38:.36)*radius+jitter};
- }
- function paintWhiteGalaxy(c,rand){
-  const palette=['101,115,216','199,100,180','66,154,204','133,97,204','221,132,83','84,166,173','192,103,166'];
-  c.save();
-  paintNebula(c,rand);
-  // A broad, distant star field sits behind the seven sharper foreground arms.
-  for(let i=0;i<(mobile()?1500:4800);i++){
-   const x=rand()*width,y=rand()*height,dx=(x-width*.5)/(width*.52),dy=(y-height*.49)/(height*.54),fade=Math.max(0,1-Math.hypot(dx,dy));
-   const color=palette[i%7],alpha=(.15+rand()*.45)*fade;
-   c.fillStyle=`rgba(${color},${alpha})`;c.beginPath();c.arc(x,y,.35+rand()*.55,0,Math.PI*2);c.fill();
-  }
-  for(let arm=0;arm<7;arm++){
-   const color=palette[arm];
-   for(let step=1;step<85;step++){
-    const radius=step/78,p=armPoint(arm,radius),fade=Math.sin(Math.min(1,radius)*Math.PI)*.8+.15;
-    bloom(c,p.x,p.y,(mobile()?15:24)+radius*(mobile()?13:27),color,.16*fade);
-   }
-   for(let i=0;i<(mobile()?2700:6500);i++){
-    const radius=Math.pow(rand(),.72)*1.1,spread=(mobile()?2:3)+radius*(mobile()?6:13);
-    const p=armPoint(arm,radius,gaussian(rand)*spread),x=p.x+gaussian(rand)*spread*1.5;
-    const alpha=(.12+rand()*.42)*Math.max(0,1-radius**3);
-    c.fillStyle=`rgba(${i%13===0?'225,150,77':i%7===0?'202,93,161':color},${alpha})`;
-    const size=rand()>.97?1.5:.5+rand()*.9;c.fillRect(x,p.y,size,size);
-   }
-   // Fine white cuts keep the gas clouds porous instead of forming solid ribbons.
-   for(let j=0;j<125;j++){
-    const radius=.20+rand()*.83,p=armPoint(arm,radius,gaussian(rand)*4);
-    bloom(c,p.x+gaussian(rand)*5,p.y,2+rand()*8,'255,255,255',.22);
-   }
-  }
-  const center={x:width*.5,y:height*.49};
-  bloom(c,center.x,center.y,mobile()?130:230,'242,167,37',.30);
-  bloom(c,center.x,center.y,mobile()?82:145,'248,181,45',.48);
-  bloom(c,center.x,center.y,mobile()?52:87,'255,207,83',.72);
-  // Fine curved rays and gold dust form a corona around the central model.
-  for(let ray=0;ray<100;ray++){
-   const angle=rand()*Math.PI*2,inner=mobile()?28:38,outer=inner+12+rand()*(mobile()?35:70);
-   const gradient=c.createLinearGradient(center.x+Math.cos(angle)*inner,center.y+Math.sin(angle)*inner,center.x+Math.cos(angle)*outer,center.y+Math.sin(angle)*outer);
-   gradient.addColorStop(0,'#e6aa3a66');gradient.addColorStop(1,'#edbc5500');
-   c.beginPath();c.moveTo(center.x+Math.cos(angle)*inner,center.y+Math.sin(angle)*inner);c.quadraticCurveTo(center.x+Math.cos(angle+.05)*(inner+outer)/2,center.y+Math.sin(angle+.05)*(inner+outer)/2,center.x+Math.cos(angle)*outer,center.y+Math.sin(angle)*outer);c.strokeStyle=gradient;c.lineWidth=.4+rand()*.6;c.stroke();
-  }
-  for(let i=0;i<(mobile()?750:1800);i++){
-   const angle=rand()*Math.PI*2,r=(mobile()?30:39)+Math.abs(gaussian(rand))*(mobile()?17:28);
-   c.fillStyle=`rgba(222,157,38,${.06+rand()*.3})`;c.fillRect(center.x+Math.cos(angle)*r,center.y+Math.sin(angle)*r,.6,.6);
-  }
-  for(let i=0;i<(mobile()?1800:4800);i++){
-   const arm=i%7,radius=rand()*1.15,p=armPoint(arm,radius,gaussian(rand)*(12+radius*23)),x=p.x+gaussian(rand)*25;
-   c.fillStyle=`rgba(${palette[arm]},${.10+rand()*.38})`;c.beginPath();c.arc(x,p.y,rand()>.98?1.3:.35+rand()*.45,0,Math.PI*2);c.fill();
-  }
-  for(let i=0;i<65;i++){
-   const p=armPoint(i%7,.18+rand()*.9,gaussian(rand)*20),color=palette[i%7];
-   bloom(c,p.x,p.y,6+rand()*8,color,.17);
-   line(c,[{x:p.x-3,y:p.y},{x:p.x+3,y:p.y}],`rgba(${color},.4)`,.6);
-   line(c,[{x:p.x,y:p.y-3},{x:p.x,y:p.y+3}],`rgba(${color},.4)`,.6);
-  }
-  c.restore();
  }
  function paintNebula(c,rand){
   // Cloud structure is baked once; animation never reruns these fractal samples.
@@ -115,7 +49,7 @@
   };
   const fbm=(x,y)=>{let value=0,amp=.54;for(let o=0;o<5;o++){value+=noise(x,y)*amp;x=x*2.03+13.7;y=y*2.03+7.2;amp*=.49;}return value;};
   const palettes={solar:[[29,78,153],[113,42,158],[221,75,58]],andromeda:[[30,117,183],[127,51,178],[221,63,126]],voyage:[[15,127,143],[55,66,180],[213,46,133]],vault:[[28,109,163],[125,47,178],[228,69,114]]};
-  const palette=palettes[variant.id],airy=whiteGalaxy();
+  const palette=palettes[variant.id];
   for(let py=0;py<texture.height;py++)for(let px=0;px<texture.width;px++){
    const u=px/texture.width,v=py/texture.height;
    const warp=fbm(u*3+19,v*3+41),n=fbm(u*6+warp*2,v*5+warp*2),fine=fbm(u*24+4,v*22+9);
@@ -126,7 +60,7 @@
    const density=Math.min(1.4,wisps*wisps*ribbon*(.5+ridge*.75))*dust;
    const mix=Math.max(0,Math.min(1,(warp-.31)*3.8)),p0=palette[mix<.5?0:1],p1=palette[mix<.5?1:2],t=mix<.5?mix*2:(mix-.5)*2;
    let red=(p0[0]*(1-t)+p1[0]*t)*density,green=(p0[1]*(1-t)+p1[1]*t)*density,blue=(p0[2]*(1-t)+p1[2]*t)*density;
-   if(variant.id==='andromeda'&&!airy){
+   if(variant.id==='andromeda'){
     const dx=u-.51,dy=(v-.54)*height/width,tilt=-.25;
     const gx=(dx*Math.cos(tilt)+dy*Math.sin(tilt))/.43,gy=(-dx*Math.sin(tilt)+dy*Math.cos(tilt))/(height/width*.32);
     const r=Math.hypot(gx,gy),a=Math.atan2(gy,gx),arms=(.5+.5*Math.cos((a-r*5.3)*3+(n-.5)*2))**5;
@@ -136,12 +70,9 @@
     const lane=1-Math.max(0,noise(gx*20+100,gy*20+100)-.45)*disc*.85;red*=lane;green*=lane;blue*=lane;
    }
    const edge=Math.min(1,u*5,(1-u)*5)*Math.min(1,v*5,(1-v)*5),index=(py*texture.width+px)*4;
-   if(airy){
-    pixels.data[index]=p0[0]*(1-t)+p1[0]*t;pixels.data[index+1]=p0[1]*(1-t)+p1[1]*t;pixels.data[index+2]=p0[2]*(1-t)+p1[2]*t;
-    pixels.data[index+3]=Math.min(.42,density*.38)*edge*255;
-   }else{pixels.data[index]=red*edge;pixels.data[index+1]=green*edge;pixels.data[index+2]=blue*edge;pixels.data[index+3]=255;}
+   pixels.data[index]=red*edge;pixels.data[index+1]=green*edge;pixels.data[index+2]=blue*edge;pixels.data[index+3]=255;
   }
-  tc.putImageData(pixels,0,0);c.save();c.globalCompositeOperation=airy?'source-over':'screen';c.drawImage(texture,0,0,width,height);c.restore();
+  tc.putImageData(pixels,0,0);c.save();c.globalCompositeOperation='screen';c.drawImage(texture,0,0,width,height);c.restore();
  }
  function baseStars(c,rand){
   const bg=c.createLinearGradient(0,0,width,height);bg.addColorStop(0,'#040512');bg.addColorStop(.6,'#0b0b21');bg.addColorStop(1,'#020812');c.fillStyle=bg;c.fillRect(0,0,width,height);
@@ -198,7 +129,6 @@
   const p=galaxyPoint(1,5.8);line(c,[core,p],'#e4d0a624',.75);
  }
  function positions(){
-  if(whiteGalaxy())return [{x:width*.5,y:height*.49},...armLayout().map(([,r],i)=>armPoint(i,r))];
   if(mobile()){
    const coords={
     solar:[[.50,.51],[.78,.61],[.22,.64],[.50,.30],[.80,.36],[.78,.79],[.21,.81],[.18,.40]],
@@ -212,6 +142,7 @@
    const radii=[0,.30,.45,.57,.70,.82,.94,1.04],angles=[0,.32,2.25,4.55,5.6,.8,2.85,3.8];
    return radii.map((r,i)=>({x:width*.5+Math.cos(angles[i]+(i?orbitTime*.004:0))*width*.43*r,y:height*.54+Math.sin(angles[i]+(i?orbitTime*.004:0))*height*.37*r}));
   }
+  if(variant.id==='andromeda')return [5.8,5.05,4.1,3,1.85,.15,-1.5,.95].map((a,i)=>galaxyPoint(.96-i*.112,a));
   if(variant.id==='voyage')return Array.from({length:8},(_,i)=>{const r=.96-i*.105;return {x:width*(.085+.83*r),y:height*(.54-.23*r+(i%2?.13:-.06))};});
   return [[.64,.26],[.40,.39],[.82,.43],[.23,.54],[.59,.56],[.89,.68],[.40,.73],[.15,.78]].map(([x,y])=>({x:x*width,y:y*height}));
  }
@@ -259,7 +190,6 @@
  function buildBackground(){
   background=document.createElement('canvas');background.width=width*dpr;background.height=height*dpr;
   const c=background.getContext('2d');c.scale(dpr,dpr);const rand=random(4119+variants.indexOf(variant)*112);
-  if(whiteGalaxy()){paintWhiteGalaxy(c,rand);return;}
   baseStars(c,rand);
   ({solar:paintSolar,andromeda:paintGalaxy,voyage:paintVoyage,vault:paintVault})[variant.id](c,rand);
   const vignette=c.createRadialGradient(width*.5,height*.5,width*.12,width*.5,height*.5,width*.7);vignette.addColorStop(0,'#02071100');vignette.addColorStop(1,'#02071166');c.fillStyle=vignette;c.fillRect(0,0,width,height);
@@ -273,7 +203,7 @@
   document.querySelector('.preview-detail').innerHTML=`<div class="selected-identity"><img src="${model.logo}" alt="" width="32" height="32"><div><span class="study-label">SELECTED MODEL</span><h3>${model.name}</h3><p>${model.agent} · Preview position ${String(order.findIndex(m=>m.id===selected)+1).padStart(2,'0')}</p></div></div><div class="preview-coverage"><div class="coverage-heading"><span>Measured task coverage</span><strong>${covered.size} / 23 tasks</strong></div><div class="coverage-grid" role="img" aria-label="${covered.size} of 23 tasks evaluated">${TASKS.map(t=>`<span class="${covered.has(t.id)?'is-evaluated':''}" title="${t.id}: ${covered.has(t.id)?'evaluated':'no measurement'}"></span>`).join('')}</div></div><a class="detail-link" href="leaderboard.html?model=${model.id}&detail=1">Explore measured results <span aria-hidden="true">↗</span></a>`;
   if(!covered.size){const link=document.querySelector('.preview-detail .detail-link');link.removeAttribute('href');link.setAttribute('aria-disabled','true');}
   document.querySelectorAll('[data-select-model],[data-star]').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.selectModel||b.dataset.star)===selected)));
-  if(whiteGalaxy())document.querySelector('.preview-detail').innerHTML=`<div class="selected-identity"><img src="${model.logo}" alt="" width="32" height="32"><h3>${model.name}</h3></div>${covered.size?`<a class="detail-link" href="leaderboard.html?model=${model.id}&detail=1">View model results <span aria-hidden="true">↗</span></a>`:''}`;
+  if(isAndromeda())document.querySelector('.preview-detail').innerHTML=`<div class="selected-identity"><img src="${model.logo}" alt="" width="32" height="32"><h3>${model.name}</h3></div>${covered.size?`<a class="detail-link" href="leaderboard.html?model=${model.id}&detail=1">View model results <span aria-hidden="true">↗</span></a>`:''}`;
  }
  function select(id){selected=id;detail();draw();}
  function motionButton(){
@@ -286,8 +216,8 @@
   document.querySelector('#scene-label').textContent=sceneTitle();document.querySelector('#scene-title').textContent=variant.title;document.querySelector('#scene-description').textContent=variant.text;document.querySelector('#direction-text').textContent=variant.direction;document.querySelector('#switcher-title').textContent=`0${variants.indexOf(variant)+1} · ${variant.name}`;
   document.querySelectorAll('[data-variant]').forEach(a=>a.setAttribute('aria-current',String(a.dataset.variant===variant.id)));
   scene.dataset.variant=variant.id;document.body.dataset.stellarVariant=variant.id;
-  document.querySelector('.study-heading h1').textContent=whiteGalaxy()?'Overall leaderboard':'A universe of embodied intelligence.';
-  scene.setAttribute('aria-label',whiteGalaxy()?'Overall model galaxy. The leading model is at the center; models closer to the center have stronger performance.':variant.title);
+  document.querySelector('.study-heading h1').textContent=isAndromeda()?'Overall leaderboard':'A universe of embodied intelligence.';
+  scene.setAttribute('aria-label',isAndromeda()?'Overall model galaxy. Stronger models are farther from the galactic core.':variant.title);
   scene.removeAttribute('aria-labelledby');renderNodes();buildBackground();detail();draw();
   if(writeURL&&!reduced.matches)scene.animate([{opacity:.55},{opacity:1}],{duration:450,easing:'ease-out'});
  }
@@ -299,20 +229,6 @@
   ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);ctx.drawImage(background,0,0,width,height);
   const points=positions(),amount=mobile()?0:1;
   pan.x+=(pointer.x-pan.x)*.06;pan.y+=(pointer.y-pan.y)*.06;
-  if(whiteGalaxy()){
-   for(let arm=0;arm<7;arm++)for(let j=0;j<18;j++){
-    const radius=.10+(j/18+elapsed*.007+arm*.13)%.95,p=armPoint(arm,radius);
-    ctx.fillStyle=`rgba(${['100,118,215','192,104,173','65,145,199','128,97,201','218,145,85','82,155,166','182,101,153'][arm]},${.14+(Math.sin(elapsed*.6+j)*.5+.5)*.20})`;
-    ctx.beginPath();ctx.arc(p.x,p.y,.7,0,Math.PI*2);ctx.fill();
-   }
-   const starRand=random(91473);
-   for(let i=0;i<(mobile()?28:58);i++){
-    const x=width*(.06+starRand()*.88),y=height*(.11+starRand()*.78),size=2.8+starRand()*4.5;
-    const shimmer=.13+(Math.sin(elapsed*.6+i*2.7)*.5+.5)*.52,color=i%4===0?'207,148,39':i%3===0?'171,111,183':'96,140,194';
-    bloom(ctx,x,y,size*2.2,color,shimmer*.25);
-    ctx.fillStyle=`rgba(${color},${shimmer})`;ctx.beginPath();ctx.moveTo(x,y-size);ctx.quadraticCurveTo(x+.5,y-.5,x+size,y);ctx.quadraticCurveTo(x+.5,y+.5,x,y+size);ctx.quadraticCurveTo(x-.5,y+.5,x-size,y);ctx.quadraticCurveTo(x-.5,y-.5,x,y-size);ctx.fill();
-   }
-  }
   for(let i=0;i<12;i++){
    const x=((i*173.71+67)%1200)/1200*width,y=((i*87.37+19)%500)/500*height;
    const alpha=.12+(Math.sin(elapsed*.7+i*2)+1)*.12;ctx.fillStyle=`rgba(203,220,255,${alpha})`;ctx.beginPath();ctx.arc(x+pan.x*amount*1.8,y+pan.y*amount*1.8,.9,0,Math.PI*2);ctx.fill();
@@ -328,11 +244,18 @@
     }
    });
   }
+  if(variant.id==='andromeda'){
+   for(let arm=0;arm<3;arm++)for(let n=0;n<24;n++){
+    const r=.12+n*.034,a=arm*Math.PI*2/3+r*5.3+elapsed*.008,p=galaxyPoint(r,a);
+    ctx.fillStyle=`rgba(185,204,255,${.14+Math.sin(elapsed*.4+n)*.07})`;
+    ctx.beginPath();ctx.arc(p.x,p.y,.7,0,Math.PI*2);ctx.fill();
+   }
+  }
   points.forEach((point,i)=>{
    const x=point.x+pan.x*amount*(.6+i*.03),y=point.y+pan.y*amount*(.6+i*.03);
    if(variant.id==='solar'&&i===0){ctx.save();ctx.globalCompositeOperation='screen';bloom(ctx,x,y,mobile()?43:74,'255,209,144',.22+Math.sin(elapsed)*.035);ctx.restore();}
    const selectedNode=order[i].id===selected;
-   if(selectedNode){ctx.beginPath();ctx.arc(x,y,mobile()?32:i===0?49:36,elapsed*.12,elapsed*.12+Math.PI*1.65);ctx.strokeStyle=whiteGalaxy()?(i===0?'#d7a15588':'#798ac080'):i===0?'#ffe3ac77':'#c2d8ff66';ctx.lineWidth=.7;ctx.stroke();}
+   if(selectedNode){ctx.beginPath();ctx.arc(x,y,mobile()?32:i===0?49:36,elapsed*.12,elapsed*.12+Math.PI*1.65);ctx.strokeStyle=i===0?'#ffe3ac77':'#c2d8ff66';ctx.lineWidth=.7;ctx.stroke();}
    starButtons[i].style.transform=`translate3d(${x}px,${y}px,0)`;
   });
  }
@@ -355,7 +278,7 @@
   if(button.dataset.action==='cycle'){order.push(order.shift());selected=order[0].id;orbitTime=0;renderNodes();buildBackground();detail();draw();}
  });
  document.addEventListener('keydown',event=>{
-  if(whiteGalaxy())return;
+  if(isAndromeda())return;
   if(event.altKey||event.ctrlKey||event.metaKey||event.shiftKey||event.target.closest('input,textarea,select,[contenteditable=true],[role=slider]'))return;
   if(event.key==='ArrowLeft'||event.key==='ArrowRight'){
    event.preventDefault();const index=variants.indexOf(variant),direction=event.key==='ArrowRight'?1:-1;

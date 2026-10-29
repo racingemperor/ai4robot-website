@@ -1,20 +1,20 @@
 # Stellar leaderboard studies
 
-Four visual studies of the Overall leaderboard, saved on `codex/prototype-stellar-board`. The production leaderboard remains at `leaderboard.html`; this preview has no primary navigation entry.
+Four Overall leaderboard studies. The production leaderboard remains at `leaderboard.html`; this preview has no primary navigation entry.
 
 Run `python -m http.server 4177 --bind 127.0.0.1` from this directory, then open `http://127.0.0.1:4177/leaderboard-prototype.html`.
 
 | Variant parameter | Visual rule |
 | --- | --- |
-| `solar` | The leader occupies the center; the other models orbit outward. |
-| `andromeda` (default) | The leader anchors the core; seven other models occupy seven arms, with stronger models closer to the center. |
+| `solar` | The leader occupies the center; other models orbit outward. |
+| `andromeda` (default) | The colorful, tilted galaxy. Stronger models lie farther from the core. |
 | `voyage` | A common origin with longer comet trails for stronger models. |
 | `vault` | Higher positions form a constellation above a planetary horizon. |
 
-The Andromeda view is a transparent particle galaxy on the page background. It omits scene controls, the variant switcher and explanatory captions. Select a model logo to update the selected identity and, where results exist, open its existing result details. The other three studies remain available through their variant URLs and retain their original comparison controls. Reduced-motion preferences disable automatic animation.
+The selected Andromeda direction restores the original colorful galaxy from `5dfe3df`: dark star field, blue-violet spiral arms, pink emission clouds and a warm core, with the original model positions. The surrounding website still follows its light/dark theme. The compact Overall heading and selected-model details remain; scene controls, explanatory captions and the variant switcher stay hidden. Select a model logo to update its identity and, where available, open its existing measured results. Other studies retain their comparison controls at their variant URLs.
 
-Scene positions illustrate the proposed visual ordering. They are independent of measured results: no Overall percentages or new model rankings are calculated. Model details use the existing published results. All drawing is local Canvas plus the existing model logos; no image API or external graphics dependency is required.
+Scene positions illustrate the proposed ordering, independent of measured results: no Overall percentages or new model rankings are calculated. Model details use the existing published results. All drawing uses local Canvas and the existing official model logos, with no image API or external graphics dependency. Reduced-motion preferences disable automatic animation.
 
-The colorful revision uses cached cloud textures, a warm core, blue stellar arms and pink emission regions. Andromeda layers transparent blue, violet and pink cloud textures behind the seven particle arms, with a distant star field and sparse, slowly twinkling highlights. A golden solar core, fine corona rays and gold dust surround the central logo; its gold styling remains on selection and focus. All layers blend into the page without a rectangular background. Its desktop and mobile layouts both preserve strictly increasing distances from the leader in display order. The other studies retain dark skies, dust lanes and small distant galaxies. The structural reference is [NASA's Messier 31 imagery](https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-31/); the scene is an artistic procedural rendering, with no NASA images embedded. Expensive cloud generation runs only when the scene or viewport changes.
+Cloud textures, the dense star field, dust lanes and distant galaxies are cached; expensive generation runs only when the viewport or variant changes. The structural reference is [NASA's Messier 31 imagery](https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-31/). This is an artistic procedural rendering with no NASA images embedded.
 
-The selected direction combines Andromeda's spiral structure with a central leader and a white background. It remains a preview; the production leaderboard has not been replaced.
+This remains an independent preview. The production leaderboard has not been replaced.
