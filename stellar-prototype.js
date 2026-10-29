@@ -49,6 +49,13 @@
  function paintWhiteGalaxy(c,rand){
   const palette=['101,115,216','199,100,180','66,154,204','133,97,204','221,132,83','84,166,173','192,103,166'];
   c.save();
+  paintNebula(c,rand);
+  // A broad, distant star field sits behind the seven sharper foreground arms.
+  for(let i=0;i<(mobile()?1500:4800);i++){
+   const x=rand()*width,y=rand()*height,dx=(x-width*.5)/(width*.52),dy=(y-height*.49)/(height*.54),fade=Math.max(0,1-Math.hypot(dx,dy));
+   const color=palette[i%7],alpha=(.15+rand()*.45)*fade;
+   c.fillStyle=`rgba(${color},${alpha})`;c.beginPath();c.arc(x,y,.35+rand()*.55,0,Math.PI*2);c.fill();
+  }
   for(let arm=0;arm<7;arm++){
    const color=palette[arm];
    for(let step=1;step<85;step++){
@@ -69,13 +76,25 @@
    }
   }
   const center={x:width*.5,y:height*.49};
-  bloom(c,center.x,center.y,mobile()?90:145,'231,164,79',.19);
-  bloom(c,center.x,center.y,mobile()?44:70,'245,197,109',.34);
+  bloom(c,center.x,center.y,mobile()?130:230,'242,167,37',.30);
+  bloom(c,center.x,center.y,mobile()?82:145,'248,181,45',.48);
+  bloom(c,center.x,center.y,mobile()?52:87,'255,207,83',.72);
+  // Fine curved rays and gold dust form a corona around the central model.
+  for(let ray=0;ray<100;ray++){
+   const angle=rand()*Math.PI*2,inner=mobile()?28:38,outer=inner+12+rand()*(mobile()?35:70);
+   const gradient=c.createLinearGradient(center.x+Math.cos(angle)*inner,center.y+Math.sin(angle)*inner,center.x+Math.cos(angle)*outer,center.y+Math.sin(angle)*outer);
+   gradient.addColorStop(0,'#e6aa3a66');gradient.addColorStop(1,'#edbc5500');
+   c.beginPath();c.moveTo(center.x+Math.cos(angle)*inner,center.y+Math.sin(angle)*inner);c.quadraticCurveTo(center.x+Math.cos(angle+.05)*(inner+outer)/2,center.y+Math.sin(angle+.05)*(inner+outer)/2,center.x+Math.cos(angle)*outer,center.y+Math.sin(angle)*outer);c.strokeStyle=gradient;c.lineWidth=.4+rand()*.6;c.stroke();
+  }
+  for(let i=0;i<(mobile()?750:1800);i++){
+   const angle=rand()*Math.PI*2,r=(mobile()?30:39)+Math.abs(gaussian(rand))*(mobile()?17:28);
+   c.fillStyle=`rgba(222,157,38,${.06+rand()*.3})`;c.fillRect(center.x+Math.cos(angle)*r,center.y+Math.sin(angle)*r,.6,.6);
+  }
   for(let i=0;i<(mobile()?1800:4800);i++){
    const arm=i%7,radius=rand()*1.15,p=armPoint(arm,radius,gaussian(rand)*(12+radius*23)),x=p.x+gaussian(rand)*25;
    c.fillStyle=`rgba(${palette[arm]},${.10+rand()*.38})`;c.beginPath();c.arc(x,p.y,rand()>.98?1.3:.35+rand()*.45,0,Math.PI*2);c.fill();
   }
-  for(let i=0;i<40;i++){
+  for(let i=0;i<65;i++){
    const p=armPoint(i%7,.18+rand()*.9,gaussian(rand)*20),color=palette[i%7];
    bloom(c,p.x,p.y,6+rand()*8,color,.17);
    line(c,[{x:p.x-3,y:p.y},{x:p.x+3,y:p.y}],`rgba(${color},.4)`,.6);
@@ -96,7 +115,7 @@
   };
   const fbm=(x,y)=>{let value=0,amp=.54;for(let o=0;o<5;o++){value+=noise(x,y)*amp;x=x*2.03+13.7;y=y*2.03+7.2;amp*=.49;}return value;};
   const palettes={solar:[[29,78,153],[113,42,158],[221,75,58]],andromeda:[[30,117,183],[127,51,178],[221,63,126]],voyage:[[15,127,143],[55,66,180],[213,46,133]],vault:[[28,109,163],[125,47,178],[228,69,114]]};
-  const palette=palettes[variant.id];
+  const palette=palettes[variant.id],airy=whiteGalaxy();
   for(let py=0;py<texture.height;py++)for(let px=0;px<texture.width;px++){
    const u=px/texture.width,v=py/texture.height;
    const warp=fbm(u*3+19,v*3+41),n=fbm(u*6+warp*2,v*5+warp*2),fine=fbm(u*24+4,v*22+9);
@@ -107,7 +126,7 @@
    const density=Math.min(1.4,wisps*wisps*ribbon*(.5+ridge*.75))*dust;
    const mix=Math.max(0,Math.min(1,(warp-.31)*3.8)),p0=palette[mix<.5?0:1],p1=palette[mix<.5?1:2],t=mix<.5?mix*2:(mix-.5)*2;
    let red=(p0[0]*(1-t)+p1[0]*t)*density,green=(p0[1]*(1-t)+p1[1]*t)*density,blue=(p0[2]*(1-t)+p1[2]*t)*density;
-   if(variant.id==='andromeda'){
+   if(variant.id==='andromeda'&&!airy){
     const dx=u-.51,dy=(v-.54)*height/width,tilt=-.25;
     const gx=(dx*Math.cos(tilt)+dy*Math.sin(tilt))/.43,gy=(-dx*Math.sin(tilt)+dy*Math.cos(tilt))/(height/width*.32);
     const r=Math.hypot(gx,gy),a=Math.atan2(gy,gx),arms=(.5+.5*Math.cos((a-r*5.3)*3+(n-.5)*2))**5;
@@ -117,9 +136,12 @@
     const lane=1-Math.max(0,noise(gx*20+100,gy*20+100)-.45)*disc*.85;red*=lane;green*=lane;blue*=lane;
    }
    const edge=Math.min(1,u*5,(1-u)*5)*Math.min(1,v*5,(1-v)*5),index=(py*texture.width+px)*4;
-   pixels.data[index]=red*edge;pixels.data[index+1]=green*edge;pixels.data[index+2]=blue*edge;pixels.data[index+3]=255;
+   if(airy){
+    pixels.data[index]=p0[0]*(1-t)+p1[0]*t;pixels.data[index+1]=p0[1]*(1-t)+p1[1]*t;pixels.data[index+2]=p0[2]*(1-t)+p1[2]*t;
+    pixels.data[index+3]=Math.min(.42,density*.38)*edge*255;
+   }else{pixels.data[index]=red*edge;pixels.data[index+1]=green*edge;pixels.data[index+2]=blue*edge;pixels.data[index+3]=255;}
   }
-  tc.putImageData(pixels,0,0);c.save();c.globalCompositeOperation='screen';c.drawImage(texture,0,0,width,height);c.restore();
+  tc.putImageData(pixels,0,0);c.save();c.globalCompositeOperation=airy?'source-over':'screen';c.drawImage(texture,0,0,width,height);c.restore();
  }
  function baseStars(c,rand){
   const bg=c.createLinearGradient(0,0,width,height);bg.addColorStop(0,'#040512');bg.addColorStop(.6,'#0b0b21');bg.addColorStop(1,'#020812');c.fillStyle=bg;c.fillRect(0,0,width,height);
@@ -282,6 +304,13 @@
     const radius=.10+(j/18+elapsed*.007+arm*.13)%.95,p=armPoint(arm,radius);
     ctx.fillStyle=`rgba(${['100,118,215','192,104,173','65,145,199','128,97,201','218,145,85','82,155,166','182,101,153'][arm]},${.14+(Math.sin(elapsed*.6+j)*.5+.5)*.20})`;
     ctx.beginPath();ctx.arc(p.x,p.y,.7,0,Math.PI*2);ctx.fill();
+   }
+   const starRand=random(91473);
+   for(let i=0;i<(mobile()?28:58);i++){
+    const x=width*(.06+starRand()*.88),y=height*(.11+starRand()*.78),size=2.8+starRand()*4.5;
+    const shimmer=.13+(Math.sin(elapsed*.6+i*2.7)*.5+.5)*.52,color=i%4===0?'207,148,39':i%3===0?'171,111,183':'96,140,194';
+    bloom(ctx,x,y,size*2.2,color,shimmer*.25);
+    ctx.fillStyle=`rgba(${color},${shimmer})`;ctx.beginPath();ctx.moveTo(x,y-size);ctx.quadraticCurveTo(x+.5,y-.5,x+size,y);ctx.quadraticCurveTo(x+.5,y+.5,x,y+size);ctx.quadraticCurveTo(x-.5,y+.5,x-size,y);ctx.quadraticCurveTo(x-.5,y-.5,x,y-size);ctx.fill();
    }
   }
   for(let i=0;i<12;i++){

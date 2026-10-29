@@ -87,12 +87,15 @@
 [data-stellar-variant=andromeda] .star-number{color:#39425d;background:#fff;border-color:#dce0eb}
 [data-stellar-variant=andromeda] .star-name{color:var(--ink);font-size:13px;text-shadow:0 1px 3px var(--paper),0 -1px 3px var(--paper),2px 0 4px var(--paper),-2px 0 4px var(--paper)}
 [data-stellar-variant=andromeda] .star-name small{display:none}
-[data-stellar-variant=andromeda] .model-star.is-leader .star-emblem{border-color:#d2a258;box-shadow:0 0 0 7px #edbd7112,0 0 40px #ebb76836}
 [data-stellar-variant=andromeda] .model-star.is-leader .star-number{color:#74501e;background:#fff6e2;border-color:#dfc38c}
 [data-stellar-variant=andromeda] .model-star.is-leader .star-name{color:var(--ink)}
 [data-stellar-variant=andromeda] .model-star[aria-pressed=true] .star-emblem{box-shadow:0 0 0 5px #b2bfe533,0 0 0 6px #7385b970,0 0 28px #a5b3d733}
+[data-stellar-variant=andromeda] .model-star.is-leader .star-emblem{background:radial-gradient(circle at 36% 30%,#fffef2 0,#ffe5a1 52%,#efbd57 100%);border-color:#e3b24d;box-shadow:0 0 0 6px #efc05a20,0 0 0 12px #efbf5b0b,0 0 42px #e4a43065,0 0 90px #e8b33e35}
+[data-stellar-variant=andromeda] .model-star.is-leader[aria-pressed=true] .star-emblem{box-shadow:0 0 0 5px #e4ad3b30,0 0 0 6px #d5a04480,0 0 50px #e8ac3675,0 0 110px #eaba4b3d}
 [data-stellar-variant=andromeda] .model-star:hover .star-emblem,
 [data-stellar-variant=andromeda] .model-star:focus-visible .star-emblem{box-shadow:0 0 0 5px #a9b5d620,0 0 0 7px #8696bd88,0 0 30px #a6b4d633}
+[data-stellar-variant=andromeda] .model-star.is-leader:hover .star-emblem,
+[data-stellar-variant=andromeda] .model-star.is-leader:focus-visible .star-emblem{box-shadow:0 0 0 5px #e4ad3b30,0 0 0 7px #d5a04499,0 0 55px #e8ac3675,0 0 115px #eaba4b3d}
 [data-stellar-variant=andromeda] .preview-detail{grid-template-columns:1fr auto;border:0;padding:0 4px 24px;min-height:60px}
 [data-stellar-variant=andromeda] .selected-identity h3{font-size:18px}
 [data-stellar-variant=andromeda] .site-footer{padding-bottom:48px}
