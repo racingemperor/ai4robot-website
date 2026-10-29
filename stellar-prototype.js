@@ -3,7 +3,7 @@
 (()=>{
  const variants=[
   {id:'solar',name:'Solar System',title:'A center of gravity.',text:'One leading star. Seven worlds in its orbit.',direction:'Stronger models move toward the center.',description:'The leading model becomes the sun. The others orbit it in ranked rings. A strong identity for the model in first place.'},
-  {id:'andromeda',name:'Andromeda',title:'Intelligence, expanding outward.',text:'Follow the spiral from its core to the frontier.',direction:'Farther from the galactic core means stronger.',description:'A tilted galaxy with luminous spiral arms. Models spread outward as they advance, leaving room for a growing field.'},
+  {id:'andromeda',name:'Andromeda',title:'Intelligence at the core.',text:'One leading model at the heart of the galaxy.',direction:'Closer to the galactic core means stronger.',description:'A tilted galaxy with luminous spiral arms. The leading model occupies the core; the others spread outward with decreasing performance.'},
   {id:'voyage',name:'Deep Space',title:'How far can intelligence go?',text:'A shared starting point. Different frontiers.',direction:'Longer journeys mean stronger performance.',description:'Eight comet trails depart from one origin. The farthest model leads. The clearest overall comparison at a glance.'},
   {id:'vault',name:'Celestial Vault',title:'The next frontier is overhead.',text:'An ascending constellation across an open sky.',direction:'Higher in the sky means stronger performance.',description:'Models form an ascending constellation above a planetary horizon. The leader sits highest in the celestial vault.'}
  ];
@@ -126,13 +126,20 @@
    c.fillStyle=`rgba(255,225,169,${.05+rand()*.24})`;c.fillRect(p.x,p.y,1.2,1.2);
   }
   bloom(c,core.x,core.y,mobile()?90:140,'255,191,119',.7);bloom(c,core.x,core.y,25,'255,239,195',.85);c.restore();
-  const p=galaxyPoint(1,5.8);line(c,[core,p],'#e4d0a624',.75);
  }
  function positions(){
+  if(isAndromeda()){
+   const core=galaxyPoint(0,0);
+   const outer=mobile()
+    ? [[.78,.57],[.22,.48],[.22,.71],[.78,.34],[.78,.84],[.44,.93],[.44,.16]].map(([x,y])=>({x:x*width,y:y*height}))
+    : [.4,.5,.6,.7,.8,.9,1.02].map((r,i)=>galaxyPoint(r,i%3*Math.PI*2/3+r*5.3));
+   // Sort by visible distance, accounting for the tilted galaxy and viewport shape.
+   outer.sort((a,b)=>Math.hypot(a.x-core.x,a.y-core.y)-Math.hypot(b.x-core.x,b.y-core.y));
+   return [core,...outer];
+  }
   if(mobile()){
    const coords={
     solar:[[.50,.51],[.78,.61],[.22,.64],[.50,.30],[.80,.36],[.78,.79],[.21,.81],[.18,.40]],
-    andromeda:[[.76,.27],[.23,.31],[.21,.75],[.73,.80],[.82,.59],[.30,.48],[.50,.67],[.50,.56]],
     voyage:[[.76,.28],[.30,.355],[.75,.43],[.29,.505],[.74,.58],[.28,.655],[.73,.73],[.27,.805]],
     vault:[[.52,.28],[.22,.40],[.79,.43],[.36,.54],[.76,.61],[.22,.66],[.54,.75],[.20,.84]]
    }[variant.id];
@@ -142,7 +149,6 @@
    const radii=[0,.30,.45,.57,.70,.82,.94,1.04],angles=[0,.32,2.25,4.55,5.6,.8,2.85,3.8];
    return radii.map((r,i)=>({x:width*.5+Math.cos(angles[i]+(i?orbitTime*.004:0))*width*.43*r,y:height*.54+Math.sin(angles[i]+(i?orbitTime*.004:0))*height*.37*r}));
   }
-  if(variant.id==='andromeda')return [5.8,5.05,4.1,3,1.85,.15,-1.5,.95].map((a,i)=>galaxyPoint(.96-i*.112,a));
   if(variant.id==='voyage')return Array.from({length:8},(_,i)=>{const r=.96-i*.105;return {x:width*(.085+.83*r),y:height*(.54-.23*r+(i%2?.13:-.06))};});
   return [[.64,.26],[.40,.39],[.82,.43],[.23,.54],[.59,.56],[.89,.68],[.40,.73],[.15,.78]].map(([x,y])=>({x:x*width,y:y*height}));
  }
@@ -217,7 +223,7 @@
   document.querySelectorAll('[data-variant]').forEach(a=>a.setAttribute('aria-current',String(a.dataset.variant===variant.id)));
   scene.dataset.variant=variant.id;document.body.dataset.stellarVariant=variant.id;
   document.querySelector('.study-heading h1').textContent=isAndromeda()?'Overall leaderboard':'A universe of embodied intelligence.';
-  scene.setAttribute('aria-label',isAndromeda()?'Overall model galaxy. Stronger models are farther from the galactic core.':variant.title);
+  scene.setAttribute('aria-label',isAndromeda()?'Overall model galaxy. The leading model is at the core; models closer to the core have stronger performance.':variant.title);
   scene.removeAttribute('aria-labelledby');renderNodes();buildBackground();detail();draw();
   if(writeURL&&!reduced.matches)scene.animate([{opacity:.55},{opacity:1}],{duration:450,easing:'ease-out'});
  }
@@ -227,7 +233,7 @@
  function draw(){
   if(!width)return;
   ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);ctx.drawImage(background,0,0,width,height);
-  const points=positions(),amount=mobile()?0:1;
+  const points=positions(),amount=mobile()||isAndromeda()?0:1;
   pan.x+=(pointer.x-pan.x)*.06;pan.y+=(pointer.y-pan.y)*.06;
   for(let i=0;i<12;i++){
    const x=((i*173.71+67)%1200)/1200*width,y=((i*87.37+19)%500)/500*height;
