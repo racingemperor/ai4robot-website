@@ -66,3 +66,41 @@
 @media(prefers-reduced-motion:reduce){.model-star,.star-emblem{transition:none}}
 @media(max-width:1100px){.stellar-study #main{padding-top:70px}}
 @media(max-width:700px){.stellar-study #main{padding-top:85px}.star-name{top:calc(22px + var(--star-size)/2 + 8px)}}
+
+/* Selected direction: a particle galaxy that blends directly into the page. */
+[data-stellar-variant=andromeda] .study-heading{justify-content:center;margin-bottom:0;text-align:center}
+[data-stellar-variant=andromeda] .study-heading h1{font-size:clamp(30px,3vw,42px);letter-spacing:-.035em}
+[data-stellar-variant=andromeda] .study-heading .study-label,
+[data-stellar-variant=andromeda] .study-heading p,
+[data-stellar-variant=andromeda] .study-heading>a,
+[data-stellar-variant=andromeda] .scene-caption,
+[data-stellar-variant=andromeda] .scene-badge,
+[data-stellar-variant=andromeda] .scene-orientation,
+[data-stellar-variant=andromeda] .scene-bottom,
+[data-stellar-variant=andromeda] .study-models,
+[data-stellar-variant=andromeda] .concept-guide,
+[data-stellar-variant=andromeda] .prototype-switcher{display:none}
+[data-stellar-variant=andromeda] .stellar-scene{height:650px;background:transparent;border-radius:0;overflow:visible;color:var(--ink)}
+[data-stellar-variant=andromeda] .stellar-scene::after{display:none}
+[data-stellar-variant=andromeda] .model-star{color:var(--ink)}
+[data-stellar-variant=andromeda] .star-emblem{border:1px solid #d4d9e8;box-shadow:0 2px 8px #6777a015,0 0 22px #fff9}
+[data-stellar-variant=andromeda] .star-number{color:#39425d;background:#fff;border-color:#dce0eb}
+[data-stellar-variant=andromeda] .star-name{color:var(--ink);font-size:13px;text-shadow:0 1px 3px var(--paper),0 -1px 3px var(--paper),2px 0 4px var(--paper),-2px 0 4px var(--paper)}
+[data-stellar-variant=andromeda] .star-name small{display:none}
+[data-stellar-variant=andromeda] .model-star.is-leader .star-emblem{border-color:#d2a258;box-shadow:0 0 0 7px #edbd7112,0 0 40px #ebb76836}
+[data-stellar-variant=andromeda] .model-star.is-leader .star-number{color:#74501e;background:#fff6e2;border-color:#dfc38c}
+[data-stellar-variant=andromeda] .model-star.is-leader .star-name{color:var(--ink)}
+[data-stellar-variant=andromeda] .model-star[aria-pressed=true] .star-emblem{box-shadow:0 0 0 5px #b2bfe533,0 0 0 6px #7385b970,0 0 28px #a5b3d733}
+[data-stellar-variant=andromeda] .model-star:hover .star-emblem,
+[data-stellar-variant=andromeda] .model-star:focus-visible .star-emblem{box-shadow:0 0 0 5px #a9b5d620,0 0 0 7px #8696bd88,0 0 30px #a6b4d633}
+[data-stellar-variant=andromeda] .preview-detail{grid-template-columns:1fr auto;border:0;padding:0 4px 24px;min-height:60px}
+[data-stellar-variant=andromeda] .selected-identity h3{font-size:18px}
+[data-stellar-variant=andromeda] .site-footer{padding-bottom:48px}
+@media(max-width:700px){
+ [data-stellar-variant=andromeda] .stellar-scene{height:700px}
+ [data-stellar-variant=andromeda] .study-heading h1{max-width:none;font-size:30px}
+ [data-stellar-variant=andromeda] .star-name{font-size:11px;width:94px;max-width:94px}
+ [data-stellar-variant=andromeda] .model-star.is-leader .star-name{top:-52px;width:74px;max-width:74px}
+ [data-stellar-variant=andromeda] .preview-detail{gap:16px;grid-template-columns:1fr}
+ [data-stellar-variant=andromeda] .detail-link{grid-column:auto;justify-self:start}
+}

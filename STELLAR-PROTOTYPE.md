@@ -7,14 +7,14 @@ Run `python -m http.server 4177 --bind 127.0.0.1` from this directory, then open
 | Variant parameter | Visual rule |
 | --- | --- |
 | `solar` | The leader occupies the center; the other models orbit outward. |
-| `andromeda` | Models advance outward from a luminous galactic core. |
+| `andromeda` (default) | The leader anchors the core; seven other models occupy seven arms, with stronger models closer to the center. |
 | `voyage` | A common origin with longer comet trails for stronger models. |
 | `vault` | Higher positions form a constellation above a planetary horizon. |
 
-Use the bottom switcher or Left/Right keys to change scenes. Select a model logo to inspect its measured task coverage and open its existing result details. The cycle button rotates the preview order; the play/pause button controls motion. Reduced-motion preferences disable automatic animation.
+The Andromeda view is a transparent particle galaxy on the page background. It omits scene controls, the variant switcher and explanatory captions. Select a model logo to update the selected identity and, where results exist, open its existing result details. The other three studies remain available through their variant URLs and retain their original comparison controls. Reduced-motion preferences disable automatic animation.
 
 Scene positions illustrate the proposed visual ordering. They are independent of measured results: no Overall percentages or new model rankings are calculated. Model details use the existing published results. All drawing is local Canvas plus the existing model logos; no image API or external graphics dependency is required.
 
-The colorful revision uses cached fractal cloud textures, dark dust lanes, a warm core, blue stellar arms, pink emission regions, dense multicolor stars and small distant galaxies. The structural reference is [NASA's Messier 31 imagery](https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-31/); the scene is an artistic procedural rendering, with no NASA images embedded. Each concept has a separate nebula palette. Expensive cloud generation runs only when the scene or viewport changes.
+The colorful revision uses cached cloud textures, a warm core, blue stellar arms and pink emission regions. Andromeda renders airy multicolor particles on transparent Canvas, blending into the white page without a rectangular background. Its desktop and mobile layouts both preserve strictly increasing distances from the leader in display order. The other studies retain dark skies, dust lanes and small distant galaxies. The structural reference is [NASA's Messier 31 imagery](https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-31/); the scene is an artistic procedural rendering, with no NASA images embedded. Expensive cloud generation runs only when the scene or viewport changes.
 
-Question for the next design decision: prioritize the first-place model (Solar), a galaxy identity (Andromeda), readable advancement (Deep Space), or a celestial landscape (Vault). No winning direction has been selected yet.
+The selected direction combines Andromeda's spiral structure with a central leader and a white background. It remains a preview; the production leaderboard has not been replaced.
