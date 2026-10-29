@@ -3,7 +3,7 @@ window.TaskReplay=(()=>{
  const h=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const pct=v=>v==null?'—':`${(v*100).toFixed(1)}%`;
  const positions=new Map(),selections=new Map();
- let selectedEvent=null;
+ let selectedEvent=null,channels={input:[],output:[]};
  let host=null,activeTask=null,recordingContext=null,mountVersion=0,playVersion=0,activeModel='',activeEpisode='',modelOpen=false,source='official',playing=false,raf=0,last=0,speed=1,time=0;
  const report=()=>recordingContext?.report||Results[source];
  const models=()=>source==='official'&&!report().models.length?Leaderboard.roster:report().models;
@@ -56,13 +56,13 @@ window.TaskReplay=(()=>{
  }
  function viewer(e){
   const src=e.video?.src,poster=e.video?.poster;
-  // Dense recordings keep a readable timeline; the complete history stays below.
-  const markerCount=Math.min(7,e.events.length);
-  const markers=[...new Set(Array.from({length:markerCount},(_,i)=>Math.max(0,e.events.findLastIndex(ev=>ev.time_s<=e.duration_s*i/Math.max(1,markerCount-1)))))];
+  channels=Evidence.timeline(e);
+  const lane=kind=>`<div class="replay-event-lane replay-${kind}"><span class="replay-lane-label">${kind==='input'?'Input':'Output'}<small>${channels[kind].length}</small></span><div class="replay-event-track" data-replay-channel="${kind}" role="slider" tabindex="${channels[kind].length?'0':'-1'}" aria-label="Model ${kind} events" aria-valuemin="0" aria-valuemax="${channels[kind].length}" aria-valuenow="0"${channels[kind].length?'':' aria-disabled="true"'}><div class="replay-marker-field" aria-hidden="true">${[...new Set(channels[kind].map(ev=>ev.time_s))].map(t=>`<i class="replay-event-mark" data-marker-time="${t}" style="left:${t/e.duration_s*100}%"></i>`).join('')}<i class="replay-lane-cursor"></i></div></div></div>`;
+  const stepArrow=direction=>`<svg viewBox="0 0 20 20" aria-hidden="true"><path d="${direction==='previous'?'m12 5-5 5 5 5':'m8 5 5 5-5 5'}"/></svg>`;
   return `<div class="replay-recording-heading"><label>Episode<select id="task-episode-select">${episodes().map(r=>`<option value="${h(r.id)}"${r.id===e.id?' selected':''}>${r.preview?r.id:`${r.id} · ${r.status}`}</option>`).join('')}</select></label><p>${e.preview?'':`${h(e.status)} · seed ${e.seed} · layout ${e.layout}`}</p></div>
-   <div class="episode-timeline"><div class="playback"><button type="button" class="lab-button playback-toggle" data-replay-action="play" aria-label="Play" title="Play">${Evidence.playbackIcon(false)}</button><input id="task-episode-seek" type="range" min="0" max="${e.duration_s}" step="0.01" value="${time}" aria-label="Episode time"><output id="task-episode-clock"></output><label>Speed<select id="task-episode-speed">${[0.5,1,2,4].map(v=>`<option value="${v}"${v===speed?' selected':''}>${v}×</option>`).join('')}</select></label></div><div class="episode-time-markers">${markers.map(i=>{const ev=e.events[i];return `<button type="button" data-replay-event="${i}" style="--event-position:${ev.time_s/e.duration_s*100}%" aria-label="Seek to ${ev.time_s} seconds: ${h(ev.type)}"><i aria-hidden="true"></i><span>${ev.time_s.toFixed(1)}s</span></button>`;}).join('')}</div></div>
+   <div class="episode-timeline replay-timeline"><div class="replay-toolbar"><button type="button" class="lab-button playback-toggle" data-replay-action="play" aria-label="Play" title="Play">${Evidence.playbackIcon(false)}</button><output id="task-episode-clock"></output><div class="replay-timeline-legend"><span class="replay-input"><i aria-hidden="true"></i>Model input</span><span class="replay-output"><i aria-hidden="true"></i>Model output</span></div><label>Speed<select id="task-episode-speed">${[0.5,1,2,4].map(v=>`<option value="${v}"${v===speed?' selected':''}>${v}×</option>`).join('')}</select></label></div><div class="replay-event-lanes">${lane('input')}${lane('output')}<div class="replay-scrubber"><input id="task-episode-seek" type="range" min="0" max="${e.duration_s}" step="0.01" value="${time}" aria-label="Episode time"></div><div class="replay-ruler" aria-hidden="true">${[0,.25,.5,.75,1].map(f=>`<span style="left:${f*100}%">${(e.duration_s*f).toFixed(1)}s</span>`).join('')}</div></div></div>
    <div class="episode-synchronized task-recording-layout"><section class="episode-visuals${e.events.some(ev=>ev.images?.length)?' has-observations':''}"><div class="evidence-panel-heading"><h4>Episode video</h4><output id="task-frame-time"></output></div><div class="episode-stage">${src?`<video id="task-episode-video" src="${h(src)}"${poster?` poster="${h(poster)}"`:''} preload="metadata" playsinline controls></video>`:Evidence.slot('VIDEO','Model episode recording','This model’s continuous recording follows the shared timeline','episode-video-slot')}</div><p id="task-video-status" role="status"></p><div id="task-observations" class="task-replay-observations"></div></section>
-   <section class="episode-trace" aria-label="Synchronized model input and output"><div class="evidence-panel-heading"><h4>Model trace</h4><span id="task-step-label"></span></div><div id="task-event" class="current-event"></div><div id="task-sync-content"></div></section>
+   <section class="episode-trace" aria-label="Synchronized model input and output"><div class="evidence-panel-heading"><h4>Model trace</h4><div class="replay-step-controls"><button type="button" data-replay-action="previous" aria-label="Previous step" title="Previous step">${stepArrow('previous')}</button><span id="task-step-label"></span><button type="button" data-replay-action="next" aria-label="Next step" title="Next step">${stepArrow('next')}</button></div></div><div id="task-event" class="current-event"></div><div id="task-sync-content"></div></section>
    <section id="task-code-content" class="trace-code-block" aria-label="Submitted code"></section><section class="trace-feedback"><h4>Execution feedback</h4><p id="task-feedback" tabindex="0" aria-label="Execution feedback"></p></section></div>
    <details class="episode-step-directory"><summary>All steps and code revisions · ${e.events.length}</summary><div class="event-list">${e.events.map((ev,i)=>`<button type="button" data-replay-event="${i}"><time>${ev.time_s.toFixed(1)}s</time><strong>${h(ev.type)}</strong><span>${h(ev.code?.filename||ev.text)}</span></button>`).join('')}</div></details>`;
  }
@@ -74,12 +74,24 @@ window.TaskReplay=(()=>{
  }
  function updateTime(){
   const e=episode();if(!e||!host?.querySelector('#task-episode-seek'))return;
-  time=Math.min(Math.max(time,0),e.duration_s);positions.set(key(e),time);
+  time=Math.min(Math.max(time,0),e.duration_s);
+  // Media clocks can land a fraction of a frame before an explicitly selected step.
+  if(selectedEvent!==null){const selectedTime=e.events[selectedEvent].time_s;if(Math.abs(selectedTime-time)>.02)selectedEvent=null;else time=selectedTime;}
+  positions.set(key(e),time);
   const seek=host.querySelector('#task-episode-seek');seek.value=time;seek.setAttribute('aria-valuetext',`${time.toFixed(1)} of ${e.duration_s} seconds`);
-  host.querySelector('#task-episode-clock').textContent=`${time.toFixed(1)} / ${e.duration_s}s`;
+  host.querySelector('#task-episode-clock').textContent=`${time.toFixed(2)} / ${e.duration_s.toFixed(2)}s`;
   host.querySelector('#task-frame-time').textContent=`${time.toFixed(1)}s`;
-  if(selectedEvent!==null&&Math.abs(e.events[selectedEvent].time_s-time)>.02)selectedEvent=null;
   const snapshot=Evidence.atTime(e,time,selectedEvent),event=snapshot.event;
+  host.querySelector('.replay-timeline').style.setProperty('--timeline-progress',`${time/e.duration_s*100}%`);
+  for(const kind of ['input','output']){
+   const track=host.querySelector(`[data-replay-channel="${kind}"]`),record=snapshot[kind];
+   const position=record?channels[kind].findIndex(ev=>e.events[ev.index]===record)+1:0;
+   track.setAttribute('aria-valuenow',position);
+   track.setAttribute('aria-valuetext',position?`${kind==='input'?'Input':'Output'} ${position} of ${channels[kind].length}, ${record.time_s.toFixed(2)} seconds, step ${channels[kind][position-1].index+1}`:`No model ${kind} at this time`);
+   track.querySelectorAll('[data-marker-time]').forEach(mark=>mark.classList.toggle('is-current',!!record&&Number(mark.dataset.markerTime)===record.time_s));
+  }
+  host.querySelector('[data-replay-action="previous"]').disabled=snapshot.index<=0;
+  host.querySelector('[data-replay-action="next"]').disabled=snapshot.index>=e.events.length-1;
   host.querySelector('#task-step-label').textContent=snapshot.index<0?'Before first step':`Step ${snapshot.index+1} / ${e.events.length}`;
   host.querySelector('#task-event').textContent=event?`${event.time_s.toFixed(2)}s · ${event.type}${event.recorded_at?' · '+event.recorded_at:''}`:'Before the first recorded step';
   host.querySelector('#task-event').title=event?.recorded_at||'';
@@ -87,7 +99,7 @@ window.TaskReplay=(()=>{
   if(content.dataset.step!==stamp){
    content.dataset.step=stamp;
    const frames=snapshot.images;host.querySelector('#task-observations').innerHTML=frames?`<h4>Model observations · ${frames.time_s.toFixed(1)}s</h4><div class="replay-frame-grid">${frames.images.map(frame=>`<figure><img src="${h(frame.src)}" alt="${h(frame.alt)}" loading="lazy"><figcaption>${h(frame.alt)}</figcaption></figure>`).join('')}</div>`:'';
-   const block=(title,record,field)=>`<section class="trace-text-block"><div><h4>${title}</h4><span>${record?`${record.time_s.toFixed(1)}s`:'Not supplied'}</span></div>${record?`<pre tabindex="0" aria-label="${title} at ${record.time_s} seconds">${h(record[field])}</pre>`:Evidence.slot('TEXT',title,'The exact recorded message at this time','trace-missing')}</section>`;
+   const block=(title,record,field)=>`<section class="trace-text-block replay-${field}"><div><h4><i class="replay-trace-key" aria-hidden="true"></i>${title}</h4><span>${record?`${record.time_s.toFixed(2)}s`:'Not supplied'}</span></div>${record?`<pre tabindex="0" aria-label="${title} at ${record.time_s} seconds">${h(record[field])}</pre>`:Evidence.slot('TEXT',title,'The exact recorded message at this time','trace-missing')}</section>`;
    const codeLabel=snapshot.code?`${snapshot.code.code.filename} · ${snapshot.code.time_s.toFixed(1)}s`:'No code submitted yet';
    content.innerHTML=block('Model input',snapshot.input,'input')+block('Model output',snapshot.output,'output');
    host.querySelector('#task-code-content').innerHTML=`<div><h4>Code / tool call</h4><span title="${h(codeLabel)}">${h(codeLabel)}</span></div>${snapshot.code?`<pre tabindex="0" aria-label="Code snapshot at ${snapshot.code.time_s} seconds"><code>${h(snapshot.code.code.content)}</code></pre>`:Evidence.slot('CODE','Submitted code','Code appears at its recorded submission time','trace-missing')}`;
@@ -99,6 +111,10 @@ window.TaskReplay=(()=>{
  function seek(value,eventIndex=null){
   const e=episode();if(!e)return;selectedEvent=eventIndex;time=Math.min(Math.max(Number(value)||0,0),e.duration_s);
   const video=host.querySelector('video');if(video?.readyState>=1)video.currentTime=time;updateTime();
+ }
+ function selectStep(index){
+  const e=episode();if(!e||index<0||index>=e.events.length)return;
+  suspend();seek(e.events[index].time_s,index);
  }
  function wireVideo(){
   const video=host.querySelector('video'),e=episode();if(!video)return;
@@ -131,10 +147,28 @@ window.TaskReplay=(()=>{
   time=episode()?positions.get(key(episode()))||0:0;
   host.onclick=event=>{
    const m=event.target.closest('[data-replay-model]');if(m){toggleModel(m.dataset.replayModel);return;}
+   const track=event.target.closest('[data-replay-channel]');
+   if(track){
+    const rows=channels[track.dataset.replayChannel];if(!rows.length)return;
+    const field=track.querySelector('.replay-marker-field').getBoundingClientRect();
+    const target=Math.max(0,Math.min(1,(event.clientX-field.left)/field.width))*episode().duration_s;
+    const nearest=rows.reduce((best,row)=>Math.abs(row.time_s-target)<Math.abs(best.time_s-target)?row:best,rows[0]);
+    selectStep(nearest.index);track.focus({preventScroll:true});return;
+   }
    const b=event.target.closest('button');if(!b)return;
-   if(b.dataset.replayEvent!==undefined){const index=Number(b.dataset.replayEvent);seek(episode().events[index].time_s,index);return;}
+   if(b.dataset.replayEvent!==undefined){selectStep(Number(b.dataset.replayEvent));return;}
    const action=b.dataset.replayAction;
    if(action==='play')play();
+   if(action==='previous'||action==='next')selectStep(Evidence.atTime(episode(),time,selectedEvent).index+(action==='next'?1:-1));
+  };
+  host.onkeydown=event=>{
+   const track=event.target.closest('[data-replay-channel]');if(!track)return;
+   const rows=channels[track.dataset.replayChannel];if(!rows.length)return;
+   const keys=['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'];if(!keys.includes(event.key))return;
+   event.preventDefault();
+   const current=Evidence.atTime(episode(),time,selectedEvent).index,position=rows.findLastIndex(row=>row.index<=current);
+   const target=event.key==='Home'?0:event.key==='End'?rows.length-1:Math.max(0,Math.min(rows.length-1,position+(['ArrowRight','ArrowUp'].includes(event.key)?1:-1)));
+   selectStep(rows[target].index);
   };
   host.oninput=event=>{if(event.target.id==='task-episode-seek')seek(event.target.value);};
   host.onchange=event=>{

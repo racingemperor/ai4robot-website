@@ -12,6 +12,13 @@ window.Evidence = (() => {
   const past=episode.events.slice(0,index+1);
   return {index,event:index<0?null:episode.events[index],input:past.findLast(event=>event.input),output:past.findLast(event=>event.output),code:past.findLast(event=>event.code),images:past.findLast(event=>event.images?.length)};
  }
+ function timeline(episode) {
+  const channels={input:[],output:[]};
+  episode.events.forEach((event,index)=>{
+   for(const kind of ['input','output'])if(event[kind])channels[kind].push({index,time_s:event.time_s});
+  });
+  return channels;
+ }
  function preview(task) {
   const steps=[
    [0,'Task input','Instruction and initial context','The exact task instruction, robot manual and allowed context will appear here.'],
@@ -24,5 +31,5 @@ window.Evidence = (() => {
   ];
   return {id:`layout-${task.id.toLowerCase()}`,task_id:task.id,model_id:'model-slot-01',status:'pending',duration_s:90,preview:true,events:steps.map(([time_s,type,title,text],index)=>({time_s,type,text:`${title}. ${text}`,input:`[INPUT PLACEHOLDER · STEP ${index+1}]\n${index===0?task.goal:'Exact observations, messages and tool feedback supplied at this step.'}`,output:`[MODEL OUTPUT PLACEHOLDER · STEP ${index+1}]\nThe model's recorded response at ${time_s}s will appear here. This preview contains no model response.`,...(index===2||index===4?{code:{filename:task.track==='A'?'policy.py':task.track==='B'?'train.py':task.track==='D'?'collect_trajectories.py':'build_scene.py',content:`# CODE PLACEHOLDER · REVISION ${index===2?'01':'02'}\n# Full file snapshot submitted at ${time_s}s.\n# This is a reserved display area, not generated robot code.`}}:{})}))};
  }
- return {slot,atTime,preview,playbackIcon};
+ return {slot,atTime,timeline,preview,playbackIcon};
 })();

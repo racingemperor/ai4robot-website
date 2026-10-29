@@ -4,12 +4,12 @@ const fs=require('node:fs');
 const path=require('node:path');
 const vm=require('node:vm');
 
-function replay({withVideo=false,withResults=false,search}={}){
+function replay({withVideo=false,withResults=false,search,events=[]}={}){
  const empty={models:[],results:[],episodes:[]},elements=new Map(),playFailures=[];
- const recorded={models:[{id:'model-a',name:'Test model',agent:'Test harness'},{id:'model-b',name:'Zero model',agent:'Test harness'},{id:'model-c',name:'Pending model',agent:'Test harness'}],results:[],episodes:[{id:'recording-1',model_id:'model-a',task_id:'T06',duration_s:4,events:[],video:{src:'https://example.test/recording.mp4'}}]};
- const video={currentTime:0,playbackRate:1,pauseCount:0,pause(){this.pauseCount++;},addEventListener(){},play(){return {catch(callback){playFailures.push(callback);}};}};
+ const recorded={models:[{id:'model-a',name:'Test model',agent:'Test harness'},{id:'model-b',name:'Zero model',agent:'Test harness'},{id:'model-c',name:'Pending model',agent:'Test harness'}],results:[],episodes:[{id:'recording-1',model_id:'model-a',task_id:'T06',duration_s:4,events,video:{src:'https://example.test/recording.mp4'}}]};
+ const video={currentTime:0,playbackRate:1,pauseCount:0,listeners:{},pause(){this.pauseCount++;},addEventListener(name,listener){this.listeners[name]=listener;},play(){return {catch(callback){playFailures.push(callback);}};}};
  function element(selector){
-  if(!elements.has(selector))elements.set(selector,{dataset:{},attributes:{},setAttribute(k,v){this.attributes[k]=v;},focus(){this.focused=true;},scrollIntoView(){}});
+  if(!elements.has(selector))elements.set(selector,{dataset:{},attributes:{},style:{setProperty(){}},querySelectorAll:()=>[],setAttribute(k,v){this.attributes[k]=v;},focus(){this.focused=true;},scrollIntoView(){}});
   return elements.get(selector);
  }
  const context={
@@ -27,9 +27,10 @@ function replay({withVideo=false,withResults=false,search}={}){
  const host={isConnected:true,innerHTML:'',querySelector:s=>s==='video'?(withVideo?video:null):element(s),querySelectorAll:s=>s==='[data-replay-model]'?[...host.innerHTML.matchAll(/data-replay-model="([^"]+)"/g)].map(m=>Object.assign(element('model:'+m[1]),{dataset:{replayModel:m[1]}})):[]};
  const controller=context.window.TaskReplay;
  controller.mount(host,{id:'T06'});
- const clickPlay=()=>host.onclick({target:{closest:s=>s==='button'?{dataset:{replayAction:'play'}}:null}});
+ const clickAction=action=>host.onclick({target:{closest:s=>s==='button'?{dataset:{replayAction:action}}:null}});
+ const clickPlay=()=>clickAction('play');
  const clickModel=id=>host.onclick({target:{closest:s=>s==='[data-replay-model]'?{dataset:{replayModel:id}}:null}});
- return {context,controller,host,playFailures,clickPlay,clickModel,element,video};
+ return {context,controller,host,playFailures,clickPlay,clickAction,clickModel,element,video};
 }
 test('closing a task ignores a delayed playback rejection',()=>{
  const r=replay({withVideo:true});r.clickPlay();r.controller.unmount();
@@ -126,4 +127,35 @@ test('switching fixed-model recordings pauses the old player and ignores its del
  assert.doesNotThrow(()=>r.playFailures[0](new Error('Old playback interrupted')));
  r.controller.mount(r.host,{id:'T06'});
  assert.match(r.host.innerHTML,/data-replay-model/,'normal Task view is restored after leaving the fixed-model mode');
+});
+
+test('step buttons and channel keys inspect same-time messages without revealing future code',()=>{
+ const events=[{time_s:0,input:'instruction'},{time_s:0,output:'first response'},{time_s:0,output:'second response',code:{filename:'tool.txt',content:'later code'}},{time_s:4,type:'Judgment',text:'score'}];
+ const r=replay({withVideo:true,events});
+ r.clickPlay();r.clickAction('previous');
+ assert.equal(r.element('[data-replay-action="play"]').attributes['aria-label'],'Play');
+ assert.equal(r.element('#task-step-label').textContent,'Step 2 / 4');
+ assert.doesNotMatch(r.element('#task-sync-content').innerHTML,/second response/);
+ assert.doesNotMatch(r.element('#task-code-content').innerHTML,/later code/);
+ r.clickAction('previous');assert.equal(r.element('#task-step-label').textContent,'Step 1 / 4');
+ assert.equal(r.element('[data-replay-action="previous"]').disabled,true);
+ const key=key=>r.host.onkeydown({key,preventDefault(){},target:{closest:()=>({dataset:{replayChannel:'output'}})}});
+ key('ArrowRight');assert.equal(r.element('#task-step-label').textContent,'Step 2 / 4');
+ key('ArrowRight');assert.equal(r.element('#task-step-label').textContent,'Step 3 / 4');
+ key('Home');assert.equal(r.element('#task-step-label').textContent,'Step 2 / 4');
+ key('End');assert.equal(r.element('#task-step-label').textContent,'Step 3 / 4');
+ r.clickAction('next');assert.equal(r.element('#task-step-label').textContent,'Step 4 / 4');
+ assert.equal(r.element('[data-replay-action="next"]').disabled,true);
+});
+
+test('media seek rounding retains the explicitly selected event until the playhead moves away',()=>{
+ const r=replay({withVideo:true,events:[{time_s:0,input:'instruction'},{time_s:.3,output:'response'},{time_s:4,type:'Judgment'}]});
+ r.video.duration=4;r.video.readyState=4;r.video.listeners.loadedmetadata();
+ r.clickAction('next');r.video.currentTime=.299999;r.video.listeners.timeupdate();
+ assert.equal(r.element('#task-step-label').textContent,'Step 2 / 3');
+ assert.match(r.element('#task-sync-content').innerHTML,/response/);
+ assert.equal(r.element('#task-episode-seek').value,.3);
+ r.video.currentTime=.1;r.video.listeners.timeupdate();
+ assert.equal(r.element('#task-step-label').textContent,'Step 1 / 3');
+ assert.doesNotMatch(r.element('#task-sync-content').innerHTML,/response/);
 });

@@ -47,3 +47,19 @@ test('steps sharing a simulation timestamp can be inspected separately without s
  assert.equal(E.atTime(episode,0,1).code,undefined);
  assert.equal(E.atTime(episode,0).output.output,'second response');
 });
+
+test('timeline channels preserve every input/output at its recorded time and exclude judging',()=>{
+ for(const episode of R.official.episodes){
+  const channels=E.timeline(episode);
+  for(const kind of ['input','output']){
+   assert.equal(channels[kind].length,episode.events.filter(ev=>ev[kind]).length);
+   for(const item of channels[kind]){
+    const ev=episode.events[item.index];assert.ok(ev[kind]);assert.equal(item.time_s,ev.time_s);
+    assert.notEqual(ev.type,'Judgment');
+   }
+  }
+ }
+ const channels=E.timeline({events:[{time_s:0,input:'a'},{time_s:0,input:'b',output:'c'},{time_s:3,output:'d'},{time_s:4,type:'Judgment'}]});
+ assert.deepEqual(Array.from(channels.input,x=>x.index),[0,1]);
+ assert.deepEqual(Array.from(channels.output,x=>x.index),[1,2]);
+});
