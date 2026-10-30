@@ -18,7 +18,7 @@ window.HomeOverview = (() => {
  <section id="benchmark-video" class="home-overview-film" aria-label="Benchmark overview video">${Evidence.slot('VIDEO','Embodied Generalist Exam · Overview','','home-film-slot')}</section>
  <section id="benchmark-introduction" class="section home-introduction" aria-labelledby="home-introduction-title"><h2 id="home-introduction-title">Beyond the digital world</h2><div class="home-introduction-copy">
   <p>The <strong>Embodied Generalist Exam (EGE)</strong> evaluates the breadth of foundation models’ embodied capabilities beyond robot control. Its <strong>23 tasks</strong> span six categories: robotic manipulation, navigation, scene generation and interaction reconstruction, policy development and training, training data collection, and in-context learning. The tasks cover five classes of robot embodiments: robotic arms, dexterous hands, mobile robots, quadrupeds and humanoids.</p>
-  <p>Built with <strong>NVIDIA Isaac Sim 5.1 and Isaac Lab</strong>, each task combines an instruction, an executable environment, available observations and tools, interaction constraints and independent success criteria. Eight foundation models use their corresponding agent harnesses without task-specific fine-tuning, under matched initial conditions and resource budgets. The protocol specifies <strong>three independent trials per task and model</strong>, including failures and timeouts, and reports success rate, intermediate progress, full-process wall-clock time and token consumption.</p>
+  <p>Built with <strong>NVIDIA Isaac Sim 5.1 and Isaac Lab</strong>, each task combines an instruction, an executable environment, available observations and tools, interaction constraints and independent success criteria. Eight foundation models use their corresponding agent harnesses without task-specific fine-tuning, under matched initial conditions and resource budgets. The protocol specifies <strong>three independent trials per task and model</strong>, including failures and timeouts, and reports average task scores, full-process wall-clock time and token consumption.</p>
  </div></section>`;}
  function shell(){return `<section id="home-overall" class="section home-overall" aria-labelledby="home-overall-title">
   <div class="home-overall-heading"><div><h2 id="home-overall-title">Overall leaderboard</h2></div><a class="text-link" id="home-overall-link" href="${Site.href('leaderboard')}">Full leaderboard ↗</a></div>
@@ -31,13 +31,14 @@ window.HomeOverview = (() => {
   let rank=0,previous;
   const data=source;
   const links={data,category:null,group:null,robot:null,track:null,section:null};
-  return `<div class="home-rank-axis" aria-hidden="true"><span></span><span class="home-rank-ticks">${[0,25,50,75,100].map(n=>`<i style="left:${n}%">${n}%</i>`).join('')}</span><span>${TASKS.length} tasks</span></div><div class="home-rank-rows" aria-label="Overall success rates">${models.map((model,index)=>{
-   const value=model.complete?model.score:null;
-   if(value!==null){if(previous!==value)rank=index+1;previous=value;}
-   const score=value===null?'—':`${(value*100).toFixed(1)}%`;
+  return `<div class="home-rank-axis" aria-hidden="true"><span></span><span class="home-rank-ticks">${[0,25,50,75,100].map(n=>`<i style="left:${n}%">${n}</i>`).join('')}</span><span>${TASKS.length} tasks</span></div><div class="home-rank-rows" aria-label="Overall scores">${models.map((model,index)=>{
+   const value=model.score;
+   const ranked=model.complete&&value!==null;
+   if(ranked){if(previous!==value)rank=index+1;previous=value;}
+   const score=value===null?'—':(value*100).toFixed(1);
    const coverage=`${model.complete?TASKS.length:model.scheduled?0:model.coverage} / ${TASKS.length}`;
-   return `<a class="home-rank-row${value===null?' is-pending':''}" href="${h(Site.href('leaderboard',{...links,model:model.id,detail:1}))}" data-overall-model="${h(model.id)}" aria-label="${h(model.name)} · ${value===null?'Unranked':`Rank ${rank}, Overall success ${score}`} · Open model results" style="--model-color:${Leaderboard.colorFor(model)}">
-    <span class="home-rank-number">${value===null?'—':rank}</span><span class="home-rank-logo">${Results.logo(model)}</span><span class="home-rank-name"><strong>${h(model.name)}</strong><span>${h(model.agent)}</span></span>
+   return `<a class="home-rank-row${value===null?' is-pending':''}" href="${h(Site.href('leaderboard',{...links,model:model.id,detail:1}))}" data-overall-model="${h(model.id)}" aria-label="${h(model.name)} · ${ranked?`Rank ${rank}`:'Unranked'}, Overall score ${score} · Open model results" style="--model-color:${Leaderboard.colorFor(model)}">
+    <span class="home-rank-number">${ranked?rank:'—'}</span><span class="home-rank-logo">${Results.logo(model)}</span><span class="home-rank-name"><strong>${h(model.name)}</strong><span>${h(model.agent)}</span></span>
     <span class="home-rank-track" aria-hidden="true">${value===null?'':`<span style="width:${value*100}%"></span>`}</span><span class="home-rank-value"><strong>${score}</strong><small>${coverage}</small></span>
    </a>`;
   }).join('')||'<p class="home-rank-empty">No models in this report.</p>'}</div>`;

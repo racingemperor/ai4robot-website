@@ -16,7 +16,7 @@ function replay({withVideo=false,withResults=false,search,events=[]}={}){
   window:{addEventListener(){}},document:{addEventListener(){}},URL,URLSearchParams,
   location:new URL('https://example.test/tasks.html'+(search??`?data=demo${withVideo?'&episodeModel=model-a':''}`)),
   Site:{refreshLinks(){}},Leaderboard:{roster:[]},cancelAnimationFrame(){},
-  Results:{sourceFor:v=>v==='official'?'official':'demo',defaultSource:()=>'demo',logo:()=>'',official:empty,demo:withVideo||withResults?recorded:empty,summarize:()=>[{id:'model-a',score:.6,progress:.8,trials:10},{id:'model-b',score:0,progress:0,trials:10}]},
+  Results:{sourceFor:v=>v==='official'?'official':'demo',defaultSource:()=>'demo',logo:()=>'',official:empty,demo:withVideo||withResults?recorded:empty,summarize:()=>[{id:'model-a',score:.6,trials:10},{id:'model-b',score:0,trials:10}]},
   sessionStorage:{getItem(){throw new Error('Published recordings must not read local reports');}}
  };
  context.history={replaceState(_a,_b,url){context.location=new URL(url,context.location);}};
@@ -56,12 +56,14 @@ test('failure of the active playback request remains visible',()=>{
  assert.match(r.element('#task-video-status').textContent,/Playback failed/);
 });
 
-test('task model rows distinguish a 60% fill, measured zero and missing results',()=>{
+test('task model rows show scores out of 100 with proportional bars and distinct missing results',()=>{
  const r=replay({withResults:true});
  assert.match(r.host.innerHTML,/width:60%/);
- assert.match(r.host.innerHTML,/60\.0%/);
+ assert.match(r.host.innerHTML,/<strong>60\.0<\/strong>/);
  assert.match(r.host.innerHTML,/width:0%/);
- assert.match(r.host.innerHTML,/0\.0%/);
+ assert.match(r.host.innerHTML,/<strong>0\.0<\/strong>/);
+ assert.match(r.host.innerHTML,/Average score/);
+ assert.doesNotMatch(r.host.innerHTML,/Success rate|Progress \/ 100|\d\.\d%/);
  assert.match(r.host.innerHTML,/task-success-track is-pending/);
  assert.equal([...r.host.innerHTML.matchAll(/aria-expanded="false"/g)].length,3);
  assert.doesNotMatch(r.host.innerHTML,/id="task-episode-seek"/,'ordinary task visits start compact');

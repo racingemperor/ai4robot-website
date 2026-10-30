@@ -16,11 +16,14 @@ test('published GPT-6 results preserve the supplied outcomes and partial scores 
  for(const [task,success,progress] of expected){
   const row=R.official.results.find(r=>r.task_id===task);
   assert.equal(row.model_id,'gpt6-astra');assert.equal(row.trials,1);
-  assert.equal(row.successes,success);assert.ok(Math.abs(row.progress_sum-progress)<1e-12);
+  assert.equal(row.successes,success);assert.ok(Math.abs(row.score_sum-progress)<1e-12);
  }
  const model=R.summarize(R.official,context.TASKS.map(t=>t.id)).find(m=>m.id==='gpt6-astra');
  assert.equal(model.coverage,12);assert.equal(model.trials,12);assert.equal(model.successes,2);
- assert.equal(model.complete,false);assert.equal(model.score,null);
+ assert.equal(model.complete,false);assert.ok(Math.abs(model.score-.3549583333333333)<1e-12);
+ assert.equal(R.summarize(R.official,['T05'])[0].score,.6018);
+ assert.equal(R.summarize(R.official,['T06'])[0].score,1);
+ assert.equal(R.summarize(R.official,['T08'])[0].score,0);
  for(const m of R.summarize(R.official,['T06']).filter(m=>m.id!=='gpt6-astra'))assert.equal(m.score,null);
  assert.equal(R.defaultSource(),'official');assert.equal(R.sourceFor('demo'),'official');
 });

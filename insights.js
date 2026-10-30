@@ -202,13 +202,13 @@ window.Insights = (() => {
  function waveform(dimensionId){
   return TASKS.map(task=>({task,...profile(task).find(d=>d.id===dimensionId)}));
  }
- function topModels(report,metric='score',limit=5){
-  const ids=TASKS.map(t=>t.id),key=metric==='progress'?'progress':'score';
+ function topModels(report,limit=5){
+  const ids=TASKS.map(t=>t.id);
   const models=Results.summarize(report,ids).filter(m=>m.complete&&m.score!==null)
    .sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id)).slice(0,limit);
   return models.map(model=>({...model,categories:CATEGORIES.map(category=>{
    const row=Results.summarize(report,TASKS.filter(t=>t.category===category.id).map(t=>t.id)).find(m=>m.id===model.id);
-   return {id:category.id,value:row?.complete?row[key]:null};
+   return {id:category.id,value:row?.complete?row.score:null};
   })}));
  }
  return {dimensions,levels,profile,waveform,topModels};

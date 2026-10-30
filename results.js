@@ -31,7 +31,7 @@ window.Results = (() => {
     const trials=20,successes=Math.max(0,18-mi-((ti*3+mi*2)%7));
     const progress = successes+(trials-successes)*(0.2+((ti+mi)%5)*0.1);
     const duration = 35+ti*7+mi*11;
-    demo.results.push({model_id:m.id,task_id:t.id,trials,successes,progress_sum:Number(progress.toFixed(3)),duration_sum_s:duration*trials});
+    demo.results.push({model_id:m.id,task_id:t.id,trials,successes,score_sum:Number(progress.toFixed(3)),duration_sum_s:duration*trials});
     const success=successes>=trials/2;
     const texts=[`Initial state and goal: ${t.goal}`,`Allowed observation: cameras and measured body state.`,`Key action: ${t.beats[1]}.`,`${success?'Success':'Failure'} criterion: ${t.proof}`];
     demo.episodes.push({id:`${m.id}-${t.id.toLowerCase()}`,model_id:m.id,task_id:t.id,status:success?'success':'failure',duration_s:duration,seed:0,layout:0,events:texts.map((text,i)=>({time_s:Math.round(duration*i/3),type:['Goal','Observation','Action','Judgment'][i],text,input:i===0?t.goal:'Camera observation and permitted measured state.',output:text,...(i===2?{code:{filename:'policy.py',content:'# policy.py\n# Control program'}}:{})}))});
@@ -62,7 +62,9 @@ window.Results = (() => {
       if(!r||!modelIds.has(r.model_id)||!TASKS.some(t=>t.id===r.task_id))fail('A result references an unknown model or task.');
       const key=`${r.model_id}/${r.task_id}`;if(pairs.has(key))fail(`Duplicate result: ${key}. Combine trial aggregates first.`);pairs.add(key);
       const trials=integer(r.trials,'trials',1),successes=integer(r.successes,'successes',0,trials);
-      clean.results.push({model_id:r.model_id,task_id:r.task_id,trials,successes,progress_sum:num(r.progress_sum,'progress_sum',successes,trials),duration_sum_s:num(r.duration_sum_s,'duration_sum_s')});
+      // Older reports stored normalized trial scores under progress_sum.
+      const scoreSum=num(r.score_sum??r.progress_sum,'score_sum',0,trials);
+      clean.results.push({model_id:r.model_id,task_id:r.task_id,trials,successes,score_sum:scoreSum,duration_sum_s:num(r.duration_sum_s,'duration_sum_s')});
     }
     if(raw.episodes!==undefined&&!Array.isArray(raw.episodes))fail('episodes must be an array.');
     if((raw.episodes||[]).length>500)fail('A report supports at most 500 episodes.');
@@ -110,25 +112,19 @@ window.Results = (() => {
     }
     return clean;
   }
+  // Each trial score is normalized to 0–1 in the report and displayed as 0–100 points.
+  const taskScore=row=>row?(row.score_sum??row.progress_sum)/row.trials:null;
   function summarize(data,ids){
     const taskIds=[...new Set(ids)].filter(id=>TASKS.some(t=>t.id===id));
-    const categories=[...new Set(taskIds.map(id=>TASKS.find(t=>t.id===id).category))];
     const mean=values=>values.length?values.reduce((a,b)=>a+b,0)/values.length:null;
     return data.models.map(model=>{
       const rows=data.results.filter(r=>r.model_id===model.id&&taskIds.includes(r.task_id));
       const trials=rows.reduce((n,r)=>n+r.trials,0),successes=rows.reduce((n,r)=>n+r.successes,0);
-      const pooled=trials?successes/trials:null,coverage=rows.length;
-      const categoryRows=categories.map(c=>rows.filter(r=>TASKS.find(t=>t.id===r.task_id).category===c));
-      const hasCategories=categoryRows.length>0&&categoryRows.every(rs=>rs.length>0);
-      const score=hasCategories?mean(categoryRows.map(rs=>mean(rs.map(r=>r.successes/r.trials)))):null;
-      const progress=hasCategories?mean(categoryRows.map(rs=>mean(rs.map(r=>r.progress_sum/r.trials)))):null;
-      const z=1.96,den=trials?1+z*z/trials:1;
-      const center=trials?(pooled+z*z/(2*trials))/den:0;
-      const margin=trials?z*Math.sqrt(pooled*(1-pooled)/trials+z*z/(4*trials*trials))/den:0;
-      return {...model,trials,successes,score,pooled,coverage,complete:taskIds.length>0&&coverage===taskIds.length,progress,duration:trials?rows.reduce((n,r)=>n+r.duration_sum_s,0)/trials:null,ci:trials?[center-margin,center+margin]:null};
+      const coverage=rows.length,score=mean(rows.map(taskScore));
+      return {...model,trials,successes,score,coverage,complete:taskIds.length>0&&coverage===taskIds.length,duration:trials?rows.reduce((n,r)=>n+r.duration_sum_s,0)/trials:null};
     });
   }
   function csv(rows){return '\uFEFF'+rows.map(row=>row.map(v=>{let value=String(v??'');if(typeof v==='string'&&/^[=+\-@\t\r]/.test(value))value="'"+value;return '"'+value.replaceAll('"','""')+'"';}).join(',')).join('\r\n');}
   if(window.PUBLISHED_RESULTS)Object.assign(official,validate(window.PUBLISHED_RESULTS));
-  return {version,official,demo,validate,summarize,csv,roster,logo,logoPath,defaultSource,sourceFor};
+  return {version,official,demo,validate,taskScore,summarize,csv,roster,logo,logoPath,defaultSource,sourceFor};
 })();

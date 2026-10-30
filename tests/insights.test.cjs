@@ -12,11 +12,10 @@ for(const file of ['tasks','results','insights']){
 const {Insights,Results}=context.window;
 const tasks=context.TASKS;
 
-test('Home selects the same five complete models by balanced success, retaining that cohort for progress',()=>{
- const rows=Insights.topModels(Results.demo),progress=Insights.topModels(Results.demo,'progress');
+test('Home selects the five complete models by average score across all tasks',()=>{
+ const rows=Insights.topModels(Results.demo);
  const expected=Results.summarize(Results.demo,tasks.map(t=>t.id)).sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));
  assert.equal(rows.length,5);assert.deepEqual(Array.from(rows,m=>m.id),Array.from(expected.slice(0,5),m=>m.id));
- assert.deepEqual(Array.from(progress,m=>m.id),Array.from(rows,m=>m.id));
  for(const model of rows)for(const category of context.CATEGORIES){
   const expected=Results.summarize(Results.demo,tasks.filter(t=>t.category===category.id).map(t=>t.id)).find(m=>m.id===model.id);
   assert.equal(model.categories.find(c=>c.id===category.id).value,expected.score);

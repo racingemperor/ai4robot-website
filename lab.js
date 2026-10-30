@@ -73,7 +73,7 @@ window.Lab=(()=>{
    if(action==='share'){syncURL();share();}
    if(action==='json')download(`ai4robot-${source}-report.json`,JSON.stringify({...report(),website_data_source:source},null,2));
    if(action==='template')download('ai4robot-report-template.json',JSON.stringify({...Results.official,models:[{id:'your-model',name:'Your model',version:'Exact version',agent:'Exact harness'}],results:[],episodes:[]},null,2));
-   if(action==='csv')download(`ai4robot-${source}-results.csv`,Results.csv([['source','protocol','model','coverage','success_rate','pooled_success','wilson_low','wilson_high','progress_0_100','mean_simulation_s'],...Results.summarize(report(),tasks().map(t=>t.id)).map(m=>['Model results',report().protocol,m.name,m.coverage,m.score,m.pooled,m.ci?.[0],m.ci?.[1],m.progress==null?null:m.progress*100,m.duration])]),'text/csv;charset=utf-8');
+   if(action==='csv')download(`ai4robot-${source}-results.csv`,Results.csv([['source','protocol','model','coverage','average_score_0_100','mean_simulation_s'],...Results.summarize(report(),tasks().map(t=>t.id)).map(m=>['Model results',report().protocol,m.name,m.coverage,m.score==null?null:m.score*100,m.duration])]),'text/csv;charset=utf-8');
   });
   root.addEventListener('keydown',e=>{const model=e.target.closest('.model-curve,.curve-label');if(model&&['Enter',' '].includes(e.key)){e.preventDefault();openModel(model);}});
   root.addEventListener('change',e=>{

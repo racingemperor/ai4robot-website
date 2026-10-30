@@ -35,27 +35,28 @@ test('model selection and task filtering preserve the exact task scope and safel
  const legacy=render({modelQuery:'nonexistent'});assert.equal(legacy.selectedModel,'gpt6-astra');assert.equal((legacy.html.match(/data-chart-model=/g)||[]).length,8);assert(!legacy.html.includes('model-search'));
 });
 
-test('partial results distinguish zero success from missing data and never receive a rank',()=>{
+test('partial results show earned scores, distinguish missing data and never receive a rank',()=>{
  const tasks=context.TASKS.filter(t=>['T01','T21'].includes(t.id));
- const report={models:[{id:'partial',name:'Partial model',agent:'Harness',version:'v1'}],results:[{model_id:'partial',task_id:'T01',trials:4,successes:0,progress_sum:1,duration_sum_s:40}],episodes:[]};
+ const report={models:[{id:'partial',name:'Partial model',agent:'Harness',version:'v1'}],results:[{model_id:'partial',task_id:'T01',trials:4,successes:0,score_sum:1,duration_sum_s:40}],episodes:[]};
  const rows=Results.summarize(report,tasks.map(t=>t.id));
  const view=render({report,rows,tasks,source:'official'});
  assert.match(view.html,/<td class="rank-column">—/);assert.equal(rows[0].complete,false);assert.match(view.html,/curve-unbranded/);
  const measured=view.detailHTML.match(/data-model-task="T01"[\s\S]*?<\/tr>/)[0];
  const missing=view.detailHTML.match(/data-model-task="T21"[\s\S]*?<\/tr>/)[0];
- assert(measured.includes('0.0%'));assert(measured.includes('25.0'));assert(measured.includes('0 / 4'));
- assert(!missing.includes('0.0%'));assert(missing.includes('overall-track is-pending'));assert(!missing.includes('Awaiting evidence'));
+ assert(measured.includes('25.0'));assert(measured.includes('<td>4</td>'));assert(measured.includes('width:25%'));
+ assert(!missing.includes('25.0'));assert(missing.includes('overall-track is-pending'));assert(!missing.includes('Awaiting evidence'));
+ assert.doesNotMatch(view.html+view.detailHTML,/success rate|progress \/ 100|success \/ trials/i);
 });
 
 test('model selection preserves global ranks and each task has an inline recording disclosure',()=>{
- const tasks=[context.TASKS[0]],report={models:[{id:'first',name:'First model',agent:'Harness',version:'v1'},{id:'second',name:'Second model',agent:'Harness',version:'v1'}],results:[{model_id:'first',task_id:'T01',trials:2,successes:2,progress_sum:2,duration_sum_s:10},{model_id:'second',task_id:'T01',trials:2,successes:1,progress_sum:1.5,duration_sum_s:20}],episodes:[{model_id:'second',task_id:'T01'}]};
+ const tasks=[context.TASKS[0]],report={models:[{id:'first',name:'First model',agent:'Harness',version:'v1'},{id:'second',name:'Second model',agent:'Harness',version:'v1'}],results:[{model_id:'first',task_id:'T01',trials:2,successes:2,score_sum:2,duration_sum_s:10},{model_id:'second',task_id:'T01',trials:2,successes:1,score_sum:1.5,duration_sum_s:20}],episodes:[{model_id:'second',task_id:'T01'}]};
  const view=render({report,rows:Results.summarize(report,['T01']),tasks,source:'official',selectedModel:'second'});
  assert.equal(view.selectedModel,'second');assert.match(view.html,/<td class="rank-column">2/);
  assert.match(view.detailHTML,/data-model-task-toggle="T01" aria-expanded="false" aria-controls="model-task-panel-T01"/);
  assert.match(view.detailHTML,/id="model-task-panel-T01" hidden/);
  assert.match(view.detailHTML,/data-board-task-replay="T01"/);
  assert.doesNotMatch(view.detailHTML,/episodes\.html/);
- assert(view.html.includes('50.0%'));assert(view.detailHTML.includes('75.0'));
+ assert(view.html.includes('75.0'));assert(view.detailHTML.includes('75.0'));
 });
 
 test('model dossiers and tables omit data-status notices',()=>{
@@ -65,22 +66,23 @@ test('model dossiers and tables omit data-status notices',()=>{
 });
 
 
-test('chart category rates and Overall preserve equal category weighting and the matrix uses all task headers',()=>{
+test('chart categories average their tasks and Overall weights every task equally',()=>{
  const tasks=context.TASKS.filter(t=>['T01','T02','T21'].includes(t.id));
  const report={models:[{id:'one',name:'One',agent:'Harness',version:'v1'}],results:[
- {model_id:'one',task_id:'T01',trials:10,successes:0,progress_sum:0,duration_sum_s:10},
- {model_id:'one',task_id:'T02',trials:10,successes:10,progress_sum:10,duration_sum_s:10},
- {model_id:'one',task_id:'T21',trials:10,successes:10,progress_sum:10,duration_sum_s:10}],episodes:[]};
+ {model_id:'one',task_id:'T01',trials:10,successes:0,score_sum:0,duration_sum_s:10},
+ {model_id:'one',task_id:'T02',trials:10,successes:10,score_sum:10,duration_sum_s:10},
+ {model_id:'one',task_id:'T21',trials:10,successes:10,score_sum:10,duration_sum_s:10}],episodes:[]};
  const options={report,rows:Results.summarize(report,tasks.map(t=>t.id)),tasks,source:'official'};
  const view=render(options);
- assert.match(view.html,/Robotic manipulation: 50.0%/);assert.match(view.html,/Navigation: 100.0%/);assert.match(view.html,/Overall: 75.0%/);
+ assert.match(view.html,/Robotic manipulation: 50.0/);assert.match(view.html,/Navigation: 100.0/);assert.match(view.html,/Overall: 66.7/);
+ assert.match(view.html,/Score \/ 100/);assert.doesNotMatch(view.html,/\d\.\d%/);
  for(const id of ['T01','T02','T21'])assert(view.html.includes('data-table-sort="'+id+'"'));
  assert(!render({...options,hiddenModels:['one']}).html.includes('class="model-curve"'));
  assert(render({...options,hiddenModels:['one']}).html.includes('No models selected'));
 });
 
 test('task sorting puts missing results last in both directions without changing Overall ranks',()=>{
- const tasks=[context.TASKS[0]],report={models:[{id:'missing',name:'Missing',agent:'H',version:'v1'},{id:'zero',name:'Zero',agent:'H',version:'v1'},{id:'full',name:'Full',agent:'H',version:'v1'}],results:[{model_id:'zero',task_id:'T01',trials:2,successes:0,progress_sum:0,duration_sum_s:2},{model_id:'full',task_id:'T01',trials:2,successes:2,progress_sum:2,duration_sum_s:2}],episodes:[]};
+ const tasks=[context.TASKS[0]],report={models:[{id:'missing',name:'Missing',agent:'H',version:'v1'},{id:'zero',name:'Zero',agent:'H',version:'v1'},{id:'full',name:'Full',agent:'H',version:'v1'}],results:[{model_id:'zero',task_id:'T01',trials:2,successes:0,score_sum:0,duration_sum_s:2},{model_id:'full',task_id:'T01',trials:2,successes:2,score_sum:2,duration_sum_s:2}],episodes:[]};
  const options={report,rows:Results.summarize(report,['T01']),tasks,source:'official',tableSort:'T01'};
  const modelOrder=direction=>[...render({...options,tableDirection:direction}).html.match(/<table class="task-comparison-table">[\s\S]*?<\/table>/)[0].matchAll(/class="table-model" data-board-model="([^"]+)"/g)].map(m=>m[1]);
  assert.deepEqual(modelOrder(-1),['full','zero','missing']);

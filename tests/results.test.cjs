@@ -16,16 +16,34 @@ test('official data has no fabricated model scores; examples cover all 23 tasks'
   const d=R.validate(R.demo);assert.equal(d.models.length,8);assert.equal(d.results.length,184);assert.equal(d.episodes.length,184);
   assert.deepEqual(Array.from(d.models,m=>m.id),Array.from(R.roster,m=>m.id));
 });
-test('category-balanced metrics differ from pooled trials and do not hide missing categories',()=>{
-  const result=(task,trials,successes,progress)=>({model_id:'a',task_id:task,trials,successes,progress_sum:progress,duration_sum_s:trials*15});
+test('scores average trials within a task and then weight each task equally across categories',()=>{
+  const result=(task,trials,successes,progress)=>({model_id:'a',task_id:task,trials,successes,score_sum:progress,duration_sum_s:trials*15});
   const data={models:[{id:'a'}],results:[result('T01',2,1,1.5),result('T02',8,2,4),result('T21',10,10,10),result('T16',5,0,1),result('T13',5,0,1),result('T14',5,5,5),result('T15',5,0,2),result('T23',2,1,1.5),result('T12',2,0,1),result('T18',2,2,2)]};
   const row=R.summarize(data,['T01','T02','T21','T16','T13','T14','T15','T23','T12','T18'])[0];
-  assert.ok(Math.abs(row.score-(.375+1+1/3+0+.5+.5)/6)<1e-12);
-  assert.ok(Math.abs(row.progress-(.625+1+8/15+.2+.75+.75)/6)<1e-12);
-  assert.equal(row.pooled,21/46);assert.equal(row.duration,15);assert.equal(row.complete,true);assert.ok(row.ci[0]<row.pooled&&row.ci[1]>row.pooled);
-  const partial=R.summarize(data,['T01','T02','T03'])[0];assert.equal(partial.complete,false);assert.equal(partial.coverage,2);assert.equal(partial.score,.375);
-  assert.equal(R.summarize(data,['T01','T17'])[0].score,null);
+  assert.ok(Math.abs(row.score-.63)<1e-12);
+  assert.equal(row.duration,15);assert.equal(row.complete,true);
+  const partial=R.summarize(data,['T01','T02','T03'])[0];assert.equal(partial.complete,false);assert.equal(partial.coverage,2);assert.equal(partial.score,.625);
+  const missing=R.summarize(data,['T01','T17'])[0];assert.equal(missing.score,.75);assert.equal(missing.complete,false);
   assert.equal(R.summarize(data,[])[0].score,null);
+});
+test('partial trial scores determine the result even when no trial is marked successful',()=>{
+  const report={models:[{id:'a'}],results:[
+    {model_id:'a',task_id:'T01',trials:1,successes:0,score_sum:.2,duration_sum_s:1},
+    {model_id:'a',task_id:'T02',trials:10,successes:0,score_sum:4,duration_sum_s:10},
+    {model_id:'a',task_id:'T21',trials:2,successes:0,score_sum:1.8,duration_sum_s:2}
+  ]};
+  assert.equal(R.taskScore(report.results[1]),.4);
+  assert.equal(R.summarize(report,['T01','T02','T21'])[0].score,.5);
+  assert.ok(Math.abs(R.summarize(report,['T01','T02'])[0].score-.3)<1e-12);
+  assert.equal(R.taskScore(null),null);
+});
+test('legacy normalized score aggregates remain readable and exports use the canonical score field',()=>{
+  const report=clone(R.demo),row=report.results[0];
+  row.progress_sum=row.score_sum;delete row.score_sum;
+  const clean=R.validate(report).results[0];
+  assert.equal(clean.score_sum,row.progress_sum);assert.equal(clean.progress_sum,undefined);
+  assert.equal(R.taskScore(row),R.taskScore(clean));
+  for(const value of [-1,21,NaN]){const bad=clone(R.demo);bad.results[0].score_sum=value;assert.throws(()=>R.validate(bad));}
 });
 test('catalog follows all six manuscript categories and restores T18 and trajectory collection',()=>{
   const ts=context.TASKS;assert.equal(ts.length,23);
@@ -50,11 +68,11 @@ test('catalog follows all six manuscript categories and restores T18 and traject
   assert.equal(ts.find(t=>t.id==='T11').track,'A');assert.equal(ts.find(t=>t.id==='T21').robot,'Unitree Go2');assert.equal(ts.find(t=>t.id==='T03').robot,'Franka Panda');
 });
 test('reject duplicate, unknown, malformed or contradictory results',()=>{
-  const changes=[d=>d.results.push(d.results[0]),d=>d.results[0].task_id='T24',d=>d.results[0].successes=21,d=>d.results[0].trials=1.5,d=>d.results[0].duration_sum_s=NaN,d=>d.models[0].id='bad"id',d=>d.results[0].progress_sum=-1,d=>d.environment='real'];
+  const changes=[d=>d.results.push(d.results[0]),d=>d.results[0].task_id='T24',d=>d.results[0].successes=21,d=>d.results[0].trials=1.5,d=>d.results[0].duration_sum_s=NaN,d=>d.models[0].id='bad"id',d=>d.results[0].score_sum=-1,d=>d.environment='real'];
   for(const change of changes){const data=clone(R.demo);change(data);assert.throws(()=>R.validate(data));}
 });
 test('reject invalid episode references and out-of-order times; strip unknown fields',()=>{
-  for(const change of [d=>d.episodes[0].task_id='T24',d=>d.episodes[0].events[1].time_s=-1,d=>d.episodes[0].events[2].time_s=0,d=>d.episodes[0].duration_s=0,d=>d.episodes.push(d.episodes[0]),d=>{d.results[0].trials=1;d.results[0].successes=0;d.results[0].progress_sum=0;d.episodes[0].status='success';}]){const d=clone(R.demo);change(d);assert.throws(()=>R.validate(d));}
+  for(const change of [d=>d.episodes[0].task_id='T24',d=>d.episodes[0].events[1].time_s=-1,d=>d.episodes[0].events[2].time_s=0,d=>d.episodes[0].duration_s=0,d=>d.episodes.push(d.episodes[0]),d=>{d.results[0].trials=1;d.results[0].successes=0;d.results[0].score_sum=0;d.episodes[0].status='success';}]){const d=clone(R.demo);change(d);assert.throws(()=>R.validate(d));}
   const d=clone(R.demo);d.episodes[0].video_url='https://example.com/private.mp4';d.models[0].html='<script>bad</script>';const clean=R.validate(d);assert.equal(clean.episodes[0].video_url,undefined);assert.equal(clean.models[0].html,undefined);
 });
 test('CSV escapes quotes and spreadsheet formulas while preserving numeric negatives',()=>{
