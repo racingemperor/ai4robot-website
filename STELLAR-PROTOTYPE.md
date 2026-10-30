@@ -18,3 +18,9 @@ Scene positions illustrate the proposed ordering, independent of measured result
 Cloud textures, the dense star field, dust lanes and distant galaxies are cached; expensive generation runs only when the viewport or variant changes. The structural reference is [NASA's Messier 31 imagery](https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-31/). This is an artistic procedural rendering with no NASA images embedded.
 
 This remains an independent preview. The production leaderboard has not been replaced.
+
+## Solar perspective
+
+An additional independent study is available at `solar-perspective.html`. The viewpoint sits beside a large cropped Sun on the left, looking outward toward seven model planets. White elliptical orbit lines, small asteroids, lit planetary surfaces and a distant star field establish scale and depth. The leading model's logo sits on the Sun. The existing Andromeda study is unchanged.
+
+The solar view reuses the official model roster, result links and site theme. Logo buttons select a model in place. The background is drawn and cached locally, with only sparse star glints animated; reduced-motion preferences keep it static. Mobile uses a separate vertical arrangement. Source files are `solar-perspective.html`, `solar-perspective.css` and `solar-perspective.js`.
