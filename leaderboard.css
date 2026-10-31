@@ -55,7 +55,8 @@
 .chart-help,.chart-source-table summary,.task-column-key summary{font-size:13px;color:var(--muted);line-height:1.7}
 .chart-help{margin-top:12px}.chart-source-table{margin-top:16px}.chart-source-table summary,.task-column-key summary{cursor:pointer;min-height:44px;align-content:center}
 .chart-source-table .table-scroll{margin-top:12px}
-.chart-source-table table{min-width:850px}
+.chart-source-table table{min-width:1100px}
+.chart-source-table .table-score{min-width:92px}
 .chart-empty{padding:20px 24px;background:var(--surface);border-radius:14px;margin:8px 0 20px}
 .chart-empty strong{font-size:16px}.chart-empty p{font-size:14px;color:var(--muted);margin:6px 0 14px}
 .board-section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:22px}
@@ -64,12 +65,17 @@
 .board-search input{width:100%}
 .table-scroll-hint{font-size:12px;color:var(--muted);margin-bottom:10px}
 .task-comparison-scroll{overflow:auto;max-width:100%;border:1px solid var(--line);border-radius:14px}
-.task-comparison-table{border-collapse:separate;border-spacing:0;width:100%;min-width:2040px;font-size:13px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.task-comparison-table{border-collapse:separate;border-spacing:0;width:100%;font-size:13px;white-space:nowrap;font-variant-numeric:tabular-nums}
 .task-comparison-table caption{text-align:left;font-size:12px;color:var(--muted);padding:14px 18px;background:var(--surface)}
 .task-comparison-table th,.task-comparison-table td{text-align:center;padding:0 6px;border-bottom:1px solid var(--line);height:68px;background:var(--paper)}
 .task-comparison-table thead th{height:54px;background:var(--surface);font-weight:700}
 .task-comparison-table button{min-height:44px;min-width:44px;border:0;background:transparent;color:inherit;cursor:pointer;padding:8px 4px;font:inherit}
 .task-comparison-table button:hover{color:var(--accent);background:var(--surface)}
+.task-comparison-table .score-cell-button{display:block;width:100%;min-width:116px;padding:12px 10px;border-radius:8px;text-align:left}
+.table-score{display:grid;gap:8px;min-width:0;text-align:left}
+.table-score>strong{color:var(--ink);font-size:15px;line-height:1.3;font-weight:700;font-variant-numeric:tabular-nums}
+.table-score .overall-track{width:100%;height:8px;flex:none;background:color-mix(in srgb,var(--model-color) 14%,var(--paper))}
+.table-score .overall-track.is-pending{background:transparent;border:1px dashed var(--line);opacity:.7}
 .task-comparison-table thead button{font-weight:700}.task-comparison-table th[aria-sort]{color:var(--accent)}
 .task-comparison-table .rank-column{width:42px;min-width:42px;color:var(--muted)}
 .task-comparison-table .model-column{position:sticky;left:0;min-width:230px;width:230px;text-align:left;z-index:2;box-shadow:1px 0 0 var(--line)}
@@ -128,8 +134,7 @@
 .model-task-name strong{font-size:13px;line-height:1.5;font-weight:600}
 .model-task-name>span:last-child{margin-left:auto;color:var(--muted)}
 .model-task-table th>small{margin-top:4px;padding-left:34px;font-size:11px}
-.task-score-bar{display:flex;align-items:center;gap:12px;min-width:145px}
-.task-score-bar strong{min-width:43px;text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.task-score-bar{min-width:145px}
 .model-episode-link{font-size:12px;white-space:nowrap;color:var(--accent)}
 .task-result-pending{font-size:12px;color:var(--muted)}
 :root[data-theme=dark] .model-monogram{color:color-mix(in srgb,var(--model-color,var(--accent)) 65%,#fff)}
