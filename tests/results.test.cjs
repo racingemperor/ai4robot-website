@@ -79,6 +79,26 @@ test('CSV escapes quotes and spreadsheet formulas while preserving numeric negat
   const text=R.csv([['a,"b','=1+1','@SUM(A1)',-2]]);assert.ok(text.startsWith('\uFEFF'));assert.ok(text.includes('a,""b'));assert.ok(text.includes("'=1+1"));assert.ok(text.includes("'@SUM"));assert.ok(text.includes('"-2"'));
 });
 
+test('aggregate-only scores retain unknown outcomes and timing while validating supplied values',()=>{
+ const d=clone(R.demo);delete d.results[0].successes;delete d.results[0].duration_sum_s;
+ const clean=R.validate(d),summary=R.summarize(clean,['T01'])[0];
+ assert.equal(clean.results[0].successes,undefined);assert.equal(clean.results[0].duration_sum_s,undefined);
+ assert.equal(summary.duration,null);assert.equal(summary.successes,null);
+ for(const field of ['successes','duration_sum_s']){
+  const invalid=clone(d);invalid.results[0][field]=-1;assert.throws(()=>R.validate(invalid));
+ }
+});
+
+test('reported Overall values require complete known models and apply only to the full task scope',()=>{
+ const d=clone(R.demo),id=d.models[0].id;d.overall_scores={[id]:.123};
+ const clean=R.validate(d),ids=context.TASKS.map(t=>t.id);
+ assert.equal(R.summarize(clean,ids)[0].score,.123);
+ assert.equal(R.summarize(clean,[ids[0]])[0].score,R.taskScore(clean.results[0]));
+ assert.equal(R.summarize(clean,ids.slice().reverse())[0].score,.123);
+ for(const overall_scores of [[],null,{missing:.5},{[id]:1.01},{[id]:NaN}])assert.throws(()=>R.validate({...d,overall_scores}));
+ assert.throws(()=>R.validate({...d,results:d.results.slice(1)}));
+});
+
 test('episode input, output and code preserve multiline text and strip unknown fields',()=>{
   const d=clone(R.demo),event=d.episodes[0].events[1];
   event.input='Observation\nMeasured state\t0.5';event.output='<script>display only</script>\nResponse';

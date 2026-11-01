@@ -72,7 +72,7 @@ window.Lab=(()=>{
    if(b.hasAttribute('data-scope-reset')){Object.assign(scope,TaskFilters.normalize({}));draw();q('[data-scope-reset]')?.focus({preventScroll:true});}
    if(action==='share'){syncURL();share();}
    if(action==='json')download(`ai4robot-${source}-report.json`,JSON.stringify({...report(),website_data_source:source},null,2));
-   if(action==='template')download('ai4robot-report-template.json',JSON.stringify({...Results.official,models:[{id:'your-model',name:'Your model',version:'Exact version',agent:'Exact harness'}],results:[],episodes:[]},null,2));
+   if(action==='template')download('ai4robot-report-template.json',JSON.stringify({...Results.official,models:[{id:'your-model',name:'Your model',version:'Exact version',agent:'Exact harness'}],results:[],episodes:[],overall_scores:{}},null,2));
    if(action==='csv')download(`ai4robot-${source}-results.csv`,Results.csv([['source','protocol','model','coverage','average_score_0_100','mean_simulation_s'],...Results.summarize(report(),tasks().map(t=>t.id)).map(m=>['Model results',report().protocol,m.name,m.coverage,m.score==null?null:m.score*100,m.duration])]),'text/csv;charset=utf-8');
   });
   root.addEventListener('keydown',e=>{const model=e.target.closest('.model-curve,.curve-label');if(model&&['Enter',' '].includes(e.key)){e.preventDefault();openModel(model);}});

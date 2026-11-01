@@ -3,29 +3,50 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const context={window:{}};
 vm.createContext(context);
-for(const name of ['tasks','gpt6-results','results','evidence']){
+for(const name of ['tasks','gpt6-results','manuscript-results','results','evidence']){
  vm.runInContext(fs.readFileSync(path.join(__dirname,`../${name}.js`),'utf8'),context);
  if(name==='tasks')context.TASKS=context.window.TASKS;
 }
 const R=context.window.Results,E=context.window.Evidence;
 
-test('published GPT-6 results preserve the supplied outcomes and partial scores without filling missing tasks',()=>{
+test('original GPT-6 trial aggregates remain intact alongside the manuscript report',()=>{
+ const original=R.validate(context.window.PUBLISHED_RESULTS);
  const expected=[['T01',0,.1],['T02',0,.15],['T05',0,.6018],['T06',1,1],['T07',0,.1],['T08',0,0],['T09',1,1],['T10',0,.3],['T11',0,.1],['T19',0,.5857],['T21',0,.322],['T22',0,0]];
  assert.equal(R.official.models.length,8);
- assert.equal(R.official.results.length,12);
+ assert.equal(original.results.length,12);
  for(const [task,success,progress] of expected){
-  const row=R.official.results.find(r=>r.task_id===task);
+  const row=original.results.find(r=>r.task_id===task);
   assert.equal(row.model_id,'gpt6-astra');assert.equal(row.trials,1);
   assert.equal(row.successes,success);assert.ok(Math.abs(row.score_sum-progress)<1e-12);
  }
- const model=R.summarize(R.official,context.TASKS.map(t=>t.id)).find(m=>m.id==='gpt6-astra');
+ const model=R.summarize(original,context.TASKS.map(t=>t.id)).find(m=>m.id==='gpt6-astra');
  assert.equal(model.coverage,12);assert.equal(model.trials,12);assert.equal(model.successes,2);
  assert.equal(model.complete,false);assert.ok(Math.abs(model.score-.3549583333333333)<1e-12);
- assert.equal(R.summarize(R.official,['T05'])[0].score,.6018);
- assert.equal(R.summarize(R.official,['T06'])[0].score,1);
- assert.equal(R.summarize(R.official,['T08'])[0].score,0);
- for(const m of R.summarize(R.official,['T06']).filter(m=>m.id!=='gpt6-astra'))assert.equal(m.score,null);
+ assert.equal(R.summarize(original,['T05'])[0].score,.6018);
+ assert.equal(R.summarize(original,['T06'])[0].score,1);
+ assert.equal(R.summarize(original,['T08'])[0].score,0);
+ for(const m of R.summarize(original,['T06']).filter(m=>m.id!=='gpt6-astra'))assert.equal(m.score,null);
  assert.equal(R.defaultSource(),'official');assert.equal(R.sourceFor('demo'),'official');
+});
+
+test('the manuscript supplies 23 scores for every model and preserves its reported Overall values',()=>{
+ const rows=R.summarize(R.official,context.TASKS.map(t=>t.id));
+ assert.equal(R.official.results.length,184);
+ const expected=[67,56.6,50.6,47.1,44.2,37.7,39.1,33];
+ rows.forEach((m,i)=>{
+  assert.ok(Math.abs(m.score*100-expected[i])<1e-10);
+  assert.equal(m.coverage,23);assert.equal(m.complete,true);assert.equal(m.trials,69);
+  assert.equal(m.duration,null);assert.equal(m.successes,null);
+ });
+ const scores=id=>R.summarize(R.official,[id]).map(m=>Math.round(m.score*100));
+ assert.deepEqual(Array.from(scores('T01')),[78,78,77,62,66,59,45,47]);
+ assert.deepEqual(Array.from(scores('T05')),[75,79,72,70,76,66,54,39]);
+ assert.deepEqual(Array.from(scores('T23')),[57,39,49,22,53,33,48,25]);
+ const navigation=R.summarize(R.official,['T21','T22']);
+ assert.ok(Math.abs(navigation[0].score-.755)<1e-12);
+ assert.equal(navigation[0].coverage,2);assert.equal(navigation[0].trials,6);
+ assert.ok(R.official.results.every(r=>!('successes' in r)&&!('duration_sum_s' in r)));
+ assert.deepEqual(JSON.parse(JSON.stringify(R.official.episodes)),JSON.parse(JSON.stringify(context.window.PUBLISHED_RESULTS.episodes)));
 });
 
 test('all twelve recordings have valid media, complete histories and original model turn timestamps',()=>{

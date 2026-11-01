@@ -61,10 +61,21 @@ window.Results = (() => {
     for(const r of raw.results){
       if(!r||!modelIds.has(r.model_id)||!TASKS.some(t=>t.id===r.task_id))fail('A result references an unknown model or task.');
       const key=`${r.model_id}/${r.task_id}`;if(pairs.has(key))fail(`Duplicate result: ${key}. Combine trial aggregates first.`);pairs.add(key);
-      const trials=integer(r.trials,'trials',1),successes=integer(r.successes,'successes',0,trials);
+      const trials=integer(r.trials,'trials',1);
       // Older reports stored normalized trial scores under progress_sum.
       const scoreSum=num(r.score_sum??r.progress_sum,'score_sum',0,trials);
-      clean.results.push({model_id:r.model_id,task_id:r.task_id,trials,successes,score_sum:scoreSum,duration_sum_s:num(r.duration_sum_s,'duration_sum_s')});
+      const result={model_id:r.model_id,task_id:r.task_id,trials,score_sum:scoreSum};
+      if(r.successes!==undefined)result.successes=integer(r.successes,'successes',0,trials);
+      if(r.duration_sum_s!==undefined)result.duration_sum_s=num(r.duration_sum_s,'duration_sum_s');
+      clean.results.push(result);
+    }
+    if(raw.overall_scores!==undefined){
+      if(!raw.overall_scores||typeof raw.overall_scores!=='object'||Array.isArray(raw.overall_scores))fail('overall_scores must map model IDs to normalized scores.');
+      clean.overall_scores={};
+      for(const [id,score] of Object.entries(raw.overall_scores)){
+        if(!modelIds.has(id)||clean.results.filter(r=>r.model_id===id).length!==TASKS.length)fail('A reported Overall requires a known model with complete task coverage.');
+        clean.overall_scores[id]=num(score,'overall_scores',0,1);
+      }
     }
     if(raw.episodes!==undefined&&!Array.isArray(raw.episodes))fail('episodes must be an array.');
     if((raw.episodes||[]).length>500)fail('A report supports at most 500 episodes.');
@@ -76,7 +87,7 @@ window.Results = (() => {
       if(!['success','failure','incomplete'].includes(e.status))fail('Episode status must be success, failure or incomplete.');
       const pairKey=`${e.model_id}/${e.task_id}`,aggregate=clean.results.find(r=>r.model_id===e.model_id&&r.task_id===e.task_id);
       const count=seenCounts.get(pairKey)||{total:0,success:0};count.total++;if(e.status==='success')count.success++;seenCounts.set(pairKey,count);
-      if(count.total>aggregate.trials||count.success>aggregate.successes||count.total-count.success>aggregate.trials-aggregate.successes)fail('Episode counts or outcomes contradict their aggregate.');
+      if(count.total>aggregate.trials||(aggregate.successes!==undefined&&(count.success>aggregate.successes||count.total-count.success>aggregate.trials-aggregate.successes)))fail('Episode counts or outcomes contradict their aggregate.');
       const duration=num(e.duration_s,'duration_s',0.001,10000000);
       if(!Array.isArray(e.events)||!e.events.length||e.events.length>2000)fail('Each episode requires 1–2000 events.');
       let previous=-1;
@@ -119,12 +130,17 @@ window.Results = (() => {
     const mean=values=>values.length?values.reduce((a,b)=>a+b,0)/values.length:null;
     return data.models.map(model=>{
       const rows=data.results.filter(r=>r.model_id===model.id&&taskIds.includes(r.task_id));
-      const trials=rows.reduce((n,r)=>n+r.trials,0),successes=rows.reduce((n,r)=>n+r.successes,0);
-      const coverage=rows.length,score=mean(rows.map(taskScore));
-      return {...model,trials,successes,score,coverage,complete:taskIds.length>0&&coverage===taskIds.length,duration:trials?rows.reduce((n,r)=>n+r.duration_sum_s,0)/trials:null};
+      const trials=rows.reduce((n,r)=>n+r.trials,0),successes=rows.length&&rows.every(r=>r.successes!==undefined)?rows.reduce((n,r)=>n+r.successes,0):null;
+      const coverage=rows.length,complete=taskIds.length>0&&coverage===taskIds.length;
+      // Preserve the manuscript's explicitly reported Overall only for the full catalog.
+      const reported=complete&&taskIds.length===TASKS.length?data.overall_scores?.[model.id]:undefined;
+      const score=reported??mean(rows.map(taskScore));
+      const duration=trials&&rows.every(r=>r.duration_sum_s!==undefined)?rows.reduce((n,r)=>n+r.duration_sum_s,0)/trials:null;
+      return {...model,trials,successes,score,coverage,complete,duration};
     });
   }
   function csv(rows){return '\uFEFF'+rows.map(row=>row.map(v=>{let value=String(v??'');if(typeof v==='string'&&/^[=+\-@\t\r]/.test(value))value="'"+value;return '"'+value.replaceAll('"','""')+'"';}).join(',')).join('\r\n');}
-  if(window.PUBLISHED_RESULTS)Object.assign(official,validate(window.PUBLISHED_RESULTS));
+  const published=window.MANUSCRIPT_RESULTS?{...window.MANUSCRIPT_RESULTS,episodes:window.PUBLISHED_RESULTS?.episodes||[]}:window.PUBLISHED_RESULTS;
+  if(published)Object.assign(official,validate(published));
   return {version,official,demo,validate,taskScore,summarize,csv,roster,logo,logoPath,defaultSource,sourceFor};
 })();

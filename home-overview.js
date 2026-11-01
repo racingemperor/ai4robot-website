@@ -4,13 +4,14 @@ window.HomeOverview = (() => {
  function introduction(){return `<section id="overview" class="home-paper-info" aria-labelledby="home-paper-title">
   <h2 id="home-paper-title">Embodied Generalist Exam</h2>
   <dl class="home-paper-meta" aria-label="Paper information">
-   <div><dt>Report</dt><dd><a href="${Site.href('report')}">Publications &amp; updates ↗</a></dd></div>
+   <div><dt>Report</dt><dd><a href="${Site.href('report')}">Research paper ↗</a></dd></div>
    <div><dt>Repository</dt><dd><a href="${RESEARCH_REPO}" target="_blank" rel="noopener">ALEXander22568 / AI4Robot ↗</a></dd></div>
    <div><dt>Leaderboard</dt><dd><a href="${Site.href('leaderboard')}">View the full leaderboard ↗</a></dd></div>
   </dl>
  </section>
  <section id="home-news" class="home-news section" aria-labelledby="home-news-title"><h2 id="home-news-title">News</h2>
   <div class="home-news-list" role="region" aria-label="Project updates" tabindex="0"><ul>
+   <li><time datetime="2026-11-01">Nov 1 <span>2026</span></time><p>The leaderboard now includes scores for <strong>eight models across all 23 tasks</strong>. Browse each model’s results and the updated task descriptions.</p></li>
    <li><time datetime="2026-10-28">Oct 28 <span>2026</span></time><p>The updated manuscript defines <strong>23 tasks in six categories</strong>, including training data collection and in-context learning. Explore the <a href="${Site.href('leaderboard')}">interactive leaderboard</a>.</p></li>
    <li><time datetime="2026-10-27">Oct 27 <span>2026</span></time><p><a href="${Site.href('contribute')}">Contribution guidelines</a> are available for model evaluations, agent harnesses, task proposals and reproducible evidence.</p></li>
   </ul></div>
@@ -18,7 +19,7 @@ window.HomeOverview = (() => {
  <section id="benchmark-video" class="home-overview-film" aria-label="Benchmark overview video">${Evidence.slot('VIDEO','Embodied Generalist Exam · Overview','','home-film-slot')}</section>
  <section id="benchmark-introduction" class="section home-introduction" aria-labelledby="home-introduction-title"><h2 id="home-introduction-title">Beyond the digital world</h2><div class="home-introduction-copy">
   <p>The <strong>Embodied Generalist Exam (EGE)</strong> evaluates the breadth of foundation models’ embodied capabilities beyond robot control. Its <strong>23 tasks</strong> span six categories: robotic manipulation, navigation, scene generation and interaction reconstruction, policy development and training, training data collection, and in-context learning. The tasks cover five classes of robot embodiments: robotic arms, dexterous hands, mobile robots, quadrupeds and humanoids.</p>
-  <p>Built with <strong>NVIDIA Isaac Sim 5.1 and Isaac Lab</strong>, each task combines an instruction, an executable environment, available observations and tools, interaction constraints and independent success criteria. Eight foundation models use their corresponding agent harnesses without task-specific fine-tuning, under matched initial conditions and resource budgets. The protocol specifies <strong>three independent trials per task and model</strong>, including failures and timeouts, and reports average task scores, full-process wall-clock time and token consumption.</p>
+  <p>Built with <strong>NVIDIA Isaac Sim 5.1 and Isaac Lab</strong>, each task combines an instruction, an executable environment, available observations and tools, interaction constraints and independent evaluation functions. Eight foundation models use their corresponding agent harnesses without task-specific fine-tuning, under matched initial conditions and resource budgets. The protocol specifies <strong>three independent trials per task and model</strong>, including failures and timeouts, and reports task-specific scores, full-process wall-clock time and token consumption. A six-stage development and validation process is cross-checked by at least three authors at every stage.</p>
  </div></section>`;}
  function shell(){return `<section id="home-overall" class="section home-overall" aria-labelledby="home-overall-title">
   <div class="home-overall-heading"><div><h2 id="home-overall-title">Overall leaderboard</h2></div><a class="text-link" id="home-overall-link" href="${Site.href('leaderboard')}">Full leaderboard ↗</a></div>

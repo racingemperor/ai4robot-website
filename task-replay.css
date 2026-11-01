@@ -1,4 +1,5 @@
 .task-integrated-replay{--replay-input:#bd393e;--replay-output:#245ecb;margin-top:22px;min-width:0}
+.task-scoring-title{margin-top:24px}.task-scoring{margin:12px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px}.task-scoring>div{padding:12px 0;border-top:1px solid var(--line)}.task-scoring dt{font-size:14px;color:var(--muted);line-height:1.5}.task-scoring dd{margin:7px 0 0;font-size:24px;font-weight:700}.task-scoring dd small{font-size:12px;font-weight:400;color:var(--muted)}.task-scoring-note{margin-top:10px;font-size:14px}.task-paper-figure{margin:0}.task-paper-figure a{display:block}.task-paper-figure img{display:block;width:100%;height:auto;border-radius:16px}.task-paper-figure figcaption{margin-top:10px;font-size:13px;color:var(--muted)}
 [data-theme=dark] .task-integrated-replay{--replay-input:#ff9296;--replay-output:#8eb9ff}
 .task-integrated-replay .replay-input{--replay-event-color:var(--replay-input)}
 .task-integrated-replay .replay-output{--replay-event-color:var(--replay-output)}
