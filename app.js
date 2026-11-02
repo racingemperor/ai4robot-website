@@ -30,7 +30,7 @@ function taskCard(t) {
  return `<button class="task-card" data-select="${t.id}" aria-haspopup="dialog" aria-controls="task-focus" aria-label="Open ${t.id}: ${t.name}" style="--task-color:${group(t.group).color}">
   <span class="task-card-image">${TASK_VIDEOS[t.id]?.poster?`<img class="task-thumbnail" src="${esc(TASK_VIDEOS[t.id].poster)}" alt="" loading="lazy" width="400" height="300">`:thumbnail(t)}<span class="task-card-id">${t.id}</span><span class="task-card-open" aria-hidden="true">↗</span></span>
   <span class="task-card-body"><span class="task-card-category">${t.robot}</span><strong class="task-card-title">${t.name}</strong><span class="task-card-goal">${t.goal}</span>
-  <span class="task-trait-cells" aria-label="Paper category"><span>${category(t.category).name}</span></span><span class="task-card-bottom"><span>${tracks[t.track].output}</span><span>Explore task <b aria-hidden="true">↗</b></span></span></span>
+  <span class="task-trait-cells" aria-label="Paper category"><span>${category(t.category).name}</span></span></span>
  </button>`;
 }
 function explorer() {
