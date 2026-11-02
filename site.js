@@ -12,7 +12,7 @@ const RESEARCH_NOTES='https://app.notion.com/p/gpt-robotllm-as-policy-benchmark-
 window.Site=(()=>{
  const pages={
   home:['index.html','Home','AI4Robot','Code meets the physical world.','LLM EMBODIMENT BENCHMARK'],
-  tasks:['tasks.html','Task','Inside each task.','Explore 23 tasks across six embodied categories, with model performance, recordings, inputs, outputs and submitted artifacts in one place.','THE TASK COLLECTION'],
+  tasks:['tasks.html','Task','Explore the task suites.','Six capability suites, 23 embodied tasks. Explore each suite, then open a task to inspect its demonstration, model scores and synchronized recordings.','THE TASK COLLECTION'],
   leaderboard:['leaderboard.html','Leaderboard','Leaderboard','Compare eight foundation models across six task categories and 23 tasks. Select a model to inspect its results.','MODEL PERFORMANCE'],
   report:['report.html','Report','Report','The Embodied Generalist Exam research paper.','RESEARCH PAPER'],
   contribute:['contribute.html','Contribute','Contribute','Bring a new task, method or model to the Embodied Generalist Exam.','CONTRIBUTE'],

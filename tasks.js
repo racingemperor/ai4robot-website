@@ -1,11 +1,11 @@
 /* Catalog aligned with the EGE manuscript and task figure supplied on 2026-11-01. */
 window.CATEGORIES=[
- {id:'manipulation',name:'Robotic manipulation',count:13,output:'Control program',hidden:'Initial layouts and target instructions'},
- {id:'navigation',name:'Navigation',count:2,output:'Control program',hidden:'Start states, goals and scene layouts'},
- {id:'scene-generation',name:'Scene generation and interaction reconstruction',count:3,output:'Scene / motion files',hidden:'Text constraints, reference geometry and motion'},
- {id:'policy-development',name:'Policy development and training',count:2,output:'Training code + policy weights',hidden:'Evaluation script and test conditions'},
- {id:'training-data',name:'Training data collection',count:1,output:'Trajectory dataset',hidden:'Task-specific collection and validation conditions'},
- {id:'in-context-learning',name:'In-context learning',count:2,output:'Control program',hidden:'New layouts, rules and robot interfaces'}
+ {id:'manipulation',name:'Robotic manipulation',description:'Tests physical execution: turn a task instruction into coordinated robot motion, precise contact and stable object manipulation across arms, dexterous hands and humanoids.',count:13,output:'Control program',hidden:'Initial layouts and target instructions'},
+ {id:'navigation',name:'Navigation',description:'Tests movement through unfamiliar indoor environments: explore rooms, identify requested objects and follow semantic instructions to reach a destination.',count:2,output:'Control program',hidden:'Start states, goals and scene layouts'},
+ {id:'scene-generation',name:'Scene generation and interaction reconstruction',description:'Tests the construction of interactive simulations from text, images or video: build scenes, recover geometry and reconstruct physically executable hand–object interactions.',count:3,output:'Scene / motion files',hidden:'Text constraints, reference geometry and motion'},
+ {id:'policy-development',name:'Policy development and training',description:'Tests learning through code: design a training procedure, train a robot policy and evaluate its acquired locomotion or dexterous manipulation skills.',count:2,output:'Training code + policy weights',hidden:'Evaluation script and test conditions'},
+ {id:'training-data',name:'Training data collection',description:'Tests the collection of robot interaction data: produce training trajectories with recorded observations, actions and task outcomes in the required format.',count:1,output:'Trajectory dataset',hidden:'Task-specific collection and validation conditions'},
+ {id:'in-context-learning',name:'In-context learning',description:'Tests adaptation from the supplied context: infer a rule from demonstrations or learn an unfamiliar robot interface, then apply that knowledge to complete a new task.',count:2,output:'Control program',hidden:'New layouts, rules and robot interfaces'}
 ];
 window.GROUPS=[
  {id:'manipulate',name:'Objects & contact',en:'MANIPULATION',color:'#b84b32',question:'Can a goal become precise contact?'},
