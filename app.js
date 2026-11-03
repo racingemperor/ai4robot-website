@@ -55,7 +55,7 @@ function collection() {
 }
 function taskDemonstration(t) {
  const clip=TASK_VIDEOS[t.id];
- return `<figure class="task-demo" aria-label="${esc(t.id)} task demonstration"><div class="task-demo-stage">${clip?`<video id="task-demo-video" src="${esc(clip.src)}"${clip.poster?` poster="${esc(clip.poster)}"`:''} controls playsinline preload="metadata" aria-label="${esc(t.name)} demonstration"></video>`:Evidence.slot('VIDEO','Task demonstration','')}</div><figcaption class="sr-only">${esc(t.name)} task demonstration</figcaption></figure>`;
+ return `<figure class="task-demo" aria-label="${esc(t.id)} task demonstration"><div class="task-demo-stage">${clip?`<video id="task-demo-video" src="${esc(clip.src)}"${clip.poster?` poster="${esc(clip.poster)}"`:''} controls autoplay muted playsinline preload="metadata" aria-label="${esc(t.name)} demonstration"></video>`:Evidence.slot('VIDEO','Task demonstration','')}</div><figcaption class="sr-only">${esc(t.name)} task demonstration</figcaption></figure>`;
 }
 function pauseTaskDemonstration(){ $('#task-demo-video')?.pause(); }
 function detail() {
